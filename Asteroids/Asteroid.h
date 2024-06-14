@@ -10,6 +10,8 @@ using std::vector;
 using std::pair;
 using std::make_pair;
 
+float myRand();
+
 class SpaceObject {
 public:
 	float x, y, dx, dy, angle;
@@ -40,12 +42,14 @@ public:
 	vector<SpaceObject> asteroids;
 	vector<SpaceObject> bulletes;
 	int score;
+	void generateAsteroids();
 
 	Asteroid() {
 		sAppName = "Asteroid";
 	}
 	bool OnUserCreate()override {
 		spaceship = { ScreenWidth()/2.0f,ScreenHeight()/2.0f,0.0f,0.0f,0.0f,{make_pair(0,-5),make_pair(-2.5,2.5),make_pair(2.5,2.5)},5};
+		generateAsteroids();
 		return true;
 	};
 
@@ -53,13 +57,25 @@ public:
 		Clear(olc::BLACK);
 		KeyHit(fElapsedTime);
 		spaceship.move();
-		
+		for (auto& i : asteroids) {
+			i.move();
+			DrawWireFrame(i,olc::DARK_YELLOW);
+		}
 		DrawWireFrame(spaceship);
 		return true;
 	};
+	virtual bool Draw(int32_t x, int32_t y, olc::Pixel p = olc::WHITE) {
+		float fx, fy;
+		fx = x;
+		fy = y;
+		
+		WrapCoordinates(fx, fy);
 
-	void WrapCoordinates(float ix, float iy, float& ox, float& oy);
+		return PixelGameEngine::Draw(fx, fy,p);
+	}
+
+	void WrapCoordinates(float &x, float &y);
 	bool KeyHit(float fElapsedTime);
-	void DrawWireFrame(SpaceObject &sObject);
+	void DrawWireFrame(SpaceObject &sObject,olc::Pixel color=olc::WHITE);
 };
 

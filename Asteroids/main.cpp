@@ -5,7 +5,7 @@
 
 int main() {
 	Asteroid asteroid;
-	if (asteroid.Construct(256, 200, 2, 2)) {
+	if (asteroid.Construct(300, 200, 2, 2)) {
 		asteroid.Start();
 	}
 }
