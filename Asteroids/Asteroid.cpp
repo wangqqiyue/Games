@@ -18,6 +18,10 @@ bool Asteroid::KeyHit(float fElapsedTime) {
 		spaceship.dx += sinf(spaceship.angle)* fElapsedTime;
 		spaceship.dy += -cosf(spaceship.angle)* fElapsedTime;
 	}
+	if (GetKey(olc::DOWN).bHeld || GetKey(olc::S).bHeld) {
+		spaceship.dx -= sinf(spaceship.angle) * fElapsedTime;
+		spaceship.dy -= -cosf(spaceship.angle) * fElapsedTime;
+	}
 	if (GetKey(olc::LEFT).bHeld||GetKey(olc::A).bHeld) {
 		spaceship.angle -= 1.0f* fElapsedTime;
 	}
@@ -77,7 +81,7 @@ void Asteroid::removeBullets() {
 void Asteroid::generateBullets() {
 	SpaceObject b(spaceship);
 	float speed = 3.0f;
-	b.nSize = 1;
+	b.nSize = 2;
 	b.points.clear();
 	b.x += spaceship.points[0].first * cosf(b.angle) - spaceship.points[0].second * sinf(b.angle);
 	b.y += spaceship.points[0].first * sinf(b.angle) + spaceship.points[0].second * cosf(b.angle);
@@ -122,8 +126,8 @@ void Asteroid::generateAsteroids() {
 void Asteroid::gamePrompt() {
 	string win = "You Win!";
 	string playAgain = "Play Again?y/n";
-	DrawString((ScreenWidth()-win.length()* GetScreenPixelSize().x)/2, ScreenHeight() / 2- GetScreenPixelSize().y, win);
-	DrawString((ScreenWidth()-playAgain.length() * GetScreenPixelSize().x) / 2, ScreenHeight() / 2+ GetScreenPixelSize().y, playAgain);
+	DrawString((ScreenWidth()-win.size()* GetScreenPixelSize().x)/2, ScreenHeight() / 2- GetScreenPixelSize().y, win);
+	DrawString((ScreenWidth()-playAgain.size() * GetScreenPixelSize().x) / 2, ScreenHeight() / 2+ GetScreenPixelSize().y, playAgain);
 	if (GetKey(olc::Y).bHeld) {
 		generateAsteroids();
 		score = 0;
@@ -133,7 +137,8 @@ void Asteroid::gamePrompt() {
 bool checkCllision(SpaceObject s1, SpaceObject s2) {
 	float dx = (s1.x - s2.x) * (s1.x - s2.x);
 	float dy = (s1.y - s2.y) * (s1.y - s2.y);
-	if (sqrtf(dx + dy) <= (s1.nSize + s2.nSize))
+	if (sqrtf(dx + dy) <= 1.20f*(s1.nSize + s2.nSize))
 		return true;
+	//cout << "¾àÀëÊÇ" << sqrtf(dx + dy) << endl;
 	return false;
 }

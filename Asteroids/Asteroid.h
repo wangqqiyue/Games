@@ -81,29 +81,31 @@ public:
 		Clear(olc::BLACK);
 		if (0 == asteroids.size()) {
 			gamePrompt();
+			return true;
 		}
 		string scoreStr = "score=";
 		scoreStr += to_string(score);
 		DrawString({ 0,0 }, scoreStr, olc::RED);
 		KeyHit(fElapsedTime);
 		spaceship.move();
-		for (auto& i : asteroids) {
-			i.move();
-			DrawWireFrame(i,olc::YELLOW);
-		}
+
 		DrawWireFrame(spaceship);
 		for (auto& i : bullets) {
-			i.move();
 			for (auto j = asteroids.begin(); j != asteroids.end(); j++) {
-				if (checkCllision(i, *j)) {
+				if (checkCllision(i,*j)) {
 					j = asteroids.erase(j);
 					j--;
 					score++;
-
 				}
 			}
+			i.move();
 			removeBullets();
-			Draw(i.x, i.y);
+			Draw( i.x,i.y);
+		}
+
+		for (auto& i : asteroids) {
+			i.move();
+			DrawWireFrame(i, olc::YELLOW);
 		}
 		return true;
 	};
