@@ -3,12 +3,15 @@
 #include <vector>
 #include <utility>
 #include <iostream>
+#include <string>
 using std::cout;
 using std::endl;
 
 using std::vector;
 using std::pair;
 using std::make_pair;
+using std::string;
+using std::to_string;
 
 float myRand();
 
@@ -76,6 +79,12 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime)override{
 		Clear(olc::BLACK);
+		if (0 == asteroids.size()) {
+			gamePrompt();
+		}
+		string scoreStr = "score=";
+		scoreStr += to_string(score);
+		DrawString({ 0,0 }, scoreStr, olc::RED);
 		KeyHit(fElapsedTime);
 		spaceship.move();
 		for (auto& i : asteroids) {
@@ -85,6 +94,14 @@ public:
 		DrawWireFrame(spaceship);
 		for (auto& i : bullets) {
 			i.move();
+			for (auto j = asteroids.begin(); j != asteroids.end(); j++) {
+				if (checkCllision(i, *j)) {
+					j = asteroids.erase(j);
+					j--;
+					score++;
+
+				}
+			}
 			removeBullets();
 			Draw(i.x, i.y);
 		}
@@ -104,5 +121,6 @@ public:
 	bool KeyHit(float fElapsedTime);
 	void DrawWireFrame(SpaceObject &sObject,olc::Pixel color=olc::WHITE);
 	void removeBullets();
+	void gamePrompt();
 };
 

@@ -119,6 +119,16 @@ void Asteroid::generateAsteroids() {
 
 	}
 }
+void Asteroid::gamePrompt() {
+	string win = "You Win!";
+	string playAgain = "Play Again?y/n";
+	DrawString((ScreenWidth()-win.length()* GetScreenPixelSize().x)/2, ScreenHeight() / 2- GetScreenPixelSize().y, win);
+	DrawString((ScreenWidth()-playAgain.length() * GetScreenPixelSize().x) / 2, ScreenHeight() / 2+ GetScreenPixelSize().y, playAgain);
+	if (GetKey(olc::Y).bHeld) {
+		generateAsteroids();
+		score = 0;
+	}
+}
 
 bool checkCllision(SpaceObject s1, SpaceObject s2) {
 	float dx = (s1.x - s2.x) * (s1.x - s2.x);
