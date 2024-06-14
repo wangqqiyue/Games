@@ -28,11 +28,30 @@ public:
 		this->points = ps;
 		this->nSize = size;
 	}
+	//拷贝构造函数, 当对象作为函数参数或返回值时,调用
+	SpaceObject(const SpaceObject& s) {
+		x = s.x;
+		y = s.y;
+		dx = s.dx;
+		dy = s.dy;
+		angle = s.angle;
+		points = s.points;
+		nSize = s.nSize;
+	}
+	
 	void move() {
 		x += dx;
 		y += dy;
 	}
+
+	void print() {
+		cout << "x,y,dx,dy,angle,psNum,nSize=" << x << "," << y 
+			<< "," << dx << "," << dy << "," << angle << "," 
+			<< points.size() << "," << nSize << endl;
+	}
 };
+
+bool checkCllision(SpaceObject s1, SpaceObject s2);
 
 class Asteroid:public olc::PixelGameEngine
 {
@@ -40,9 +59,11 @@ class Asteroid:public olc::PixelGameEngine
 public:
 	SpaceObject spaceship;
 	vector<SpaceObject> asteroids;
-	vector<SpaceObject> bulletes;
+	vector<SpaceObject> bullets;
 	int score;
+	int bulletsTotal=0;
 	void generateAsteroids();
+	void generateBullets();
 
 	Asteroid() {
 		sAppName = "Asteroid";
@@ -59,9 +80,14 @@ public:
 		spaceship.move();
 		for (auto& i : asteroids) {
 			i.move();
-			DrawWireFrame(i,olc::DARK_YELLOW);
+			DrawWireFrame(i,olc::YELLOW);
 		}
 		DrawWireFrame(spaceship);
+		for (auto& i : bullets) {
+			i.move();
+			removeBullets();
+			Draw(i.x, i.y);
+		}
 		return true;
 	};
 	virtual bool Draw(int32_t x, int32_t y, olc::Pixel p = olc::WHITE) {
@@ -77,5 +103,6 @@ public:
 	void WrapCoordinates(float &x, float &y);
 	bool KeyHit(float fElapsedTime);
 	void DrawWireFrame(SpaceObject &sObject,olc::Pixel color=olc::WHITE);
+	void removeBullets();
 };
 
