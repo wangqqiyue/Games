@@ -54,7 +54,8 @@ public:
 	}
 };
 
-bool checkCllision(SpaceObject s1, SpaceObject s2);
+float getDistance(float x1, float y1, float x2, float y2);
+bool checkCollision(SpaceObject &s1, SpaceObject& s2);
 
 class Asteroid:public olc::PixelGameEngine
 {
@@ -63,7 +64,8 @@ public:
 	SpaceObject spaceship;
 	vector<SpaceObject> asteroids;
 	vector<SpaceObject> bullets;
-	int score;
+	int score=0;
+	int hp=10;
 	int bulletsTotal=0;
 	void generateAsteroids();
 	void generateBullets();
@@ -79,20 +81,37 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime)override{
 		Clear(olc::BLACK);
-		if (0 == asteroids.size()) {
+
+		/*
+		if (0 >= hp) {
+			gameOver();
+		}	
+		//检测是否胜利
+		else if (0 == asteroids.size()) {
 			gamePrompt();
 			return true;
 		}
+		*/
+
+		//绘制分数
 		string scoreStr = "score=";
 		scoreStr += to_string(score);
-		DrawString({ 0,0 }, scoreStr, olc::RED);
-		KeyHit(fElapsedTime);
-		spaceship.move();
+		DrawString( 0,0 , scoreStr, olc::GREEN);
+		//绘制生命值
+		string hpStr = "hp";
+		hpStr += to_string(hp);
+		DrawString(ScreenWidth() -hpStr.length()*8-50, 0, hpStr, (hp > 3 ? olc::GREEN : olc::RED));
+		FillRect(ScreenWidth()-45, 3, hp*40/10, 5, (hp > 3 ? olc::GREEN : olc::RED));
 
+		KeyHit(fElapsedTime);
+
+
+		spaceship.move();
 		DrawWireFrame(spaceship);
+
 		for (auto& i : bullets) {
 			for (auto j = asteroids.begin(); j != asteroids.end(); j++) {
-				if (checkCllision(i,*j)) {
+				if (getDistance(i.x,i.y,j->x,j->y)<i.nSize+j->nSize) {
 					j = asteroids.erase(j);
 					j--;
 					score++;
@@ -105,6 +124,10 @@ public:
 
 		for (auto& i : asteroids) {
 			i.move();
+			//陨石与飞船碰撞,减少血量
+			if (checkCollision(i, spaceship)) {
+				hp--;
+			}
 			DrawWireFrame(i, olc::YELLOW);
 		}
 		return true;
@@ -124,5 +147,7 @@ public:
 	void DrawWireFrame(SpaceObject &sObject,olc::Pixel color=olc::WHITE);
 	void removeBullets();
 	void gamePrompt();
+	void gameOver();
 };
 
+void translatePoints(const SpaceObject& sObject, vector<pair<float, float>>& psTranslated);

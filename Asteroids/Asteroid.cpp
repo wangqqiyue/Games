@@ -39,25 +39,8 @@ void Asteroid::DrawWireFrame(SpaceObject &sObject,olc::Pixel color) {
 	WrapCoordinates(sObject.x, sObject.y);
 	vector<pair<float, float>> psTranslated=sObject.points;
 	int psNumber = sObject.points.size();
-	float angle = sObject.angle;
-	//rotate
-	for (int i = 0; i < psNumber; i++) {
-		psTranslated[i].first = sObject.points[i].first * cosf(angle)-sObject.points[i].second*sinf(angle);
-		psTranslated[i].second = sObject.points[i].first * sinf(angle) + sObject.points[i].second * cosf(angle);
-	}
 
-
-	//scale
-	for (int i = 0; i < psNumber; i++) {
-		psTranslated[i].first *= sObject.nSize;
-		psTranslated[i].second *= sObject.nSize;
-	}
-
-	//translated to Screen World
-	for (int i = 0; i < psNumber; i++) {
-		psTranslated[i].first += sObject.x;
-		psTranslated[i].second += sObject.y;
-	}
+	translatePoints(sObject,psTranslated);
 	
 	for (int i = 0; i < psNumber; i++) {
 		int next = (i + 1) % psNumber;
@@ -131,14 +114,84 @@ void Asteroid::gamePrompt() {
 	if (GetKey(olc::Y).bHeld) {
 		generateAsteroids();
 		score = 0;
+		hp = 0;
+	}
+}
+void Asteroid::gameOver() {
+	string die = "You Die!";
+	string playAgain = "Play Again?y/n";
+	asteroids.clear();
+	DrawString((ScreenWidth() - die.size() * GetScreenPixelSize().x) / 2, ScreenHeight() / 2 - GetScreenPixelSize().y, die);
+	DrawString((ScreenWidth() - playAgain.size() * GetScreenPixelSize().x) / 2, ScreenHeight() / 2 + GetScreenPixelSize().y, playAgain);
+	if (GetKey(olc::Y).bHeld) {
+		generateAsteroids();
+		score = 0;
+		hp = 10;
 	}
 }
 
-bool checkCllision(SpaceObject s1, SpaceObject s2) {
-	float dx = (s1.x - s2.x) * (s1.x - s2.x);
-	float dy = (s1.y - s2.y) * (s1.y - s2.y);
-	if (sqrtf(dx + dy) <= 1.20f*(s1.nSize + s2.nSize))
+float getDistance(float x1,float y1,float x2,float y2) {
+	float dx = (x1 - x2) * (x1 - x2);
+	float dy = (y1 - y2) * (y1 - y2);
+	return sqrtf(dx + dy);
+}
+
+bool checkCollision(SpaceObject &s1, SpaceObject &s2) {
+	int detected=0;
+	float x[3];
+	float y[3];
+	SpaceObject sTriangle = (s1.points.size() == 3) ? s1 : s2;
+	SpaceObject sCircle = (s1.points.size() == 3) ? s2 : s1;
+	vector<pair<float, float>> psTranslated;
+	psTranslated.push_back(make_pair(0, 0));
+	psTranslated.push_back(make_pair(0, 0));
+	psTranslated.push_back(make_pair(0, 0));
+	translatePoints(sTriangle, psTranslated);
+
+	for (int i = 0; i < 3; i++) {
+		if (getDistance(psTranslated[i].first, psTranslated[i].second, sCircle.x, sCircle.y) <= s1.nSize + s2.nSize) {
+			detected++;
+		}
+	}
+	
+	if (detected>0) {
+		//物体互相远离
+		float dx, dy;
+		if (s1.nSize < s1.nSize) {
+			s1.dx = s2.dx;
+			s1.dy = s2.dy;
+		}
+		else {
+			s1.dx = s2.dx;
+			s1.dy = s2.dy;
+		}
 		return true;
+	}
+		
 	//cout << "距离是" << sqrtf(dx + dy) << endl;
 	return false;
+}
+
+void translatePoints(const SpaceObject& sObject, vector<pair<float, float>>& psTranslated) {
+	int psNumber = sObject.points.size();
+	float angle = sObject.angle;
+
+	//rotate
+	for (int i = 0; i < psNumber; i++) {
+		psTranslated[i].first = sObject.points[i].first * cosf(angle) - sObject.points[i].second * sinf(angle);
+		psTranslated[i].second = sObject.points[i].first * sinf(angle) + sObject.points[i].second * cosf(angle);
+	}
+
+
+	//scale
+	for (int i = 0; i < psNumber; i++) {
+		psTranslated[i].first *= sObject.nSize;
+		psTranslated[i].second *= sObject.nSize;
+	}
+
+	//translated to Screen World
+	for (int i = 0; i < psNumber; i++) {
+		psTranslated[i].first += sObject.x;
+		psTranslated[i].second += sObject.y;
+	}
 }
