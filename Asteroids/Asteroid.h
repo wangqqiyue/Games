@@ -21,6 +21,7 @@ public:
 	int nSize;
 
 	vector<pair<float, float>> points;
+	vector<pair<float, float>> psTranslated;
 	SpaceObject() = default;
 	SpaceObject(float x, float y, float dx, float dy, float angle, vector<pair<float, float>>ps,int size) {
 		this->x = x;
@@ -30,6 +31,7 @@ public:
 		this->angle = angle;
 		this->points = ps;
 		this->nSize = size;
+
 	}
 	//拷贝构造函数, 当对象作为函数参数或返回值时,调用
 	SpaceObject(const SpaceObject& s) {
@@ -40,8 +42,9 @@ public:
 		angle = s.angle;
 		points = s.points;
 		nSize = s.nSize;
+		psTranslated = s.psTranslated;
 	}
-	
+	void translatePoints();
 	void move() {
 		x += dx;
 		y += dy;
@@ -54,6 +57,8 @@ public:
 	}
 };
 
+
+bool IsPointInsideCircle(float cx, float cy, float radius, float x, float y);
 float getDistance(float x1, float y1, float x2, float y2);
 bool checkCollision(SpaceObject &s1, SpaceObject& s2);
 
@@ -111,10 +116,11 @@ public:
 
 		for (auto& i : bullets) {
 			for (auto j = asteroids.begin(); j != asteroids.end(); j++) {
-				if (getDistance(i.x,i.y,j->x,j->y)<i.nSize+j->nSize) {
+				if (IsPointInsideCircle(j->x,j->y,j->nSize,i.x,i.y)) {
 					j = asteroids.erase(j);
 					j--;
 					score++;
+					i.x = -100;//把子弹移动到屏幕外
 				}
 			}
 			i.move();
@@ -125,9 +131,11 @@ public:
 		for (auto& i : asteroids) {
 			i.move();
 			//陨石与飞船碰撞,减少血量
+			/*
 			if (checkCollision(i, spaceship)) {
 				hp--;
 			}
+			*/
 			DrawWireFrame(i, olc::YELLOW);
 		}
 		return true;
@@ -149,5 +157,3 @@ public:
 	void gamePrompt();
 	void gameOver();
 };
-
-void translatePoints(const SpaceObject& sObject, vector<pair<float, float>>& psTranslated);

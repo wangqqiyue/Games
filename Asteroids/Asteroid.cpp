@@ -37,14 +37,15 @@ bool Asteroid::KeyHit(float fElapsedTime) {
 
 void Asteroid::DrawWireFrame(SpaceObject &sObject,olc::Pixel color) {
 	WrapCoordinates(sObject.x, sObject.y);
-	vector<pair<float, float>> psTranslated=sObject.points;
 	int psNumber = sObject.points.size();
-
-	translatePoints(sObject,psTranslated);
+	
+	sObject.translatePoints();
 	
 	for (int i = 0; i < psNumber; i++) {
 		int next = (i + 1) % psNumber;
-		DrawLine(psTranslated[i].first, psTranslated[i].second, psTranslated[next].first, psTranslated[next].second, color);
+		
+		DrawLine(sObject.psTranslated[i].first, sObject.psTranslated[i].second, sObject.psTranslated[next].first, sObject.psTranslated[next].second, color);
+		
 	}
 }
 void Asteroid::removeBullets() {
@@ -137,61 +138,41 @@ float getDistance(float x1,float y1,float x2,float y2) {
 }
 
 bool checkCollision(SpaceObject &s1, SpaceObject &s2) {
-	int detected=0;
-	float x[3];
-	float y[3];
-	SpaceObject sTriangle = (s1.points.size() == 3) ? s1 : s2;
-	SpaceObject sCircle = (s1.points.size() == 3) ? s2 : s1;
-	vector<pair<float, float>> psTranslated;
-	psTranslated.push_back(make_pair(0, 0));
-	psTranslated.push_back(make_pair(0, 0));
-	psTranslated.push_back(make_pair(0, 0));
-	translatePoints(sTriangle, psTranslated);
-
-	for (int i = 0; i < 3; i++) {
-		if (getDistance(psTranslated[i].first, psTranslated[i].second, sCircle.x, sCircle.y) <= s1.nSize + s2.nSize) {
-			detected++;
-		}
-	}
 	
-	if (detected>0) {
-		//物体互相远离
-		float dx, dy;
-		if (s1.nSize < s1.nSize) {
-			s1.dx = s2.dx;
-			s1.dy = s2.dy;
-		}
-		else {
-			s1.dx = s2.dx;
-			s1.dy = s2.dy;
-		}
-		return true;
-	}
-		
-	//cout << "距离是" << sqrtf(dx + dy) << endl;
+
 	return false;
 }
 
-void translatePoints(const SpaceObject& sObject, vector<pair<float, float>>& psTranslated) {
-	int psNumber = sObject.points.size();
-	float angle = sObject.angle;
-
+void SpaceObject::translatePoints() {
+	int psNumber = points.size();
+	float angle = this->angle;
+	if (psTranslated.size() == 0) {
+		for (int i = 0; i < psNumber; i++) {
+			psTranslated.push_back(make_pair(0, 0));
+		}
+	}
+	
 	//rotate
 	for (int i = 0; i < psNumber; i++) {
-		psTranslated[i].first = sObject.points[i].first * cosf(angle) - sObject.points[i].second * sinf(angle);
-		psTranslated[i].second = sObject.points[i].first * sinf(angle) + sObject.points[i].second * cosf(angle);
+		psTranslated[i].first = points[i].first * cosf(angle) - points[i].second * sinf(angle);
+		psTranslated[i].second = points[i].first * sinf(angle) +points[i].second * cosf(angle);
 	}
 
 
 	//scale
 	for (int i = 0; i < psNumber; i++) {
-		psTranslated[i].first *= sObject.nSize;
-		psTranslated[i].second *= sObject.nSize;
+		psTranslated[i].first *= nSize;
+		psTranslated[i].second *= nSize;
 	}
 
 	//translated to Screen World
 	for (int i = 0; i < psNumber; i++) {
-		psTranslated[i].first += sObject.x;
-		psTranslated[i].second += sObject.y;
+		psTranslated[i].first += x;
+		psTranslated[i].second += y;
 	}
+}
+
+bool IsPointInsideCircle(float cx, float cy, float radius, float x, float y)
+{
+	return sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) < radius;
 }
