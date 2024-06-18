@@ -62,9 +62,11 @@ void Asteroid::removeBullets() {
 
 void Asteroid::generateBullets() {
 	SpaceObject b(spaceship);
-	float speed = 3.0f;
+	float speed = 2.0f;
 	b.nSize = 2;
 	b.points.clear();
+	b.points.push_back(make_pair(0, -1));
+	b.points.push_back(make_pair(0,1));
 	b.x += spaceship.points[0].first * cosf(b.angle) - spaceship.points[0].second * sinf(b.angle);
 	b.y += spaceship.points[0].first * sinf(b.angle) + spaceship.points[0].second * cosf(b.angle);
 	b.dx = speed * sinf(b.angle);
@@ -78,24 +80,32 @@ void Asteroid::generateBullets() {
 	*/
 }
 
+void Asteroid::GetAsteroid(SpaceObject& a,float x,float y,int nSize) {
+	a.x = x;
+	a.y = y;
+	a.dx = (1.0f-myRand()) * 0.10f;
+	a.dy = (1.0f-myRand()) * 0.10f;
+	a.angle = myRand() * 6.28f;
+	a.nSize = nSize;
+
+	int psNum = 20;
+	for (int i = 0; i < psNum; i++) {
+		float r = a.nSize * (0.8f + 0.4f * myRand());
+		float angle = (6.28f * i / psNum);
+		float x = r * sinf(angle);
+		float y = r * cosf(angle);
+		pair<float, float> p = make_pair(x, y);
+		a.points.push_back(p);
+	}
+}
+
 void Asteroid::generateAsteroids() {
 	for (int j = 0; j < 3; j++) {
 		SpaceObject a;
-		a.x = myRand()* ScreenWidth();
-		a.y = myRand() * ScreenHeight();
-		a.dx = myRand() * 0.10f;
-		a.dy = myRand() * 0.10f;
-		a.angle = myRand() * 6.28f;
-		a.nSize = 6;
-
-		int psNum = 20;
-		for (int i = 0; i < psNum; i++) {
-			float r = a.nSize * (0.8f + 0.4f * myRand());
-			float angle = (6.28f * i / psNum);
-			float x = r * sinf(angle);
-			float y = r * cosf(angle);
-			pair<float, float> p = make_pair(x, y);
-			a.points.push_back(p);
+		GetAsteroid(a,myRand()*ScreenWidth(),myRand()*ScreenHeight(),8);
+		if (checkCollision(a, spaceship)) {
+			j--;
+			continue;
 		}
 		asteroids.push_back(a);
 		/*
@@ -108,28 +118,33 @@ void Asteroid::generateAsteroids() {
 void Asteroid::gamePrompt() {
 	string win = "You Win!";
 	string playAgain = "Play Again?y/n";
-	DrawString((ScreenWidth()-win.size()* GetScreenPixelSize().x)/2, ScreenHeight() / 2- GetScreenPixelSize().y, win);
-	DrawString((ScreenWidth()-playAgain.size() * GetScreenPixelSize().x) / 2, ScreenHeight() / 2+ GetScreenPixelSize().y, playAgain);
+	DrawString((ScreenWidth()-win.size()* 8)/2, ScreenHeight() / 2- 8, win);
+	DrawString((ScreenWidth()-playAgain.size() * 8) / 2, ScreenHeight() / 2+ 8, playAgain);
 	if (GetKey(olc::Y).bHeld) {
-		generateAsteroids();
-		score = 0;
-		hp = 0;
+		ResetGame();
 	}
 }
 void Asteroid::gameOver() {
 	string die = "You Die!";
 	string playAgain = "Play Again?y/n";
 	asteroids.clear();
-	DrawString((ScreenWidth() - die.size() * GetScreenPixelSize().x) / 2, ScreenHeight() / 2 - GetScreenPixelSize().y, die);
-	DrawString((ScreenWidth() - playAgain.size() * GetScreenPixelSize().x) / 2, ScreenHeight() / 2 + GetScreenPixelSize().y, playAgain);
+	DrawString((ScreenWidth() - die.size() * 8) / 2, ScreenHeight() / 2 - 8, die);
+	DrawString((ScreenWidth() - playAgain.size() * 8) / 2, ScreenHeight() / 2 + 8, playAgain);
 	if (GetKey(olc::Y).bHeld) {
-		generateAsteroids();
-		score = 0;
-		hp = 10;
+		ResetGame();
 	}
 }
 
-float getDistance(float x1,float y1,float x2,float y2) {
+void Asteroid::ResetGame() {
+	bullets.clear();
+	asteroids.clear();
+	spaceship = { ScreenWidth() / 2.0f,ScreenHeight() / 2.0f,0.0f,0.0f,0.0f,{make_pair(0,-5),make_pair(-2.5,2.5),make_pair(2.5,2.5)},5 };
+	generateAsteroids();
+	score = 0;
+	hp = 10;
+}
+
+float GetDistance(float x1,float y1,float x2,float y2) {
 	float dx = (x1 - x2) * (x1 - x2);
 	float dy = (y1 - y2) * (y1 - y2);
 	return sqrtf(dx + dy);
@@ -154,10 +169,10 @@ bool checkCollision(SpaceObject &s1, SpaceObject &s2) {
 		for (int j = 0; j < a->psTranslated.size(); j++) {
 			int next = (j + 1) % a->psTranslated.size();
 			pair<float, float> axisProj = make_pair(-(a->psTranslated[next].second-a->psTranslated[j].second), a->psTranslated[next].first - a->psTranslated[j].first);
-			float max_a = -9999;
-			float min_a = 9999;
-			float max_b = -9999;
-			float min_b = 9999;
+			float max_a = -FLT_MAX;
+			float min_a = FLT_MAX;
+			float max_b = -FLT_MAX;
+			float min_b = FLT_MAX;
 			
 			for (int k = 0; k < a->psTranslated.size(); k++) {
 				float q = a->psTranslated[k].first * axisProj.first + a->psTranslated[k].second * axisProj.second;
@@ -249,7 +264,7 @@ bool checkCollisionDiag(SpaceObject& s1, SpaceObject& s2) {
 				line2_end.first = b->psTranslated[next].first;
 				line2_end.second = b->psTranslated[next].second;
 
-				detected = get_line_intersection(line1_start.first, line1_start.second,
+				detected += get_line_intersection(line1_start.first, line1_start.second,
 					line1_end.first, line1_end.second,
 					line2_start.first, line2_start.second,
 					line2_end.first, line2_end.second,
@@ -264,7 +279,7 @@ bool checkCollisionDiag(SpaceObject& s1, SpaceObject& s2) {
 
 	}
 
-	return false;
+	return (detected>0);
 }
 
 
@@ -297,7 +312,7 @@ void SpaceObject::Translate() {
 	}
 }
 
-bool IsPointInsideCircle(float cx, float cy, float radius, float x, float y)
+bool IsPointInsideCircle(float cx, float cy, float radius1, float x, float y,float radius2)
 {
-	return sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) < radius;
+	return sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) < 1.2 * (radius1 + radius2);
 }

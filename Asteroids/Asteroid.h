@@ -59,8 +59,7 @@ public:
 };
 
 
-bool IsPointInsideCircle(float cx, float cy, float radius, float x, float y);
-float getDistance(float x1, float y1, float x2, float y2);
+float GetDistance(float x1, float y1, float x2, float y2);
 bool checkCollision(SpaceObject &s1, SpaceObject& s2);
 //对角线法检测碰撞
 bool checkCollisionDiag(SpaceObject& s1, SpaceObject& s2);
@@ -75,22 +74,19 @@ public:
 	int score=0;
 	int hp=10;
 	int bulletsTotal=0;
-	void generateAsteroids();
-	void generateBullets();
+
 
 	Asteroid() {
 		sAppName = "Asteroid";
 	}
 	bool OnUserCreate()override {
-		spaceship = { ScreenWidth()/2.0f,ScreenHeight()/2.0f,0.0f,0.0f,0.0f,{make_pair(0,-5),make_pair(-2.5,2.5),make_pair(2.5,2.5)},5};
-		generateAsteroids();
+		ResetGame();
 		return true;
 	};
 
 	bool OnUserUpdate(float fElapsedTime)override{
 		Clear(olc::BLACK);
 
-		/*
 		if (0 >= hp) {
 			gameOver();
 		}	
@@ -99,7 +95,6 @@ public:
 			gamePrompt();
 			return true;
 		}
-		*/
 
 		//绘制分数
 		string scoreStr = "score=";
@@ -113,37 +108,50 @@ public:
 
 		KeyHit(fElapsedTime);
 
+		// 预先准备一个vector来存储需要添加的元素
+		std::vector<SpaceObject> newAsteroids;
+		for (auto& b : bullets) {
+			//检测子弹和陨石之间是否发生碰撞
+			for (auto i = asteroids.begin(); i != asteroids.end(); i++) {
+				
+				if (checkCollisionDiag(*i, b)) {
+					//陨石分裂成2块
+					if (i->nSize > 2) {
+						SpaceObject child1;
+						SpaceObject child2;
+						GetAsteroid(child1, i->x, i->y, i->nSize / 2);
+						GetAsteroid(child2, i->x, i->y, i->nSize / 2);
+						newAsteroids.push_back(child1);
+						newAsteroids.push_back(child2);
+					}
+					i = asteroids.erase(i);
+					i--;
+					b.x = -1100;
+				}
+				
+			}
+		}
+		removeBullets();
+		// 在循环外添加新生成的小行星
+		asteroids.insert(asteroids.end(), newAsteroids.begin(), newAsteroids.end()); // 添加新元素
+		newAsteroids.clear(); // 清空新元素容器
+		for (auto &a: asteroids) {
+			a.move();
+			DrawWireFrame(a, olc::YELLOW);
+			if (checkCollisionDiag(a, spaceship)) {
+				spaceship.dx *= 0.8;
+				spaceship.dy *= 0.8;
+				hp--;
+			}
+		}
 
 		spaceship.move();
 		DrawWireFrame(spaceship);
-
-		for (auto& i : bullets) {
-			for (auto j = asteroids.begin(); j != asteroids.end(); j++) {
-				if (IsPointInsideCircle(j->x,j->y,j->nSize,i.x,i.y)) {
-					j = asteroids.erase(j);
-					j--;
-					score++;
-					i.x = -100;//把子弹移动到屏幕外
-				}
-			}
-			i.move();
-			removeBullets();
-			Draw( i.x,i.y);
+		for (auto& b : bullets) {
+			b.move();
+			DrawCircle(b.x, b.y, b.nSize);
 		}
 
-		for (auto& i : asteroids) {
-			i.move();
-			//陨石与飞船碰撞,减少血量
-
-			if (checkCollision(i, spaceship)) {
-				hp--;
-				DrawWireFrame(i, olc::RED);
-			}
-			else {
-				DrawWireFrame(i, olc::YELLOW);
-			}
-
-		}
 		return true;
 	};
 	virtual bool Draw(int32_t x, int32_t y, olc::Pixel p = olc::WHITE) {
@@ -162,4 +170,8 @@ public:
 	void removeBullets();
 	void gamePrompt();
 	void gameOver();
+	void ResetGame();
+	void GetAsteroid(SpaceObject& a, float x, float y, int nSize);
+	void generateAsteroids();
+	void generateBullets();
 };
