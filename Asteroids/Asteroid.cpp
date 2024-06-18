@@ -138,7 +138,7 @@ void Asteroid::gameOver() {
 void Asteroid::ResetGame() {
 	bullets.clear();
 	asteroids.clear();
-	spaceship = { ScreenWidth() / 2.0f,ScreenHeight() / 2.0f,0.0f,0.0f,0.0f,{make_pair(0,-5),make_pair(-2.5,2.5),make_pair(2.5,2.5)},5 };
+	spaceship = { ScreenWidth() / 2.0f,ScreenHeight() / 2.0f,0.0f,0.0f,0.0f,{make_pair(0,-5),make_pair(-2.5,2.5),make_pair(0,1),make_pair(2.5,2.5)},5 };
 	generateAsteroids();
 	score = 0;
 	hp = 10;

@@ -126,6 +126,7 @@ public:
 					}
 					i = asteroids.erase(i);
 					i--;
+					score++;
 					b.x = -1100;
 				}
 				
