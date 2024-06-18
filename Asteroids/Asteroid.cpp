@@ -192,7 +192,7 @@ bool checkCollision(SpaceObject &s1, SpaceObject &s2) {
 // Returns 1 if the lines intersect, otherwise 0. In addition, if the lines 
 // intersect the intersection point may be stored in the floats i_x and i_y.
 char get_line_intersection(float p0_x, float p0_y, float p1_x, float p1_y,
-	float p2_x, float p2_y, float p3_x, float p3_y, float* i_x, float* i_y)
+	float p2_x, float p2_y, float p3_x, float p3_y, float& displacement_x, float& displacement_y)
 {
 	float s1_x, s1_y, s2_x, s2_y;
 	s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
@@ -205,10 +205,8 @@ char get_line_intersection(float p0_x, float p0_y, float p1_x, float p1_y,
 	if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
 	{
 		// Collision detected
-		if (i_x != NULL)
-			*i_x = p0_x + (t * s1_x);
-		if (i_y != NULL)
-			*i_y = p0_y + (t * s1_y);
+		displacement_x += (1 - s) * s1_x;
+		displacement_y += (1 - s) * s1_y;
 		return 1;
 	}
 
@@ -239,6 +237,9 @@ bool checkCollisionDiag(SpaceObject& s1, SpaceObject& s2) {
 			line1_start.second = a->y;
 			line1_end.first = a->psTranslated[j].first;
 			line1_end.second = a->psTranslated[j].second;
+			float displacement_x = 0.0f;
+			float displacement_y = 0.0f;
+
 			for (int k = 0; k < b->psTranslated.size(); k++) {
 				int next = (k + 1) % b->psTranslated.size();
 				pair<float, float> line2_start;
@@ -252,12 +253,12 @@ bool checkCollisionDiag(SpaceObject& s1, SpaceObject& s2) {
 					line1_end.first, line1_end.second,
 					line2_start.first, line2_start.second,
 					line2_end.first, line2_end.second,
-					NULL, NULL);
-				if (detected) {
-					return true;
-				}
-			}
+					displacement_x,displacement_y);
+				
 
+			}
+			a->x += displacement_x * (i == 0 ? 1 : -1);
+			a->y += displacement_y * (i == 0 ? 1 : -1);
 
 		}
 
