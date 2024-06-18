@@ -44,10 +44,11 @@ public:
 		nSize = s.nSize;
 		psTranslated = s.psTranslated;
 	}
-	void translatePoints();
+	void Translate();
 	void move() {
 		x += dx;
 		y += dy;
+		Translate();
 	}
 
 	void print() {
@@ -131,12 +132,15 @@ public:
 		for (auto& i : asteroids) {
 			i.move();
 			//陨石与飞船碰撞,减少血量
-			/*
+
 			if (checkCollision(i, spaceship)) {
 				hp--;
+				DrawWireFrame(i, olc::RED);
 			}
-			*/
-			DrawWireFrame(i, olc::YELLOW);
+			else {
+				DrawWireFrame(i, olc::YELLOW);
+			}
+
 		}
 		return true;
 	};

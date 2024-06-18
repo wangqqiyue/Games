@@ -39,8 +39,6 @@ void Asteroid::DrawWireFrame(SpaceObject &sObject,olc::Pixel color) {
 	WrapCoordinates(sObject.x, sObject.y);
 	int psNumber = sObject.points.size();
 	
-	sObject.translatePoints();
-	
 	for (int i = 0; i < psNumber; i++) {
 		int next = (i + 1) % psNumber;
 		
@@ -138,12 +136,59 @@ float getDistance(float x1,float y1,float x2,float y2) {
 }
 
 bool checkCollision(SpaceObject &s1, SpaceObject &s2) {
-	
+	SpaceObject* a = &s1;
+	SpaceObject* b = &s2;
+	if (s1.psTranslated.size() == 0) {
+		s1.Translate();
+	}
+	if (s2.psTranslated.size() == 0) {
+		s2.Translate();
+	}
+	for (int i = 0; i < 2; i++) {
+		//µ÷»»Ë³Ðò
+		if (i == 1) {
+			a = &s2;
+			b = &s1;
+		}
+		for (int j = 0; j < a->psTranslated.size(); j++) {
+			int next = (j + 1) % a->psTranslated.size();
+			pair<float, float> axisProj = make_pair(-(a->psTranslated[next].second-a->psTranslated[j].second), a->psTranslated[next].first - a->psTranslated[j].first);
+			float max_a = -9999;
+			float min_a = 9999;
+			float max_b = -9999;
+			float min_b = 9999;
+			
+			for (int k = 0; k < a->psTranslated.size(); k++) {
+				float q = a->psTranslated[k].first * axisProj.first + a->psTranslated[k].second * axisProj.second;
+				if (q >= max_a) {
+					max_a = q;
+				}
+				if (q <= min_a) {
+					min_a = q;
+				}
+			}
+			for (int k = 0; k < b->psTranslated.size(); k++) {
+				float q = b->psTranslated[k].first * axisProj.first + b->psTranslated[k].second * axisProj.second;
+				if (q >= max_b) {
+					max_b = q;
+				}
+				if (q <= min_b) {
+					min_b = q;
+				}
+			}
 
-	return false;
+			if (!(max_b >= min_a && max_a >= min_b)) {
+				return false;
+			}
+			
+		}
+
+	}
+
+	return true;
 }
 
-void SpaceObject::translatePoints() {
+void SpaceObject::Translate() {
 	int psNumber = points.size();
 	float angle = this->angle;
 	if (psTranslated.size() == 0) {
