@@ -62,6 +62,8 @@ public:
 bool IsPointInsideCircle(float cx, float cy, float radius, float x, float y);
 float getDistance(float x1, float y1, float x2, float y2);
 bool checkCollision(SpaceObject &s1, SpaceObject& s2);
+//¶Ô½ÇÏß·¨¼ì²âÅö×²
+bool checkCollisionDiag(SpaceObject& s1, SpaceObject& s2);
 
 class Asteroid:public olc::PixelGameEngine
 {

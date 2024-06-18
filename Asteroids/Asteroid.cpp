@@ -136,6 +136,7 @@ float getDistance(float x1,float y1,float x2,float y2) {
 }
 
 bool checkCollision(SpaceObject &s1, SpaceObject &s2) {
+	return checkCollisionDiag(s1, s2);
 	SpaceObject* a = &s1;
 	SpaceObject* b = &s2;
 	if (s1.psTranslated.size() == 0) {
@@ -187,6 +188,84 @@ bool checkCollision(SpaceObject &s1, SpaceObject &s2) {
 
 	return true;
 }
+
+// Returns 1 if the lines intersect, otherwise 0. In addition, if the lines 
+// intersect the intersection point may be stored in the floats i_x and i_y.
+char get_line_intersection(float p0_x, float p0_y, float p1_x, float p1_y,
+	float p2_x, float p2_y, float p3_x, float p3_y, float* i_x, float* i_y)
+{
+	float s1_x, s1_y, s2_x, s2_y;
+	s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
+	s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
+
+	float s, t;
+	s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+	t = (s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+	if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+	{
+		// Collision detected
+		if (i_x != NULL)
+			*i_x = p0_x + (t * s1_x);
+		if (i_y != NULL)
+			*i_y = p0_y + (t * s1_y);
+		return 1;
+	}
+
+	return 0; // No collision
+}
+
+//¶Ô½ÇÏß·¨¼ì²âÅö×²
+bool checkCollisionDiag(SpaceObject& s1, SpaceObject& s2) {
+	SpaceObject* a = &s1;
+	SpaceObject* b = &s2;
+	int detected = 0;
+	if (s1.psTranslated.size() == 0) {
+		s1.Translate();
+	}
+	if (s2.psTranslated.size() == 0) {
+		s2.Translate();
+	}
+	for (int i = 0; i < 2; i++) {
+		//µ÷»»Ë³Ğò
+		if (i == 1) {
+			a = &s2;
+			b = &s1;
+		}
+		for (int j = 0; j < a->psTranslated.size(); j++) {
+			pair<float, float> line1_start;
+			pair<float, float> line1_end;
+			line1_start.first = a->x;
+			line1_start.second = a->y;
+			line1_end.first = a->psTranslated[j].first;
+			line1_end.second = a->psTranslated[j].second;
+			for (int k = 0; k < b->psTranslated.size(); k++) {
+				int next = (k + 1) % b->psTranslated.size();
+				pair<float, float> line2_start;
+				pair<float, float> line2_end;
+				line2_start.first = b->psTranslated[k].first;
+				line2_start.second = b->psTranslated[k].second;
+				line2_end.first = b->psTranslated[next].first;
+				line2_end.second = b->psTranslated[next].second;
+
+				detected = get_line_intersection(line1_start.first, line1_start.second,
+					line1_end.first, line1_end.second,
+					line2_start.first, line2_start.second,
+					line2_end.first, line2_end.second,
+					NULL, NULL);
+				if (detected) {
+					return true;
+				}
+			}
+
+
+		}
+
+	}
+
+	return false;
+}
+
 
 void SpaceObject::Translate() {
 	int psNumber = points.size();
