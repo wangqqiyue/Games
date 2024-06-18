@@ -74,39 +74,43 @@ public:
 	int score=0;
 	int hp=10;
 	int bulletsTotal=0;
-
+	bool start = false;
 
 	Asteroid() {
 		sAppName = "Asteroid";
 	}
 	bool OnUserCreate()override {
-		ResetGame();
+		spaceship = { ScreenWidth() / 2.0f,ScreenHeight() / 2.0f,myRand() ,myRand(),myRand()*6.28f,{make_pair(0,-5),make_pair(-2.5,2.5),make_pair(0,1),make_pair(2.5,2.5)},5};
+		generateAsteroids();
 		return true;
 	};
 
 	bool OnUserUpdate(float fElapsedTime)override{
 		Clear(olc::BLACK);
+		
+		if (start) {
+			if (0 >= hp) {
+				gameOver();
+			}
+			//检测是否胜利
+			else if (0 == asteroids.size()) {
+				gamePrompt();
+				return true;
+			}
 
-		if (0 >= hp) {
-			gameOver();
-		}	
-		//检测是否胜利
-		else if (0 == asteroids.size()) {
-			gamePrompt();
-			return true;
+			//绘制分数
+			string scoreStr = "score=";
+			scoreStr += to_string(score);
+			DrawString(0, 0, scoreStr, olc::GREEN);
+			//绘制生命值
+			string hpStr = "hp";
+			hpStr += to_string(hp);
+			DrawString(ScreenWidth() - hpStr.length() * 8 - 50, 0, hpStr, (hp > 3 ? olc::GREEN : olc::RED));
+			FillRect(ScreenWidth() - 45, 3, hp * 40 / 10, 5, (hp > 3 ? olc::GREEN : olc::RED));
+			KeyHit(fElapsedTime);
+		}else {
+			StartGame();
 		}
-
-		//绘制分数
-		string scoreStr = "score=";
-		scoreStr += to_string(score);
-		DrawString( 0,0 , scoreStr, olc::GREEN);
-		//绘制生命值
-		string hpStr = "hp";
-		hpStr += to_string(hp);
-		DrawString(ScreenWidth() -hpStr.length()*8-50, 0, hpStr, (hp > 3 ? olc::GREEN : olc::RED));
-		FillRect(ScreenWidth()-45, 3, hp*40/10, 5, (hp > 3 ? olc::GREEN : olc::RED));
-
-		KeyHit(fElapsedTime);
 
 		// 预先准备一个vector来存储需要添加的元素
 		std::vector<SpaceObject> newAsteroids;
@@ -172,6 +176,7 @@ public:
 	void gamePrompt();
 	void gameOver();
 	void ResetGame();
+	void StartGame();
 	void GetAsteroid(SpaceObject& a, float x, float y, int nSize);
 	void generateAsteroids();
 	void generateBullets();

@@ -115,6 +115,22 @@ void Asteroid::generateAsteroids() {
 
 	}
 }
+void Asteroid::StartGame() {
+	string greeting1 = "====ASTEROIDS====";
+	string greeting2 = "Fire: [Space]";
+	string greeting3 = "Move: [W/A/S/D]";
+	string greeting4 = "Press Enter to Start.";
+	DrawString((ScreenWidth() - greeting1.size() * 8 * 3) / 2, 30, greeting1, olc::YELLOW, 3);
+	DrawString((ScreenWidth() - greeting2.size() * 8*2) / 2, ScreenHeight() / 2 - 8 * 4, greeting2,olc::WHITE,2);
+	DrawString((ScreenWidth() - greeting3.size() * 8*2) / 2, ScreenHeight() / 2 - 8*2, greeting3, olc::WHITE, 2);
+	DrawString((ScreenWidth() - greeting4.size() * 8*2) / 2, ScreenHeight() - 100, greeting4, olc::WHITE, 2);
+
+	if (GetKey(olc::ENTER).bHeld) {
+		ResetGame();
+		start = true;
+	}
+}
+
 void Asteroid::gamePrompt() {
 	string win = "You Win!";
 	string playAgain = "Play Again?y/n";
