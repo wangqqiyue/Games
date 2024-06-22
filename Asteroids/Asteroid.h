@@ -4,6 +4,11 @@
 #include <utility>
 #include <iostream>
 #include <string>
+#include <Windows.h>
+#include<Mmsystem.h>
+#pragma comment(lib,"winmm.lib")
+
+
 using std::cout;
 using std::endl;
 
@@ -63,6 +68,8 @@ float GetDistance(float x1, float y1, float x2, float y2);
 bool checkCollision(SpaceObject &s1, SpaceObject& s2);
 //对角线法检测碰撞
 bool checkCollisionDiag(SpaceObject& s1, SpaceObject& s2);
+bool IsPointInsideCircle(float cx, float cy, float radius1, float x, float y, float radius2);
+
 
 class Asteroid:public olc::PixelGameEngine
 {
@@ -75,13 +82,16 @@ public:
 	int hp=10;
 	int bulletsTotal=0;
 	bool start = false;
-
+	LPCWSTR laser_sound_file= TEXT("C:\\Users\\17964\\Desktop\\game_learning\\Asteroids\\sound\\laser.wav");
+	LPCWSTR startup_sound_file = TEXT("C:\\Users\\17964\\Desktop\\game_learning\\Asteroids\\sound\\startup.wav");
+	LPCWSTR crash_sound_file = TEXT("C:\\Users\\17964\\Desktop\\game_learning\\Asteroids\\sound\\Crashlit.wav");
 	Asteroid() {
 		sAppName = "Asteroid";
 	}
 	bool OnUserCreate()override {
 		spaceship = { ScreenWidth() / 2.0f,ScreenHeight() / 2.0f,myRand() ,myRand(),myRand()*6.28f,{make_pair(0,-5),make_pair(-2.5,2.5),make_pair(0,1),make_pair(2.5,2.5)},5};
 		generateAsteroids();
+		PlaySound(startup_sound_file, NULL, SND_FILENAME |SND_ASYNC| SND_LOOP);
 		return true;
 	};
 
@@ -116,9 +126,9 @@ public:
 		std::vector<SpaceObject> newAsteroids;
 		for (auto& b : bullets) {
 			//检测子弹和陨石之间是否发生碰撞
-			for (auto i = asteroids.begin(); i != asteroids.end(); i++) {
+			for (auto i = asteroids.begin(); i != asteroids.end(); ) {
 				
-				if (checkCollisionDiag(*i, b)) {
+				if (IsPointInsideCircle(b.x,b.y,b.nSize,i->x,i->y,i->nSize*i->nSize) ){
 					//陨石分裂成2块
 					if (i->nSize > 2) {
 						SpaceObject child1;
@@ -129,9 +139,11 @@ public:
 						newAsteroids.push_back(child2);
 					}
 					i = asteroids.erase(i);
-					i--;
 					score++;
 					b.x = -1100;
+				}
+				else {
+					i++;
 				}
 				
 			}
@@ -147,6 +159,9 @@ public:
 				spaceship.dx *= 0.8;
 				spaceship.dy *= 0.8;
 				hp--;
+				if (start) {
+					PlaySound(crash_sound_file, NULL, SND_FILENAME | SND_ASYNC);
+				}
 			}
 		}
 

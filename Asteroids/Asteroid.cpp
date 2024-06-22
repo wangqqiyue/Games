@@ -29,6 +29,7 @@ bool Asteroid::KeyHit(float fElapsedTime) {
 		spaceship.angle += 1.0f* fElapsedTime;
 	}
 	if (GetKey(olc::SPACE).bReleased) {
+		PlaySound(laser_sound_file,NULL, SND_FILENAME|SND_ASYNC);
 		generateBullets();
 	}
 
@@ -45,6 +46,7 @@ void Asteroid::DrawWireFrame(SpaceObject &sObject,olc::Pixel color) {
 		DrawLine(sObject.psTranslated[i].first, sObject.psTranslated[i].second, sObject.psTranslated[next].first, sObject.psTranslated[next].second, color);
 		
 	}
+	//DrawCircle(sObject.x, sObject.y, sObject.nSize, olc::RED);
 }
 void Asteroid::removeBullets() {
 	for (auto i = bullets.begin(); i != bullets.end(); ) {
@@ -126,6 +128,7 @@ void Asteroid::StartGame() {
 	DrawString((ScreenWidth() - greeting4.size() * 8*2) / 2, ScreenHeight() - 100, greeting4, olc::WHITE, 2);
 
 	if (GetKey(olc::ENTER).bHeld) {
+		PlaySound(NULL, NULL, 0);
 		ResetGame();
 		start = true;
 	}
