@@ -101,6 +101,7 @@ public:
 		if (start) {
 			if (0 >= hp) {
 				gameOver();
+				return true;
 			}
 			//¼ì²âÊÇ·ñÊ¤Àû
 			else if (0 == asteroids.size()) {
