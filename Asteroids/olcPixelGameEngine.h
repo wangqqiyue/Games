@@ -3906,6 +3906,14 @@ namespace olc
 		float fElapsedTime = elapsedTime.count();
 		fLastElapsed = fElapsedTime;
 
+		// if FPS high enough, sleep to release CPU
+		std::chrono::duration<float,std::ratio<1,1>> minimal_timing = std::chrono::duration < float, std::ratio<1, 1>>(1.0f / 120.0f);//120FPS
+		if (minimal_timing > elapsedTime) {
+			std::this_thread::sleep_for(minimal_timing - elapsedTime);
+			return ;
+		}
+		
+
 		if (bConsoleSuspendTime)
 			fElapsedTime = 0.0f;
 
