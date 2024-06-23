@@ -397,6 +397,8 @@ int main()
 #include <algorithm>
 #include <array>
 #include <cstring>
+using std::cout;
+using std::endl;
 #pragma endregion
 
 #define PGE_VER 225
@@ -3908,11 +3910,18 @@ namespace olc
 
 		// if FPS high enough, sleep to release CPU
 		std::chrono::duration<float,std::ratio<1,1>> minimal_timing = std::chrono::duration < float, std::ratio<1, 1>>(1.0f / 120.0f);//120FPS
+		//cout << "elapsedTime1=" << elapsedTime.count() << endl;
 		if (minimal_timing > elapsedTime) {
-			std::this_thread::sleep_for(minimal_timing - elapsedTime);
-			return ;
+			std::chrono::duration<float> sleep_time = minimal_timing - elapsedTime;
+			/*
+			cout << "minimal_timing=" << minimal_timing.count() << endl;
+			cout << "elapsedTime=" << elapsedTime.count() << endl;
+			cout << "sleep time=" << sleep_time.count() << endl;
+			*/
+			std::this_thread::sleep_for(sleep_time);
+			return;
 		}
-		
+		//cout << "elapsedTime=" << elapsedTime.count() << endl;
 
 		if (bConsoleSuspendTime)
 			fElapsedTime = 0.0f;

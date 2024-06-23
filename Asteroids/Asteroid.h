@@ -92,6 +92,7 @@ public:
 		spaceship = { ScreenWidth() / 2.0f,ScreenHeight() / 2.0f,myRand() ,myRand(),myRand()*6.28f,{make_pair(0,-5),make_pair(-2.5,2.5),make_pair(0,1),make_pair(2.5,2.5)},5};
 		generateAsteroids();
 		PlaySound(startup_sound_file, NULL, SND_FILENAME |SND_ASYNC| SND_LOOP);
+		
 		return true;
 	};
 
