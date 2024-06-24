@@ -41,3 +41,34 @@ void Field::DrawField(olc::PixelGameEngine* p) {
 
 
 }
+
+void Puck::InitPuck(float x, float y, float dx, float dy) {
+	position.x = x;
+	position.y = y;
+	velocity.x = dx;
+	velocity.y = dy;
+	radius = float(puckSprite->width / 2.0f);
+	cout << "width=" << puckSprite->width << endl;
+	cout << "height=" << puckSprite->height << endl;
+}
+
+
+void Puck::DrawPuck(olc::PixelGameEngine* p) {
+	p->DrawSprite(position.x-radius, position.y - radius, puckSprite.get(),1);
+	p->DrawCircle(position.x, position.y, radius, olc::RED);
+}
+
+void Puck::Move(const Field& f) {
+	float nextX, nextY;
+	nextX = position.x ;
+	nextY = position.y;
+
+	if (nextX - radius < f.innerX || nextX +radius>f.innerX+f.width) {
+		velocity.x = -velocity.x;
+	}
+	if (nextY - radius < f.innerY || nextY + radius > f.innerY + f.height) {
+		velocity.y = -velocity.y;
+	}
+	position.x += velocity.x;
+	position.y += velocity.y;
+}
