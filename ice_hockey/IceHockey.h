@@ -34,7 +34,7 @@ public:
 	bool OnUserCreate() override
 	{
 		// Called once at the start, so create things here
-		field.InitField(100.0f, 60.0f, 20.0f, 10.0f, 10.0f, this);
+		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.8f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 20.0f, this);
 		return true;
 	}
 

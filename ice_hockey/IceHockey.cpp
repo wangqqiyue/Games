@@ -21,14 +21,13 @@ void Field::InitField(float w, float h, float gw, float gp, float b,const olc::P
 }
 void Field::DrawField(olc::PixelGameEngine* p) {
 	olc::Pixel borderColor= olc::DARK_YELLOW;
-	float radius = 10.0f;
+	float radius = height/5.0f;
 
 	//绘制外圈
-	p->DrawRect(outterX, outterY, width + border * 2.0f, height + border * 2.0f, borderColor);
+	p->FillRect(outterX, outterY, width + border * 2.0f, height + border * 2.0f, borderColor);
 
 	//绘制内圈
 	p->FillRect(innerX, innerY, width, height);
-	p->DrawRect(innerX, innerY, width, height, borderColor);
 
 	//绘制中线
 	p->DrawLine(p->ScreenWidth() / 2.0f, innerY, p->ScreenWidth() / 2.0f, innerY + height, borderColor);
@@ -39,5 +38,6 @@ void Field::DrawField(olc::PixelGameEngine* p) {
 	//绘制球门
 	p->FillRect(goalLeft.x, goalLeft.y, goalDepth, goalWidth, olc::GREEN);
 	p->FillRect(goalRight.x, goalRight.y, goalDepth, goalWidth, olc::GREEN);
+
 
 }

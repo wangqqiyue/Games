@@ -3904,9 +3904,6 @@ namespace olc
 		std::chrono::duration<float> elapsedTime = m_tp2 - m_tp1;
 		m_tp1 = m_tp2;
 
-		// Our time per frame coefficient
-		float fElapsedTime = elapsedTime.count();
-		fLastElapsed = fElapsedTime;
 
 		// if FPS high enough, sleep to release CPU
 		std::chrono::duration<float,std::ratio<1,1>> minimal_timing = std::chrono::duration < float, std::ratio<1, 1>>(1.0f / 120.0f);//120FPS
@@ -3924,6 +3921,10 @@ namespace olc
 			m_tp1 = m_tp2;
 		}
 		//cout << "elapsedTime=" << elapsedTime.count() << endl;
+
+		// Our time per frame coefficient
+		float fElapsedTime = elapsedTime.count();
+		fLastElapsed = fElapsedTime;
 
 		if (bConsoleSuspendTime)
 			fElapsedTime = 0.0f;
