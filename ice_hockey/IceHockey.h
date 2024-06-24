@@ -53,6 +53,7 @@ public:
 	Field field;
 	Puck puck;
 	Paddle paddle;
+	bool holdPaddle=false;
 	IceHockey()
 	{
 		// Name your application
@@ -66,7 +67,7 @@ public:
 		// Called once at the start, so create things here
 		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.8f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 20.0f, this);
 		puck.InitPuck(field.innerX+150.0f, field.innerY+100.0f, 4.0f, -3.0f,30.0f,olc::MAGENTA);
-		paddle.InitPaddle(field.innerX + 30.0f, ScreenHeight() / 2.0f, 30.0f, 40.0f, olc::DARK_RED, olc::RED);
+		paddle.InitPaddle(field.innerX + 30.0f, ScreenHeight() / 2.0f, 20.0f,35.0f, olc::RED, olc::DARK_RED);
 		return true;
 	}
 

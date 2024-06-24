@@ -1,9 +1,36 @@
 #include "IceHockey.h"
 
+float GetDistance(olc::vf2d p1, olc::vf2d p2){
+	return sqrtf((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+}
+
 void IceHockey::MouseOperate() {
 	olc::vi2d mPos=GetMousePos();
-	paddle.pos.x = mPos.x;
-	paddle.pos.y = mPos.y;
+	if (!GetMouse(0).bHeld) {
+		holdPaddle = false;
+	}
+	if (!holdPaddle) {
+		if (GetDistance(mPos, paddle.pos) <= paddle.outerR && GetMouse(0).bHeld) {
+			holdPaddle = true;
+		}
+	}
+	if (holdPaddle) {
+		paddle.pos.x = mPos.x;
+		paddle.pos.y = mPos.y;
+		if (paddle.pos.x >= ScreenWidth() / 2.0f-paddle.outerR) {
+			paddle.pos.x = ScreenWidth() / 2.0f - paddle.outerR;
+		}
+		if (paddle.pos.x <= field.innerX+paddle.outerR) {
+			paddle.pos.x = field.innerX + paddle.outerR;
+		}
+		if (paddle.pos.y >= field.innerY+field.height - paddle.outerR) {
+			paddle.pos.y = field.innerY + field.height - paddle.outerR;
+		}
+		if (paddle.pos.y <= field.innerY + paddle.outerR) {
+			paddle.pos.y = field.innerY + paddle.outerR;
+		}
+	}
+
 }
 
 void Field::InitField(float w, float h, float gw, float gp, float b,const olc::PixelGameEngine* p) {
