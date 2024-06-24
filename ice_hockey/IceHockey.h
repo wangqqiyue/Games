@@ -27,13 +27,10 @@ public:
 	olc::vf2d position;
 	olc::vf2d velocity;
 	float radius;
-	//you can't have an olc::Decal without an olc::Sprite.
-	std::unique_ptr<olc::Sprite> puckSprite = std::make_unique<olc::Sprite>
-		("C:\\Users\\17964\\Desktop\\game_learning\\ice_hockey\\hockey_puck3.png");
-	//std::unique_ptr<olc::Decal> puckDecal= std::make_unique<olc::Decal>(puckSprite.get());
+	olc::Pixel color;
 
 	Puck() = default;
-	void InitPuck(float x, float y, float dx, float dy);
+	void InitPuck(float x, float y, float dx, float dy, float r, olc::Pixel col);
 	void DrawPuck(olc::PixelGameEngine* p);
 	void Move(const Field& f);
 
@@ -56,7 +53,7 @@ public:
 	{
 		// Called once at the start, so create things here
 		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.8f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 20.0f, this);
-		puck.InitPuck(field.innerX+150.0f, field.innerY+100.0f, 4.0f, -3.0f);
+		puck.InitPuck(field.innerX+150.0f, field.innerY+100.0f, 4.0f, -3.0f,30.0f,olc::MAGENTA);
 		return true;
 	}
 
