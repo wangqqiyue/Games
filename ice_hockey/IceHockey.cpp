@@ -1,5 +1,11 @@
 #include "IceHockey.h"
 
+void IceHockey::MouseOperate() {
+	olc::vi2d mPos=GetMousePos();
+	paddle.pos.x = mPos.x;
+	paddle.pos.y = mPos.y;
+}
+
 void Field::InitField(float w, float h, float gw, float gp, float b,const olc::PixelGameEngine* p) {
 	width = w;
 	height = h;
@@ -69,4 +75,18 @@ void Puck::Move(const Field& f) {
 	}
 	position.x += velocity.x;
 	position.y += velocity.y;
+}
+
+void Paddle::InitPaddle(float x, float y, float inR, float outR, olc::Pixel inCol, olc::Pixel outCol) {
+	pos.x = x;
+	pos.y = y;
+	innerR = inR;
+	outerR = outR;
+	innerCol = inCol;
+	outerCol = outCol;
+}
+
+void Paddle::DrawPaddle(olc::PixelGameEngine* p) {
+	p->FillCircle(pos.x, pos.y, outerR, outerCol);
+	p->FillCircle(pos.x, pos.y, innerR, innerCol);
 }
