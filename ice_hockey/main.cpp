@@ -3,7 +3,7 @@
 int main()
 {
 	IceHockey demo;
-	if (demo.Construct(256, 240, 4, 4))
+	if (demo.Construct(300, 200, 2, 2))
 		demo.Start();
 	return 0;
 }

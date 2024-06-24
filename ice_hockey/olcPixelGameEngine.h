@@ -3919,7 +3919,9 @@ namespace olc
 			cout << "sleep time=" << sleep_time.count() << endl;
 			*/
 			std::this_thread::sleep_for(sleep_time);
-			return;
+			m_tp2 = std::chrono::system_clock::now();
+			elapsedTime += m_tp2 - m_tp1;
+			m_tp1 = m_tp2;
 		}
 		//cout << "elapsedTime=" << elapsedTime.count() << endl;
 
