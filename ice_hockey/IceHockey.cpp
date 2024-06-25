@@ -4,18 +4,21 @@ float GetDistance(olc::vf2d p1, olc::vf2d p2){
 	return sqrtf((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
-void IceHockey::CollisionResponse() {
-	olc::vf2d vPaddle = paddle.GetVelocity();
+void IceHockey::CollisionResponse(Paddle& paddle) {
+	olc::vf2d vPaddle = paddle.v;
 	olc::vf2d vRelative = puck.velocity - vPaddle;
 	olc::vf2d vNormal = (puck.position - paddle.pos).norm();
 	float vRn = vRelative.dot(vNormal);
 	if (GetDistance(paddle.pos, puck.position) < paddle.outerR + puck.radius && vRn<0.0f) {
-		
+		cout << "before collision vPaddle=" << vPaddle << endl;
 		float j = -2.0f * vRn/ vNormal.dot(vNormal);
 		j /= (1.0f / paddle.mass + 1.0f / puck.mass);
 		puck.velocity += j * vNormal * 1.0f / puck.mass;
 		paddle.v -= j * vNormal * 1.0f / paddle.mass;
+		cout << "paddle.mass=" << paddle.mass << endl;
+		cout << "puck.v=" << puck.velocity << endl;
 	}
+	
 }
 
 void IceHockey::MouseOperate() {
@@ -28,26 +31,74 @@ void IceHockey::MouseOperate() {
 			holdPaddle = true;
 		}
 	}
-	if (holdPaddle) {
-		paddle.lastPos = paddle.pos;
-		paddle.pos.x = mPos.x;
-		paddle.pos.y = mPos.y;
-		if (paddle.pos.x >= ScreenWidth() / 2.0f-paddle.outerR) {
-			paddle.pos.x = ScreenWidth() / 2.0f - paddle.outerR;
-		}
-		if (paddle.pos.x <= field.innerX+paddle.outerR) {
-			paddle.pos.x = field.innerX + paddle.outerR;
-		}
-		if (paddle.pos.y >= field.innerY+field.height - paddle.outerR) {
-			paddle.pos.y = field.innerY + field.height - paddle.outerR;
-		}
-		if (paddle.pos.y <= field.innerY + paddle.outerR) {
-			paddle.pos.y = field.innerY + paddle.outerR;
-		}
-		paddle.v = paddle.GetVelocity();
+	
+	paddle.lastPos = paddle.pos;
+	paddle.pos.x = mPos.x;
+	paddle.pos.y = mPos.y;
+	if (paddle.pos.x >= ScreenWidth() / 2.0f-paddle.outerR) {
+		paddle.pos.x = ScreenWidth() / 2.0f - paddle.outerR;
 	}
+	if (paddle.pos.x <= field.innerX+paddle.outerR) {
+		paddle.pos.x = field.innerX + paddle.outerR;
+	}
+	if (paddle.pos.y >= field.innerY+field.height - paddle.outerR) {
+		paddle.pos.y = field.innerY + field.height - paddle.outerR;
+	}
+	if (paddle.pos.y <= field.innerY + paddle.outerR) {
+		paddle.pos.y = field.innerY + paddle.outerR;
+	}
+	paddle.v = paddle.pos - paddle.lastPos;
+	
+}
 
+void IceHockey::Rendering() {
+	//先绘制场地
+	field.DrawField(this);
+	//再绘制冰球
+	puck.DrawPuck(this);
+	//绘制球拍
+	paddle.DrawPaddle(this);
+	AiPaddle.DrawPaddle(this);
+}
 
+void IceHockey::AiResponse(float fElapsedTime) {
+	
+	if (puck.position.x + puck.radius <= ScreenWidth()/2.0f) {
+		return;
+	}
+	
+	
+	olc::vf2d posGoal = { field.goalRight.x+field.goalDepth,field.goalRight.y +field.goalWidth/2.0f};
+	olc::vf2d nMove;
+	
+	if (puck.velocity.mag()>=1.0f&&(posGoal - puck.position).dot(puck.velocity) > 0.001f) {
+		//防守
+		//cout << "puck.velocity=" << puck.velocity << endl;
+		olc::vf2d posCenter = (posGoal + puck.position) / 2.0f;
+		nMove = (posCenter - AiPaddle.pos).norm();
+		
+		//DrawLine(posGoal, puck.position, olc::RED);
+	}
+	else {
+		//进攻
+		nMove = (puck.position - AiPaddle.pos).norm();
+	}
+	cout << "nMove=" << nMove << endl;
+	AiPaddle.v = AiPaddle.speedEasy * nMove;
+	cout << "AiPaddle.v=" << AiPaddle.v << endl;
+	AiPaddle.Move(field);
+	if (AiPaddle.pos.x <= ScreenWidth() / 2.0f + AiPaddle.outerR) {
+		AiPaddle.pos.x = ScreenWidth() / 2.0f + AiPaddle.outerR;
+	}
+	if (AiPaddle.pos.x >= field.innerX+field.width - AiPaddle.outerR) {
+		AiPaddle.pos.x = field.innerX + field.width - AiPaddle.outerR;
+	}
+	if (AiPaddle.pos.y >= field.innerY + field.height - paddle.outerR) {
+		AiPaddle.pos.y = field.innerY + field.height - AiPaddle.outerR;
+	}
+	if (AiPaddle.pos.y <= field.innerY + paddle.outerR) {
+		AiPaddle.pos.y = field.innerY + AiPaddle.outerR;
+	}
 }
 
 void Field::InitField(float w, float h, float gw, float gp, float b,const olc::PixelGameEngine* p) {
@@ -118,6 +169,7 @@ void Puck::Move(const Field& f) {
 	position.x += velocity.x;
 	position.y += velocity.y;
 	velocity *= (1.0f-f.friction);
+
 }
 
 void Paddle::InitPaddle(float x, float y, float inR, float outR, olc::Pixel inCol, olc::Pixel outCol) {
@@ -134,11 +186,6 @@ void Paddle::DrawPaddle(olc::PixelGameEngine* p) {
 	p->FillCircle(pos.x, pos.y, innerR, innerCol);
 }
 
-olc::vf2d Paddle::GetVelocity() {
-	olc::vf2d v = pos - lastPos;
-	return v;
-}
-
 void Paddle::Move(const Field& f) {
 	float nextX, nextY;
 	nextX = pos.x;
@@ -152,4 +199,5 @@ void Paddle::Move(const Field& f) {
 	}
 	pos.x += v.x;
 	pos.y += v.y;
+	
 }
