@@ -33,7 +33,7 @@ public:
 	float mass = 1.0f;
 	float radius;
 	olc::Pixel color;
-	LPCWSTR bound_sound_file = TEXT("sound\\bound.wav");
+	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
 
 	Puck() = default;
 	void InitPuck(float x, float y, float dx, float dy, float r, olc::Pixel col);
@@ -80,7 +80,7 @@ public:
 	void CollisionResponse(Paddle& paddle);
 	void AiResponse(float fElapsedTime);
 	void Rendering();
-	LPCWSTR bound_sound_file = TEXT("sound\\bound.wav");
+	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
 public:
 	bool OnUserCreate() override
 	{
