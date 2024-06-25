@@ -107,18 +107,17 @@ void Puck::DrawPuck(olc::PixelGameEngine* p) {
 }
 
 void Puck::Move(const Field& f) {
-	float nextX, nextY;
-	nextX = position.x ;
-	nextY = position.y;
+	olc::vf2d nextPos = position + velocity;
 
-	if (nextX - radius < f.innerX || nextX +radius>f.innerX+f.width) {
+	if (nextPos.x - radius < f.innerX || nextPos.x +radius>f.innerX+f.width) {
 		velocity.x = -velocity.x;
 	}
-	if (nextY - radius < f.innerY || nextY + radius > f.innerY + f.height) {
+	if (nextPos.y - radius < f.innerY || nextPos.y + radius > f.innerY + f.height) {
 		velocity.y = -velocity.y;
 	}
 	position.x += velocity.x;
 	position.y += velocity.y;
+	velocity *= (1.0f-f.friction);
 }
 
 void Paddle::InitPaddle(float x, float y, float inR, float outR, olc::Pixel inCol, olc::Pixel outCol) {

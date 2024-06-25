@@ -15,6 +15,7 @@ public:
 	float border;
 	float innerX, innerY, outterX, outterY;
 	olc::vf2d goalLeft, goalRight;
+	float friction = 0.01;//Ä¦²ÁÁ¦ÏµÊý
 
 	Field() = default;
 	void InitField(float w, float h, float gw, float gp, float b,const olc::PixelGameEngine* p);
@@ -47,7 +48,7 @@ public:
 	olc::vf2d GetVelocity();
 	olc::vf2d lastPos;
 	olc::vf2d v;
-	float mass = 2.0f;
+	float mass = 1.0f;
 
 	void InitPaddle(float x, float y, float inR, float outR, olc::Pixel inCol, olc::Pixel outCol);
 	void DrawPaddle(olc::PixelGameEngine* p);
