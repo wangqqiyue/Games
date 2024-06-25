@@ -26,8 +26,10 @@ class Puck {
 public:
 	olc::vf2d position;
 	olc::vf2d velocity;
+	float mass = 1.0f;
 	float radius;
 	olc::Pixel color;
+	
 
 	Puck() = default;
 	void InitPuck(float x, float y, float dx, float dy, float r, olc::Pixel col);
@@ -42,9 +44,16 @@ public:
 	olc::vf2d pos;
 	float innerR,outerR;
 	olc::Pixel innerCol,outerCol;
+	olc::vf2d GetVelocity();
+	olc::vf2d lastPos;
+	olc::vf2d v;
+	float mass = 2.0f;
 	void InitPaddle(float x, float y, float inR, float outR, olc::Pixel inCol, olc::Pixel outCol);
 	void DrawPaddle(olc::PixelGameEngine* p);
+	void Move(const Field& f);
 };
+
+float GetDistance(olc::vf2d p1, olc::vf2d p2);
 
 // Override base class with your custom functionality
 class IceHockey : public olc::PixelGameEngine
@@ -54,6 +63,7 @@ public:
 	Puck puck;
 	Paddle paddle;
 	bool holdPaddle=false;
+
 	IceHockey()
 	{
 		// Name your application
@@ -75,11 +85,23 @@ public:
 	{
 		Clear(olc::BLACK);
 		MouseOperate();
+		puck.Move(field);
+		if (GetDistance(paddle.pos, puck.position) <= paddle.outerR + puck.radius) {
+			olc::vf2d vPaddle = paddle.GetVelocity();
+			olc::vf2d vRelative = puck.velocity-vPaddle;
+			olc::vf2d vNormal = (puck.position - paddle.pos).norm();
+			float j = -2.0f * (vRelative.dot(vNormal));
+			j /= vNormal.dot(vNormal);
+			j /= (1.0f / paddle.mass + 1.0f / puck.mass);
+			puck.velocity += j * vNormal * 1.0f / puck.mass;
+			paddle.v -= j * vNormal * 1.0f / paddle.mass;
+		}
+
 		//先绘制场地
 		field.DrawField(this);
 		//再绘制冰球
 		puck.DrawPuck(this);
-		puck.Move(field);
+		//绘制球拍
 		paddle.DrawPaddle(this);
 		return true;
 	}

@@ -15,6 +15,7 @@ void IceHockey::MouseOperate() {
 		}
 	}
 	if (holdPaddle) {
+		paddle.lastPos = paddle.pos;
 		paddle.pos.x = mPos.x;
 		paddle.pos.y = mPos.y;
 		if (paddle.pos.x >= ScreenWidth() / 2.0f-paddle.outerR) {
@@ -29,7 +30,9 @@ void IceHockey::MouseOperate() {
 		if (paddle.pos.y <= field.innerY + paddle.outerR) {
 			paddle.pos.y = field.innerY + paddle.outerR;
 		}
+		paddle.v = paddle.GetVelocity();
 	}
+
 
 }
 
@@ -116,4 +119,24 @@ void Paddle::InitPaddle(float x, float y, float inR, float outR, olc::Pixel inCo
 void Paddle::DrawPaddle(olc::PixelGameEngine* p) {
 	p->FillCircle(pos.x, pos.y, outerR, outerCol);
 	p->FillCircle(pos.x, pos.y, innerR, innerCol);
+}
+
+olc::vf2d Paddle::GetVelocity() {
+	olc::vf2d v = pos - lastPos;
+	return v;
+}
+
+void Paddle::Move(const Field& f) {
+	float nextX, nextY;
+	nextX = pos.x;
+	nextY = pos.y;
+
+	if (nextX - outerR < f.innerX || nextX + outerR>f.innerX + f.width) {
+		pos.x = -v.x;
+	}
+	if (nextY - outerR < f.innerY || nextY + outerR > f.innerY + f.height) {
+		pos.y = -v.y;
+	}
+	pos.x += v.x;
+	pos.y += v.y;
 }
