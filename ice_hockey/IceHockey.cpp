@@ -4,6 +4,20 @@ float GetDistance(olc::vf2d p1, olc::vf2d p2){
 	return sqrtf((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
+void IceHockey::CollisionResponse() {
+	olc::vf2d vPaddle = paddle.GetVelocity();
+	olc::vf2d vRelative = puck.velocity - vPaddle;
+	olc::vf2d vNormal = (puck.position - paddle.pos).norm();
+	float vRn = vRelative.dot(vNormal);
+	if (GetDistance(paddle.pos, puck.position) < paddle.outerR + puck.radius && vRn<0.0f) {
+		
+		float j = -2.0f * vRn/ vNormal.dot(vNormal);
+		j /= (1.0f / paddle.mass + 1.0f / puck.mass);
+		puck.velocity += j * vNormal * 1.0f / puck.mass;
+		paddle.v -= j * vNormal * 1.0f / paddle.mass;
+	}
+}
+
 void IceHockey::MouseOperate() {
 	olc::vi2d mPos=GetMousePos();
 	if (!GetMouse(0).bHeld) {
