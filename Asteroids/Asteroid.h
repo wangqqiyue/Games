@@ -82,9 +82,9 @@ public:
 	int hp=10;
 	int bulletsTotal=0;
 	bool start = false;
-	LPCWSTR laser_sound_file= TEXT("C:\\Users\\17964\\Desktop\\game_learning\\Asteroids\\sound\\laser.wav");
-	LPCWSTR startup_sound_file = TEXT("C:\\Users\\17964\\Desktop\\game_learning\\Asteroids\\sound\\startup.wav");
-	LPCWSTR crash_sound_file = TEXT("C:\\Users\\17964\\Desktop\\game_learning\\Asteroids\\sound\\Crashlit.wav");
+	LPCWSTR laser_sound_file= TEXT("sound\\laser.wav");
+	LPCWSTR startup_sound_file = TEXT("sound\\startup.wav");
+	LPCWSTR crash_sound_file = TEXT("sound\\Crashlit.wav");
 	Asteroid() {
 		sAppName = "Asteroid";
 	}
