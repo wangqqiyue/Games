@@ -10,13 +10,16 @@ void IceHockey::CollisionResponse(Paddle& paddle) {
 	olc::vf2d vNormal = (puck.position - paddle.pos).norm();
 	float vRn = vRelative.dot(vNormal);
 	if (GetDistance(paddle.pos, puck.position) < paddle.outerR + puck.radius && vRn<0.0f) {
-		cout << "before collision vPaddle=" << vPaddle << endl;
+		//cout << "before collision vPaddle=" << vPaddle << endl;
 		float j = -2.0f * vRn/ vNormal.dot(vNormal);
 		j /= (1.0f / paddle.mass + 1.0f / puck.mass);
 		puck.velocity += j * vNormal * 1.0f / puck.mass;
 		paddle.v -= j * vNormal * 1.0f / paddle.mass;
+		/*
 		cout << "paddle.mass=" << paddle.mass << endl;
 		cout << "puck.v=" << puck.velocity << endl;
+		*/
+		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
 	
 }
@@ -62,16 +65,13 @@ void IceHockey::Rendering() {
 }
 
 void IceHockey::AiResponse(float fElapsedTime) {
-	
-	if (puck.position.x + puck.radius <= ScreenWidth()/2.0f) {
-		return;
-	}
-	
-	
-	olc::vf2d posGoal = { field.goalRight.x+field.goalDepth,field.goalRight.y +field.goalWidth/2.0f};
+	olc::vf2d posGoal = { field.goalRight.x + field.goalDepth,field.goalRight.y + field.goalWidth / 2.0f };
+	olc::vf2d posPlayer = paddle.pos;
 	olc::vf2d nMove;
+
 	
-	if (puck.velocity.mag()>=1.0f&&(posGoal - puck.position).dot(puck.velocity) > 0.001f) {
+	
+	if (puck.velocity.mag()>=AiPaddle.speedEasy&&(posGoal - puck.position).dot(puck.velocity) > 0.001f) {
 		//∑¿ ÿ
 		//cout << "puck.velocity=" << puck.velocity << endl;
 		olc::vf2d posCenter = (posGoal + puck.position) / 2.0f;
@@ -83,9 +83,9 @@ void IceHockey::AiResponse(float fElapsedTime) {
 		//Ω¯π•
 		nMove = (puck.position - AiPaddle.pos).norm();
 	}
-	cout << "nMove=" << nMove << endl;
+	//cout << "nMove=" << nMove << endl;
 	AiPaddle.v = AiPaddle.speedEasy * nMove;
-	cout << "AiPaddle.v=" << AiPaddle.v << endl;
+	//cout << "AiPaddle.v=" << AiPaddle.v << endl;
 	AiPaddle.Move(field);
 	if (AiPaddle.pos.x <= ScreenWidth() / 2.0f + AiPaddle.outerR) {
 		AiPaddle.pos.x = ScreenWidth() / 2.0f + AiPaddle.outerR;
@@ -162,9 +162,11 @@ void Puck::Move(const Field& f) {
 
 	if (nextPos.x - radius < f.innerX || nextPos.x +radius>f.innerX+f.width) {
 		velocity.x = -velocity.x;
+		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
 	if (nextPos.y - radius < f.innerY || nextPos.y + radius > f.innerY + f.height) {
 		velocity.y = -velocity.y;
+		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
 	position.x += velocity.x;
 	position.y += velocity.y;

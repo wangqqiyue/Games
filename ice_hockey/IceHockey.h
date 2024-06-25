@@ -1,6 +1,9 @@
 #pragma once
 
 #include "olcPixelGameEngine.h"
+#include <Windows.h>
+#include <mmsystem.h>
+#pragma comment(lib,"winmm.lib")
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -30,7 +33,7 @@ public:
 	float mass = 1.0f;
 	float radius;
 	olc::Pixel color;
-	
+	LPCWSTR bound_sound_file = TEXT("sound\\bound.wav");
 
 	Puck() = default;
 	void InitPuck(float x, float y, float dx, float dy, float r, olc::Pixel col);
@@ -77,6 +80,7 @@ public:
 	void CollisionResponse(Paddle& paddle);
 	void AiResponse(float fElapsedTime);
 	void Rendering();
+	LPCWSTR bound_sound_file = TEXT("sound\\bound.wav");
 public:
 	bool OnUserCreate() override
 	{
