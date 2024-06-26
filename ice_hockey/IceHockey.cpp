@@ -1,9 +1,5 @@
 #include "IceHockey.h"
 
-float GetDistance(olc::vf2d p1, olc::vf2d p2){
-	return sqrtf((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
-}
-
 void IceHockey::GameReset() {
 	PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	puck.InitPuck(field, olc::MAGENTA, this);
@@ -29,19 +25,25 @@ void IceHockey::CollisionResponse(Paddle& paddle,float fElapsedTime) {
 	
 	olc::vf2d vPaddle = paddle.v;
 	olc::vf2d vRelative = puck.velocity - vPaddle;
-	olc::vf2d vNormal = (puck.position - paddle.pos).norm();
+	olc::vf2d vDis = puck.position - paddle.pos;
+	olc::vf2d vNormal = vDis.norm();
 	float vRn = vRelative.dot(vNormal);
-	if (GetDistance(paddle.pos, puck.position) < paddle.outerR + puck.radius && vRn<0.0f) {
+	float dis = vDis.mag();
+	float sumR = paddle.outerR + puck.radius;
+	//距离小于两者半径和，且相对移动速度为正
+	if ( dis < sumR && vRn<0.0f) {
+		//如果靠的太近,需要调整撞击参数
 
-		float j = -2.0f * vRn/ vNormal.dot(vNormal);
+		float j = -2.1f * vRn/ vNormal.dot(vNormal);
 		j /= (1.0f / paddle.mass + 1.0f / puck.mass);
 		puck.velocity += j * vNormal * 1.0f / puck.mass;
 		paddle.v -= j * vNormal * 1.0f / paddle.mass;
 		
 		PlaySound(NULL, 0, 0);//先停止其他声音
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
-		
-		
+		if (dis < sumR /4.0f) {
+			paddle.pos -= vDis;
+		}
 	}
 	
 }
@@ -52,7 +54,7 @@ void IceHockey::MouseOperate() {
 		holdPaddle = false;
 	}
 	if (!holdPaddle) {
-		if (GetDistance(mPos, paddle.pos) <= paddle.outerR && GetMouse(0).bHeld) {
+		if ((mPos, paddle.pos).mag() <= paddle.outerR && GetMouse(0).bHeld) {
 			holdPaddle = true;
 		}
 	}
@@ -171,6 +173,7 @@ void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {
 	this->f = f;
 	position.x = f.innerX+f.width/2.0f;
 	position.y = f.innerY+f.height/2.0f;
+	velocity = { 0,0 };
 	radius = f.goalWidth/goalPuckRatio;
 	color = col;
 }
@@ -217,18 +220,32 @@ void Puck::DrawPuck() {
 }
 
 void Puck::Move() {
-	olc::vf2d nextPos = position + velocity;
-	if (nextPos.y - radius >= f.goalLeft.y && nextPos.y + radius <= f.goalLeft.y + f.goalWidth) {
+	bool bound = true;
+	p->DrawRect(position.x - radius, position.y - radius, radius * 2, radius * 2, olc::RED);
 
-	}
-	else if (nextPos.x - radius < f.innerX || nextPos.x +radius>f.innerX+f.width) {
+	if (position.y - radius >= f.goalLeft.y && position.y + radius <= f.goalLeft.y + f.goalWidth) {
+		bound = false;
+	}else if (position.x< f.innerX + radius) {
+		position.x = f.innerX + radius;
 		velocity.x = -velocity.x;
-		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
-	}
-	else if (nextPos.y - radius < f.innerY || nextPos.y + radius > f.innerY + f.height) {
+	}else if (position.x  > f.innerX + f.width- radius) {
+		position.x = f.innerX + f.width - radius;
+		velocity.x = -velocity.x;
+	}else if (position.y  < f.innerY+ radius) {
+		position.y = f.innerY + radius;
 		velocity.y = -velocity.y;
+	}else if ( position.y > f.innerY + f.height- radius) {
+		position.y = f.innerY + f.height - radius;
+		velocity.y = -velocity.y;	
+	}else {
+		bound = false;
+	}
+
+	if (bound) {
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
+	
+
 	position.x += velocity.x;
 	position.y += velocity.y;
 	velocity *= (1.0f-f.friction);
@@ -238,15 +255,16 @@ void Puck::Move() {
 void Paddle::InitPaddle(const Field& f,Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine* p) {
 	this->p = p;
 	this->f = f;
+	v = { 0.0f,0.0f };
 	innerR = f.goalWidth / goalPaddleRatio / 1.5f;
 	outerR = f.goalWidth / goalPaddleRatio;
 	if (LEFT == side) {
 		pos.x = f.innerX + outerR;
-		pos.y = f.innerY + f.height / 2.0f;
 	}
 	else {
-
+		pos.x = f.innerX +f.width - outerR;
 	}
+	pos.y = f.innerY + f.height / 2.0f;
 
 	innerCol = inCol;
 	outerCol = outCol;
