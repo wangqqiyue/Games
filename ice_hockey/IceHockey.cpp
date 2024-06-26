@@ -1,10 +1,38 @@
 #include "IceHockey.h"
 
+void BoundBarrier(olc::vf2d& pos,olc::vf2d* v, float r, olc::vf2d barrier,  float width, float height) {
+	if (pos.x < barrier.x + r) {//左边界
+		pos.x = barrier.x + r;
+		if (v) {
+			v->x = -v->x;
+		}
+	}
+	else if (pos.x > barrier.x+width-r) {//右边界
+		pos.x = barrier.x + width - r;
+		if (v) {
+			v->x = -v->x;
+		}
+	}
+	else if (pos.y < barrier.y+r) {//上边界
+		pos.y = barrier.y + r;
+		if (v) {
+			v->y = -v->y;
+		}
+	}
+	else if (pos.y > barrier.y +height- r) {//下边界
+		pos.y = barrier.y + height - r;
+		if (v) {
+			v->y = -v->y;
+		}
+	}
+}
+
 void IceHockey::GameReset() {
 	PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	puck.InitPuck(field, olc::MAGENTA, this);
-	paddle.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
-	AiPaddle.InitPaddle(field, RIGHT, olc::BLUE, olc::DARK_BLUE, this);
+	//paddle.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
+	ai1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
+	ai2.InitPaddle(field, RIGHT, olc::BLUE, olc::DARK_BLUE, this);
 }
 
 bool IceHockey::PuckInGoal() {
@@ -32,7 +60,6 @@ void IceHockey::CollisionResponse(Paddle& paddle,float fElapsedTime) {
 	float sumR = paddle.outerR + puck.radius;
 	//距离小于两者半径和，且相对移动速度为正
 	if ( dis < sumR && vRn<0.0f) {
-		//如果靠的太近,需要调整撞击参数
 
 		float j = -2.1f * vRn/ vNormal.dot(vNormal);
 		j /= (1.0f / paddle.mass + 1.0f / puck.mass);
@@ -41,14 +68,18 @@ void IceHockey::CollisionResponse(Paddle& paddle,float fElapsedTime) {
 		
 		PlaySound(NULL, 0, 0);//先停止其他声音
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
-		if (dis < sumR /4.0f) {
+
+		//如果靠的太近,需要调整球拍位置
+		if (dis < 1.0f) {
 			paddle.pos -= vDis;
 		}
+		
+		
 	}
 	
 }
 
-void IceHockey::MouseOperate() {
+void IceHockey::MouseOperate(Paddle& paddle) {
 	olc::vi2d mPos=GetMousePos();
 	if (!GetMouse(0).bHeld) {
 		holdPaddle = false;
@@ -86,40 +117,45 @@ void IceHockey::Rendering() {
 	//绘制边框
 	field.DrawBarrier();
 	//绘制球拍
-	paddle.DrawPaddle();
-	AiPaddle.DrawPaddle();
+	//player.DrawPaddle();
+	ai1.DrawPaddle();
+	ai2.DrawPaddle();
 }
 
-void IceHockey::AiResponse(float fElapsedTime) {
-	olc::vf2d posGoal = { field.goalRight.x + field.goalDepth,field.goalRight.y + field.goalWidth / 2.0f };
+void IceHockey::AiResponse(Paddle& paddle) {
+	olc::vf2d posGoal;
+	if (LEFT == paddle.side) {
+		posGoal = { field.goalLeft.x , field.goalRight.y + field.goalWidth / 2.0f };
+	}
+	else {
+		posGoal = { field.goalRight.x + field.goalDepth, field.goalRight.y + field.goalWidth / 2.0f };
+	}
+	
 	olc::vf2d posPlayer = paddle.pos;
 	olc::vf2d nMove;
 
-	if (puck.velocity.mag()>=AiPaddle.speedEasy&&(posGoal - puck.position).dot(puck.velocity) > 0.001f) {
+	//冰球速度大于球拍速度,且冰球速度方向朝向球门,则防守
+	if (puck.velocity.mag()>=paddle.speedEasy&&(posGoal - puck.position).dot(puck.velocity) > 0.001f) {
 
 		olc::vf2d posCenter = (posGoal + puck.position) / 2.0f;
-		nMove = (posCenter - AiPaddle.pos).norm();
+		nMove = (posCenter - paddle.pos).norm();
 	}
 	else {
 		//进攻
-		nMove = (puck.position - AiPaddle.pos).norm();
+		//速度方向指向冰球
+		nMove = (puck.position - paddle.pos).norm();
 	}
 
-	AiPaddle.v = AiPaddle.speedEasy * nMove;
+	paddle.v = paddle.speedEasy * nMove;
 
-	AiPaddle.Move();
-	if (AiPaddle.pos.x <= ScreenWidth() / 2.0f + AiPaddle.outerR) {
-		AiPaddle.pos.x = ScreenWidth() / 2.0f + AiPaddle.outerR;
+	paddle.Move();
+	if (LEFT == paddle.side) {
+		BoundBarrier(paddle.pos, NULL, paddle.outerR, {field.innerX,field.innerY},field.width/2.0f,field.height);
 	}
-	if (AiPaddle.pos.x >= field.innerX+field.width - AiPaddle.outerR) {
-		AiPaddle.pos.x = field.innerX + field.width - AiPaddle.outerR;
+	else {
+		BoundBarrier(paddle.pos, NULL, paddle.outerR, { field.innerX+field.width/2.0f,field.innerY }, field.width / 2.0f, field.height);
 	}
-	if (AiPaddle.pos.y >= field.innerY + field.height - paddle.outerR) {
-		AiPaddle.pos.y = field.innerY + field.height - AiPaddle.outerR;
-	}
-	if (AiPaddle.pos.y <= field.innerY + paddle.outerR) {
-		AiPaddle.pos.y = field.innerY + AiPaddle.outerR;
-	}
+	
 }
 
 void Field::InitField(float w, float h, float gw, float gp, float b,olc::PixelGameEngine* p) {
@@ -258,6 +294,7 @@ void Paddle::InitPaddle(const Field& f,Side side, olc::Pixel inCol, olc::Pixel o
 	v = { 0.0f,0.0f };
 	innerR = f.goalWidth / goalPaddleRatio / 1.5f;
 	outerR = f.goalWidth / goalPaddleRatio;
+	this->side = side;
 	if (LEFT == side) {
 		pos.x = f.innerX + outerR;
 	}

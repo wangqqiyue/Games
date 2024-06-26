@@ -67,6 +67,7 @@ public:
 	float goalPaddleRatio = 4.0f;
 	olc::PixelGameEngine* p;
 	Field f;
+	Side side;
 
 	void InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine*p);
 	void DrawPaddle();
@@ -74,7 +75,6 @@ public:
 
 };
 
-float GetDistance(olc::vf2d p1, olc::vf2d p2);
 
 // Override base class with your custom functionality
 class IceHockey : public olc::PixelGameEngine
@@ -84,7 +84,7 @@ public:
 	Puck puck;
 	Paddle paddle;
 	bool holdPaddle=false;
-	Paddle AiPaddle;
+	Paddle player,ai1, ai2;
 	LPCWSTR whistle_sound_file = TEXT("sound\\whistle.wav");
 
 	IceHockey()
@@ -92,9 +92,9 @@ public:
 		// Name your application
 		sAppName = "IceHockey";
 	}
-	void MouseOperate();
+	void MouseOperate(Paddle& paddle);
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
-	void AiResponse(float fElapsedTime);
+	void AiResponse(Paddle& paddle);
 	void Rendering();
 	bool PuckInGoal();
 	void GameReset();
@@ -112,11 +112,13 @@ public:
 	{
 		Clear(olc::BLACK);
 		Rendering();
-		MouseOperate();
-		AiResponse(fElapsedTime);
+		//MouseOperate();
+		AiResponse(ai1);
+		AiResponse(ai2);
 		puck.Move();
-		CollisionResponse(paddle, fElapsedTime);
-		CollisionResponse(AiPaddle, fElapsedTime);
+		//CollisionResponse(player, fElapsedTime);
+		CollisionResponse(ai1, fElapsedTime);
+		CollisionResponse(ai2, fElapsedTime);
 		if (PuckInGoal()) {
 			GameReset();
 		}
