@@ -85,6 +85,7 @@ public:
 	Paddle paddle;
 	bool holdPaddle=false;
 	Paddle AiPaddle;
+	LPCWSTR whistle_sound_file = TEXT("sound\\whistle.wav");
 
 	IceHockey()
 	{
@@ -95,17 +96,15 @@ public:
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
 	void AiResponse(float fElapsedTime);
 	void Rendering();
+	bool PuckInGoal();
+	void GameReset();
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
 public:
 	bool OnUserCreate() override
 	{
-		CreateLayer();
-		SetDrawTarget(nullptr);
 		// Called once at the start, so create things here
 		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.8f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 20.0f, this);
-		puck.InitPuck(field,olc::MAGENTA,this);
-		paddle.InitPaddle(field,LEFT, olc::RED, olc::DARK_RED,this);
-		AiPaddle.InitPaddle(field,RIGHT, olc::BLUE, olc::DARK_BLUE,this);
+		GameReset();
 		return true;
 	}
 
@@ -118,7 +117,9 @@ public:
 		puck.Move();
 		CollisionResponse(paddle, fElapsedTime);
 		CollisionResponse(AiPaddle, fElapsedTime);
-		
+		if (PuckInGoal()) {
+			GameReset();
+		}
 		return true;
 	}
 };

@@ -4,6 +4,27 @@ float GetDistance(olc::vf2d p1, olc::vf2d p2){
 	return sqrtf((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
+void IceHockey::GameReset() {
+	PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
+	puck.InitPuck(field, olc::MAGENTA, this);
+	paddle.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
+	AiPaddle.InitPaddle(field, RIGHT, olc::BLUE, olc::DARK_BLUE, this);
+}
+
+bool IceHockey::PuckInGoal() {
+	float x = puck.position.x;
+	float y = puck.position.y;
+	float r = puck.radius;
+	float goalY = field.goalLeft.y;
+	float goalWidth = field.goalWidth;
+	if ( y- r >= goalY && y+r <= goalY + goalWidth) {
+		if (x + r <= field.innerX || x - r >= field.innerX + field.width) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void IceHockey::CollisionResponse(Paddle& paddle,float fElapsedTime) {
 	
 	olc::vf2d vPaddle = paddle.v;
@@ -72,8 +93,6 @@ void IceHockey::AiResponse(float fElapsedTime) {
 	olc::vf2d posPlayer = paddle.pos;
 	olc::vf2d nMove;
 
-	
-	
 	if (puck.velocity.mag()>=AiPaddle.speedEasy&&(posGoal - puck.position).dot(puck.velocity) > 0.001f) {
 
 		olc::vf2d posCenter = (posGoal + puck.position) / 2.0f;
