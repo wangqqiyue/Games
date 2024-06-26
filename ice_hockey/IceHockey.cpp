@@ -128,16 +128,16 @@ void IceHockey::AiResponseStrong(AiPaddle& paddle) {
 	olc::vf2d nMove;
 	//策略
 	if ((puck.position - paddle.pos).dot(paddle.posEnemyGoal - puck.position) > 0.5f) {
-		//如果球和敌方球门的夹角较小,则进攻
-		nMove = (puck.position - paddle.pos).norm();
-	}
-	else if ((puck.position - paddle.pos).dot(paddle.enemy->pos - puck.position) < 0.5f) {
-		//如果球和敌人的夹角较大,则进攻
-		nMove= (puck.position - paddle.pos).norm();
+		//如果球和敌方球门的夹角较小,则大力进攻
+		nMove = (puck.position - paddle.pos).norm()*2;
+		if ((puck.position - paddle.pos).dot(paddle.enemy->pos - puck.position) < 0.5f) {
+			//如果球和敌人的夹角较小,则侧面突击
+			nMove = (paddle.enemy->pos - puck.position).perp().norm()*2;
+		}
 	}
 	else {
 		//回防
-		nMove = (paddle.posGoal - paddle.pos).norm();
+		nMove = (paddle.posGoal - paddle.pos).norm()/4.0f;
 	}
 
 	paddle.v = paddle.speedEasy * nMove;
