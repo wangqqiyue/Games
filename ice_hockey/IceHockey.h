@@ -8,6 +8,11 @@
 using std::cout;
 using std::endl;
 
+enum Side {
+	LEFT =0,
+	RIGHT,
+};
+
 class Field {
 public:
 	float width;
@@ -33,10 +38,11 @@ public:
 	float mass = 1.0f;
 	float radius;
 	olc::Pixel color;
+	float goalPuckRatio = 4.0f;
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
 
 	Puck() = default;
-	void InitPuck(float x, float y, float dx, float dy, float r, olc::Pixel col);
+	void InitPuck(const Field& f, olc::Pixel col);
 	void DrawPuck(olc::PixelGameEngine* p);
 	void Move(const Field& f);
 
@@ -52,8 +58,9 @@ public:
 	olc::vf2d v;
 	float mass = 1.0f;
 	float speedEasy = 10.0f;
+	float goalPaddleRatio = 4.0f;
 
-	void InitPaddle(float x, float y, float inR, float outR, olc::Pixel inCol, olc::Pixel outCol);
+	void InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol);
 	void DrawPaddle(olc::PixelGameEngine* p);
 	void Move(const Field& f);
 
@@ -86,9 +93,9 @@ public:
 	{
 		// Called once at the start, so create things here
 		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.8f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 20.0f, this);
-		puck.InitPuck(field.innerX+150.0f, field.innerY+100.0f, 4.0f, -3.0f,30.0f,olc::MAGENTA);
-		paddle.InitPaddle(field.innerX + 30.0f, ScreenHeight() / 2.0f, 20.0f,35.0f, olc::RED, olc::DARK_RED);
-		AiPaddle.InitPaddle(field.innerX+field.width - 30.0f, ScreenHeight() / 2.0f, 20.0f, 35.0f, olc::BLUE, olc::DARK_BLUE);
+		puck.InitPuck(field,olc::MAGENTA);
+		paddle.InitPaddle(field,LEFT, olc::RED, olc::DARK_RED);
+		AiPaddle.InitPaddle(field,RIGHT, olc::BLUE, olc::DARK_BLUE);
 		return true;
 	}
 

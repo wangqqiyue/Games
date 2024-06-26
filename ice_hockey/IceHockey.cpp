@@ -10,7 +10,7 @@ void IceHockey::CollisionResponse(Paddle& paddle) {
 	olc::vf2d vNormal = (puck.position - paddle.pos).norm();
 	float vRn = vRelative.dot(vNormal);
 	if (GetDistance(paddle.pos, puck.position) < paddle.outerR + puck.radius && vRn<0.0f) {
-		//cout << "before collision vPaddle=" << vPaddle << endl;
+		cout << "before collision vPaddle=" << vPaddle << endl;
 		float j = -2.0f * vRn/ vNormal.dot(vNormal);
 		j /= (1.0f / paddle.mass + 1.0f / puck.mass);
 		puck.velocity += j * vNormal * 1.0f / puck.mass;
@@ -19,6 +19,7 @@ void IceHockey::CollisionResponse(Paddle& paddle) {
 		cout << "paddle.mass=" << paddle.mass << endl;
 		cout << "puck.v=" << puck.velocity << endl;
 		*/
+		PlaySound(NULL, 0, 0);//ÏÈÍ£Ö¹ÆäËûÉùÒô
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
 	
@@ -143,12 +144,10 @@ void Field::DrawField(olc::PixelGameEngine* p) {
 
 }
 
-void Puck::InitPuck(float x, float y, float dx, float dy,float r,olc::Pixel col) {
-	position.x = x;
-	position.y = y;
-	velocity.x = dx;
-	velocity.y = dy;
-	radius = r;
+void Puck::InitPuck(const Field& f,olc::Pixel col) {
+	position.x = f.innerX+f.width/2.0f;
+	position.y = f.innerY+f.height/2.0f;
+	radius = f.goalWidth/goalPuckRatio;
 	color = col;
 }
 
@@ -174,11 +173,17 @@ void Puck::Move(const Field& f) {
 
 }
 
-void Paddle::InitPaddle(float x, float y, float inR, float outR, olc::Pixel inCol, olc::Pixel outCol) {
-	pos.x = x;
-	pos.y = y;
-	innerR = inR;
-	outerR = outR;
+void Paddle::InitPaddle(const Field& f,Side side, olc::Pixel inCol, olc::Pixel outCol) {
+	innerR = f.goalWidth / goalPaddleRatio / 1.5f;
+	outerR = f.goalWidth / goalPaddleRatio;
+	if (LEFT == side) {
+		pos.x = f.innerX + outerR;
+		pos.y = f.innerY + f.height / 2.0f;
+	}
+	else {
+
+	}
+
 	innerCol = inCol;
 	outerCol = outCol;
 }
