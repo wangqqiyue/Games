@@ -75,6 +75,14 @@ public:
 
 };
 
+class AiPaddle :public Paddle {
+public:
+	void InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine* p,const Paddle* enemy);
+	olc::vf2d posGoal;
+	olc::vf2d posEnemyGoal;
+	const Paddle* enemy;
+};
+
 
 // Override base class with your custom functionality
 class IceHockey : public olc::PixelGameEngine
@@ -84,7 +92,8 @@ public:
 	Puck puck;
 	Paddle paddle;
 	bool holdPaddle=false;
-	Paddle player,ai1, ai2;
+	Paddle player;
+	AiPaddle ai1, ai2;
 	LPCWSTR whistle_sound_file = TEXT("sound\\whistle.wav");
 
 	IceHockey()
@@ -94,7 +103,8 @@ public:
 	}
 	void MouseOperate(Paddle& paddle);
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
-	void AiResponse(Paddle& paddle);
+	void AiResponse(AiPaddle& paddle);
+	void AiResponseStrong(AiPaddle& paddle);
 	void Rendering();
 	bool PuckInGoal();
 	void GameReset();
@@ -114,7 +124,7 @@ public:
 		Rendering();
 		//MouseOperate();
 		AiResponse(ai1);
-		AiResponse(ai2);
+		AiResponseStrong(ai2);
 		puck.Move();
 		//CollisionResponse(player, fElapsedTime);
 		CollisionResponse(ai1, fElapsedTime);
