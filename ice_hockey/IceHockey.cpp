@@ -42,8 +42,12 @@ bool IceHockey::PuckInGoal() {
 	float goalY = field.goalLeft.y;
 	float goalWidth = field.goalWidth;
 	if (y - r >= goalY && y + r <= goalY + goalWidth) {
-		if (x + r <= field.innerX || x - r >= field.innerX + field.width) {
+		if (x + r <= field.innerX ) {
+			ai2.score++;
 			return true;
+		}
+		else if (x - r >= field.innerX + field.width) {
+			ai1.score++;
 		}
 	}
 	return false;
@@ -110,7 +114,17 @@ void IceHockey::MouseOperate(Paddle& paddle) {
 
 }
 
+void IceHockey::DrawScore(int s1,int s2) {
+	std::string str = "Score ";
+	str += std::to_string(s1);
+	str += ":";
+	str += std::to_string(s2);
+	DrawString((ScreenWidth() - str.length() * 2 * 8) / 2.0f, 8, str, olc::WHITE, 2);
+}
+
 void IceHockey::Rendering() {
+	//绘制比分
+	DrawScore(ai1.score,ai2.score);
 	//先绘制场地
 	field.DrawField();
 	//再绘制冰球

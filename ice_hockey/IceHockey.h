@@ -57,6 +57,7 @@ public:
 //ÇòÅÄ
 class Paddle{
 public:
+	int score = 0;
 	olc::vf2d pos;
 	float innerR,outerR;
 	olc::Pixel innerCol,outerCol;
@@ -108,6 +109,7 @@ public:
 	void Rendering();
 	bool PuckInGoal();
 	void GameReset();
+	void DrawScore(int s1,int s2);
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
 public:
 	bool OnUserCreate() override
