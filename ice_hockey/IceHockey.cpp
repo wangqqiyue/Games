@@ -4,23 +4,23 @@ float GetDistance(olc::vf2d p1, olc::vf2d p2){
 	return sqrtf((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
 }
 
-void IceHockey::CollisionResponse(Paddle& paddle) {
+void IceHockey::CollisionResponse(Paddle& paddle,float fElapsedTime) {
+	
 	olc::vf2d vPaddle = paddle.v;
 	olc::vf2d vRelative = puck.velocity - vPaddle;
 	olc::vf2d vNormal = (puck.position - paddle.pos).norm();
 	float vRn = vRelative.dot(vNormal);
 	if (GetDistance(paddle.pos, puck.position) < paddle.outerR + puck.radius && vRn<0.0f) {
-		cout << "before collision vPaddle=" << vPaddle << endl;
+
 		float j = -2.0f * vRn/ vNormal.dot(vNormal);
 		j /= (1.0f / paddle.mass + 1.0f / puck.mass);
 		puck.velocity += j * vNormal * 1.0f / puck.mass;
 		paddle.v -= j * vNormal * 1.0f / paddle.mass;
-		/*
-		cout << "paddle.mass=" << paddle.mass << endl;
-		cout << "puck.v=" << puck.velocity << endl;
-		*/
+		
 		PlaySound(NULL, 0, 0);//先停止其他声音
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
+		
+		
 	}
 	
 }
@@ -57,12 +57,14 @@ void IceHockey::MouseOperate() {
 
 void IceHockey::Rendering() {
 	//先绘制场地
-	field.DrawField(this);
+	field.DrawField();
 	//再绘制冰球
-	puck.DrawPuck(this);
+	puck.DrawPuck();
+	//绘制边框
+	field.DrawBarrier();
 	//绘制球拍
-	paddle.DrawPaddle(this);
-	AiPaddle.DrawPaddle(this);
+	paddle.DrawPaddle();
+	AiPaddle.DrawPaddle();
 }
 
 void IceHockey::AiResponse(float fElapsedTime) {
@@ -73,21 +75,18 @@ void IceHockey::AiResponse(float fElapsedTime) {
 	
 	
 	if (puck.velocity.mag()>=AiPaddle.speedEasy&&(posGoal - puck.position).dot(puck.velocity) > 0.001f) {
-		//防守
-		//cout << "puck.velocity=" << puck.velocity << endl;
+
 		olc::vf2d posCenter = (posGoal + puck.position) / 2.0f;
 		nMove = (posCenter - AiPaddle.pos).norm();
-		
-		//DrawLine(posGoal, puck.position, olc::RED);
 	}
 	else {
 		//进攻
 		nMove = (puck.position - AiPaddle.pos).norm();
 	}
-	//cout << "nMove=" << nMove << endl;
+
 	AiPaddle.v = AiPaddle.speedEasy * nMove;
-	//cout << "AiPaddle.v=" << AiPaddle.v << endl;
-	AiPaddle.Move(field);
+
+	AiPaddle.Move();
 	if (AiPaddle.pos.x <= ScreenWidth() / 2.0f + AiPaddle.outerR) {
 		AiPaddle.pos.x = ScreenWidth() / 2.0f + AiPaddle.outerR;
 	}
@@ -102,7 +101,8 @@ void IceHockey::AiResponse(float fElapsedTime) {
 	}
 }
 
-void Field::InitField(float w, float h, float gw, float gp, float b,const olc::PixelGameEngine* p) {
+void Field::InitField(float w, float h, float gw, float gp, float b,olc::PixelGameEngine* p) {
+	this->p = p;
 	width = w;
 	height = h;
 	goalWidth = gw;
@@ -121,12 +121,8 @@ void Field::InitField(float w, float h, float gw, float gp, float b,const olc::P
 	goalRight.x = (p->ScreenWidth() + width) / 2.0f - goalDepth;
 	goalRight.y = goalLeft.y;
 }
-void Field::DrawField(olc::PixelGameEngine* p) {
-	olc::Pixel borderColor= olc::DARK_YELLOW;
-	float radius = height/5.0f;
+void Field::DrawField() {
 
-	//绘制外圈
-	p->FillRect(outterX, outterY, width + border * 2.0f, height + border * 2.0f, borderColor);
 
 	//绘制内圈
 	p->FillRect(innerX, innerY, width, height);
@@ -135,7 +131,7 @@ void Field::DrawField(olc::PixelGameEngine* p) {
 	p->DrawLine(p->ScreenWidth() / 2.0f, innerY, p->ScreenWidth() / 2.0f, innerY + height, borderColor);
 
 	//绘制中央圆
-	p->DrawCircle(p->ScreenWidth() / 2.0f, p->ScreenHeight() / 2.0f, radius,olc::BLACK);
+	p->DrawCircle(p->ScreenWidth() / 2.0f, p->ScreenHeight() / 2.0f, height/ heightRadiusRatio,olc::BLACK);
 
 	//绘制球门
 	p->FillRect(goalLeft.x, goalLeft.y, goalDepth, goalWidth, olc::GREEN);
@@ -144,7 +140,16 @@ void Field::DrawField(olc::PixelGameEngine* p) {
 
 }
 
-void Puck::InitPuck(const Field& f,olc::Pixel col) {
+void Field::DrawBarrier() {
+	p->FillRect(outterX, outterY, border, height + border * 2.0f, borderColor);
+	p->FillRect(outterX, outterY, width + border * 2.0f,border, borderColor);
+	p->FillRect(outterX+width+border, outterY, border, height + border * 2.0f, borderColor);
+	p->FillRect(outterX, outterY+height+border, width + border * 2.0f, border, borderColor);
+}
+
+void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {
+	this->p = p;
+	this->f = f;
 	position.x = f.innerX+f.width/2.0f;
 	position.y = f.innerY+f.height/2.0f;
 	radius = f.goalWidth/goalPuckRatio;
@@ -152,18 +157,56 @@ void Puck::InitPuck(const Field& f,olc::Pixel col) {
 }
 
 
-void Puck::DrawPuck(olc::PixelGameEngine* p) {
-	p->FillCircle(position.x, position.y, radius,color);
+void Puck::DrawPuck() {
+	float x = position.x;
+	float y = position.y;
+	if (radius > 0)
+	{
+		int x0 = 0;
+		int y0 = radius;
+		int d = 3 - 2 * radius;
+
+		//定义一个lambda函数drawline
+		auto drawline = [&](int sx, int ex, int y)
+		{
+			for (int x = sx; x <= ex; x++)
+				p->Draw(x, y, color);
+		};
+
+		while (y0 >= x0)
+		{
+			drawline(x - y0, x + y0, y - x0);
+			if (x0 > 0)	drawline(x - y0, x + y0, y + x0);
+
+			if (d < 0)
+				d += 4 * x0++ + 6;
+			else
+			{
+				if (x0 != y0)
+				{
+					drawline(x - x0, x + x0, y - y0);
+					drawline(x - x0, x + x0, y + y0);
+				}
+				d += 4 * (x0++ - y0--) + 10;
+			}
+		}
+	}
+	else
+		p->Draw(x, y, color);
+	
+	
 }
 
-void Puck::Move(const Field& f) {
+void Puck::Move() {
 	olc::vf2d nextPos = position + velocity;
+	if (nextPos.y - radius >= f.goalLeft.y && nextPos.y + radius <= f.goalLeft.y + f.goalWidth) {
 
-	if (nextPos.x - radius < f.innerX || nextPos.x +radius>f.innerX+f.width) {
+	}
+	else if (nextPos.x - radius < f.innerX || nextPos.x +radius>f.innerX+f.width) {
 		velocity.x = -velocity.x;
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
-	if (nextPos.y - radius < f.innerY || nextPos.y + radius > f.innerY + f.height) {
+	else if (nextPos.y - radius < f.innerY || nextPos.y + radius > f.innerY + f.height) {
 		velocity.y = -velocity.y;
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
@@ -173,7 +216,9 @@ void Puck::Move(const Field& f) {
 
 }
 
-void Paddle::InitPaddle(const Field& f,Side side, olc::Pixel inCol, olc::Pixel outCol) {
+void Paddle::InitPaddle(const Field& f,Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine* p) {
+	this->p = p;
+	this->f = f;
 	innerR = f.goalWidth / goalPaddleRatio / 1.5f;
 	outerR = f.goalWidth / goalPaddleRatio;
 	if (LEFT == side) {
@@ -188,12 +233,12 @@ void Paddle::InitPaddle(const Field& f,Side side, olc::Pixel inCol, olc::Pixel o
 	outerCol = outCol;
 }
 
-void Paddle::DrawPaddle(olc::PixelGameEngine* p) {
+void Paddle::DrawPaddle() {
 	p->FillCircle(pos.x, pos.y, outerR, outerCol);
 	p->FillCircle(pos.x, pos.y, innerR, innerCol);
 }
 
-void Paddle::Move(const Field& f) {
+void Paddle::Move() {
 	float nextX, nextY;
 	nextX = pos.x;
 	nextY = pos.y;

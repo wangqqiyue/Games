@@ -24,10 +24,14 @@ public:
 	float innerX, innerY, outterX, outterY;
 	olc::vf2d goalLeft, goalRight;
 	float friction = 0.01;//Ä¦²ÁÁ¦ÏµÊý
+	olc::Pixel borderColor = olc::DARK_YELLOW;
+	float heightRadiusRatio =  5.0f;
+	olc::PixelGameEngine* p;
 
 	Field() = default;
-	void InitField(float w, float h, float gw, float gp, float b,const olc::PixelGameEngine* p);
-	void DrawField(olc::PixelGameEngine* p);
+	void InitField(float w, float h, float gw, float gp, float b,olc::PixelGameEngine* p);
+	void DrawField();
+	void DrawBarrier();
 };
 
 //±ùÇò
@@ -39,12 +43,14 @@ public:
 	float radius;
 	olc::Pixel color;
 	float goalPuckRatio = 4.0f;
-	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
+	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav"); 
+	Field f;
+	olc::PixelGameEngine* p;
 
 	Puck() = default;
-	void InitPuck(const Field& f, olc::Pixel col);
-	void DrawPuck(olc::PixelGameEngine* p);
-	void Move(const Field& f);
+	void InitPuck(const Field& f, olc::Pixel col, olc::PixelGameEngine* p);
+	void DrawPuck();
+	void Move();
 
 };
 
@@ -59,10 +65,12 @@ public:
 	float mass = 1.0f;
 	float speedEasy = 10.0f;
 	float goalPaddleRatio = 4.0f;
+	olc::PixelGameEngine* p;
+	Field f;
 
-	void InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol);
-	void DrawPaddle(olc::PixelGameEngine* p);
-	void Move(const Field& f);
+	void InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine*p);
+	void DrawPaddle();
+	void Move();
 
 };
 
@@ -84,18 +92,20 @@ public:
 		sAppName = "IceHockey";
 	}
 	void MouseOperate();
-	void CollisionResponse(Paddle& paddle);
+	void CollisionResponse(Paddle& paddle,float fElapsedTime);
 	void AiResponse(float fElapsedTime);
 	void Rendering();
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
 public:
 	bool OnUserCreate() override
 	{
+		CreateLayer();
+		SetDrawTarget(nullptr);
 		// Called once at the start, so create things here
 		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.8f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 20.0f, this);
-		puck.InitPuck(field,olc::MAGENTA);
-		paddle.InitPaddle(field,LEFT, olc::RED, olc::DARK_RED);
-		AiPaddle.InitPaddle(field,RIGHT, olc::BLUE, olc::DARK_BLUE);
+		puck.InitPuck(field,olc::MAGENTA,this);
+		paddle.InitPaddle(field,LEFT, olc::RED, olc::DARK_RED,this);
+		AiPaddle.InitPaddle(field,RIGHT, olc::BLUE, olc::DARK_BLUE,this);
 		return true;
 	}
 
@@ -105,9 +115,9 @@ public:
 		Rendering();
 		MouseOperate();
 		AiResponse(fElapsedTime);
-		puck.Move(field);
-		CollisionResponse(paddle);
-		CollisionResponse(AiPaddle);
+		puck.Move();
+		CollisionResponse(paddle, fElapsedTime);
+		CollisionResponse(AiPaddle, fElapsedTime);
 		
 		return true;
 	}
