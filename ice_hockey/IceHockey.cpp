@@ -79,7 +79,7 @@ void IceHockey::CollisionResponse(Paddle& paddle, float fElapsedTime) {
 	olc::vf2d vPaddle = paddle.v;
 	olc::vf2d vRelative = puck.velocity - vPaddle;
 	olc::vf2d vDis = puck.position - paddle.pos;
-	olc::vf2d vNormal = vDis.norm();
+	olc::vf2d vNormal = vDis.norm();//碰撞垂向量
 	float vRn = vRelative.dot(vNormal);
 	float dis = vDis.mag();
 	float sumR = paddle.outerR + puck.radius;
@@ -321,7 +321,35 @@ void Puck::Move() {
 	p->DrawRect(position.x - radius, position.y - radius, radius * 2, radius * 2, olc::RED);
 
 	if (position.y - radius >= f.goalLeft.y && position.y + radius <= f.goalLeft.y + f.goalWidth) {
+		//如果冰球上下边沿都在在球门范围内,则不必检测碰撞
 		bound = false;
+	}
+	else if(position.y >= f.goalLeft.y && position.y <= f.goalLeft.y + f.goalWidth) {
+		//如果冰球的球心在球门范围内,检测碰撞点
+		olc::vf2d leftUp, leftDown, rightUp, rightDown;//待检测的4个碰撞点
+		olc::vf2d vRelative={0.0f,0.0f};//相对速度
+		olc::vf2d vN;//碰撞垂向量
+		leftUp =  f.goalLeft;
+		leftDown = { leftUp.x,leftUp.y + f.goalWidth };
+		rightUp = { f.goalRight.x + f.goalDepth,f.goalRight.y };
+		rightDown = { rightUp.x,rightUp.y + f.goalWidth };
+		if ((position - leftUp).mag() < radius) {
+			vN = (position - leftUp).norm();
+			vRelative = velocity.dot(vN) * vN;
+		}
+		else if ((position - leftDown).mag() < radius) {
+			vN = (position - leftDown).norm();
+			vRelative = velocity.dot(vN) * vN;
+		}
+		else if ((position - rightUp).mag() < radius) {
+			vN = (position - rightUp).norm();
+			vRelative = velocity.dot(vN) * vN;
+		}
+		else if ((position - rightDown).mag() < radius) {
+			vN = (position - rightDown).norm();
+			vRelative = velocity.dot(vN) * vN;
+		}
+		velocity += -2.0f*vRelative;
 	}
 	else {
 		bound = BoundBarrier(position, &velocity, radius, { f.innerX,f.innerY }, f.width, f.height);
