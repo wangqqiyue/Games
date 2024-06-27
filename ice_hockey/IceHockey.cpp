@@ -97,6 +97,9 @@ void IceHockey::CollisionResponse(Paddle& paddle, float fElapsedTime) {
 		//调整位置
 		paddle.pos -= (sumR-dis)*vDis.norm();
 
+		if (puck.velocity.mag() > 100.0f) {
+			puck.velocity /= 2.0f;
+		}
 	}
 
 }
@@ -243,7 +246,8 @@ void Field::DrawField() {
 
 
 	//绘制内圈
-	p->FillRect(innerX, innerY, width, height);
+	// Fill 函数很耗时,尽量少用
+	//p->FillRect(innerX, innerY, width, height);
 
 	//绘制中线
 	p->DrawLine(p->ScreenWidth() / 2.0f, innerY, p->ScreenWidth() / 2.0f, innerY + height, borderColor);
@@ -252,8 +256,8 @@ void Field::DrawField() {
 	p->DrawCircle(p->ScreenWidth() / 2.0f, p->ScreenHeight() / 2.0f, height/ heightRadiusRatio,olc::BLACK);
 
 	//绘制球门
-	p->FillRect(goalLeft.x, goalLeft.y, goalDepth, goalWidth, olc::GREEN);
-	p->FillRect(goalRight.x, goalRight.y, goalDepth, goalWidth, olc::GREEN);
+	p->DrawRect(goalLeft.x, goalLeft.y, goalDepth, goalWidth, olc::GREEN);
+	p->DrawRect(goalRight.x, goalRight.y, goalDepth, goalWidth, olc::GREEN);
 
 
 }

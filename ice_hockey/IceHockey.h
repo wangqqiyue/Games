@@ -130,13 +130,14 @@ public:
 	bool OnUserUpdate(float fElapsedTime) override
 	{
 		
-		Clear(olc::BLACK);
+		Clear(olc::WHITE);
 		if (reset) {
 			Sleep(1000);
 			//播放开始比赛的哨声
 			PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 			reset = false;
 		}
+
 		MouseOperate(player1);
 		//AiResponseStrong(ai1);
 		AiResponseStrong(ai2);
