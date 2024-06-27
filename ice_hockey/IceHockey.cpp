@@ -1,30 +1,36 @@
 #include "IceHockey.h"
 
-void BoundBarrier(olc::vf2d& pos,olc::vf2d* v, float r, olc::vf2d barrier,  float width, float height) {
+bool BoundBarrier(olc::vf2d& pos,olc::vf2d* v, float r, olc::vf2d barrier,  float width, float height) {
+	bool bound = false;
 	if (pos.x < barrier.x + r) {//左边界
 		pos.x = barrier.x + r;
 		if (v) {
 			v->x = -v->x;
 		}
+		bound = true;
 	}
 	else if (pos.x > barrier.x+width-r) {//右边界
 		pos.x = barrier.x + width - r;
 		if (v) {
 			v->x = -v->x;
 		}
+		bound = true;
 	}
 	else if (pos.y < barrier.y+r) {//上边界
 		pos.y = barrier.y + r;
 		if (v) {
 			v->y = -v->y;
 		}
+		bound = true;
 	}
 	else if (pos.y > barrier.y +height- r) {//下边界
 		pos.y = barrier.y + height - r;
 		if (v) {
 			v->y = -v->y;
 		}
+		bound = true;
 	}
+	return bound;
 }
 
 void IceHockey::GameReset() {
@@ -90,10 +96,6 @@ void IceHockey::CollisionResponse(Paddle& paddle, float fElapsedTime) {
 
 		//调整位置
 		paddle.pos -= (sumR-dis)*vDis.norm();
-		
-		
-		
-
 
 	}
 
@@ -320,20 +322,9 @@ void Puck::Move() {
 
 	if (position.y - radius >= f.goalLeft.y && position.y + radius <= f.goalLeft.y + f.goalWidth) {
 		bound = false;
-	}else if (position.x< f.innerX + radius) {
-		position.x = f.innerX + radius;
-		velocity.x = -velocity.x;
-	}else if (position.x  > f.innerX + f.width- radius) {
-		position.x = f.innerX + f.width - radius;
-		velocity.x = -velocity.x;
-	}else if (position.y  < f.innerY+ radius) {
-		position.y = f.innerY + radius;
-		velocity.y = -velocity.y;
-	}else if ( position.y > f.innerY + f.height- radius) {
-		position.y = f.innerY + f.height - radius;
-		velocity.y = -velocity.y;	
-	}else {
-		bound = false;
+	}
+	else {
+		bound = BoundBarrier(position, &velocity, radius, { f.innerX,f.innerY }, f.width, f.height);
 	}
 
 	if (bound) {
