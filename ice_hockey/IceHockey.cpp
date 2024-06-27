@@ -32,7 +32,6 @@ void IceHockey::GameReset() {
 	player1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
 	//ai1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this,&ai2);
 	ai2.InitPaddle(field, RIGHT, olc::BLUE, olc::DARK_BLUE, this,&ai1);
-	reset = true;
 }
 
 bool IceHockey::PuckInGoal() {
@@ -42,15 +41,25 @@ bool IceHockey::PuckInGoal() {
 	float goalY = field.goalLeft.y;
 	float goalWidth = field.goalWidth;
 	if (y - r >= goalY && y + r <= goalY + goalWidth) {
+		//×ó²à½øÇò£¬ÔòÓÒ²àÊ¤Àû
 		if (x + r <= field.innerX ) {
-			
 			ai2.score++;
+			//ÔÚÓÒ²àÖÐÑëÎ»ÖÃ»æÖÆ GOAL! ×Ö·û´®
+			std::string win = "GOAL!";
+			float x = ((field.innerX + field.width)+(field.innerX+field.width/2.0f) - 2 * win.length() * 8) / 2.0f;
+			float y = field.innerY + field.height / 2.0f;
+			DrawString(x,y,win,olc::BLACK,2);
 			PlaySound(lose_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 			return true;
 		}
+		//ÓÒ²à½øÇò£¬Ôò×ó²àÊ¤Àû
 		else if (x - r >= field.innerX + field.width) {
 			//ai1.score++;
 			player1.score++;
+			std::string win = "GOAL!";
+			float x = ((field.innerX ) + (field.innerX + field.width / 2.0f) - 2 * win.length() * 8) / 2.0f;
+			float y = field.innerY + field.height / 2.0f;
+			DrawString(x, y, win, olc::BLACK, 2);
 			PlaySound(win_sound_file,NULL,SND_FILENAME|SND_ASYNC);
 			
 			return true;
@@ -258,7 +267,7 @@ void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {
 	this->p = p;
 	this->f = f;
 	position.x = f.innerX+f.width/2.0f;
-	position.y = f.innerY;
+	position.y = f.innerY+radius;
 	velocity = { 0,1.0f };
 	radius = f.goalWidth/goalPuckRatio;
 	color = col;

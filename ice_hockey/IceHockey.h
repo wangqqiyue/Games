@@ -129,8 +129,14 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
+		
 		Clear(olc::BLACK);
-
+		if (reset) {
+			Sleep(1000);
+			//播放开始比赛的哨声
+			PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
+			reset = false;
+		}
 		MouseOperate(player1);
 		//AiResponseStrong(ai1);
 		AiResponseStrong(ai2);
@@ -140,13 +146,10 @@ public:
 		CollisionResponse(player1, fElapsedTime);
 		CollisionResponse(ai2, fElapsedTime);
 		Rendering();
-		if (reset) {
-			Sleep(1000);
-			reset = false;
-		}
+		
 		if (PuckInGoal()) {
-			Sleep(1000);
 			GameReset();
+			reset = true;
 		}
 
 		return true;
