@@ -317,7 +317,7 @@ void Puck::DrawPuck() {
 }
 
 void Puck::Move() {
-	bool bound = true;
+	bool bound = false;
 	p->DrawRect(position.x - radius, position.y - radius, radius * 2, radius * 2, olc::RED);
 
 	if (position.y - radius >= f.goalLeft.y && position.y + radius <= f.goalLeft.y + f.goalWidth) {
@@ -349,13 +349,17 @@ void Puck::Move() {
 			vN = (position - rightDown).norm();
 			vRelative = velocity.dot(vN) * vN;
 		}
-		velocity += -2.0f*vRelative;
+		if (vRelative.mag() > 0.01f) {
+			bound = true;
+			velocity += -2.0f * vRelative;
+		}
 	}
 	else {
 		bound = BoundBarrier(position, &velocity, radius, { f.innerX,f.innerY }, f.width, f.height);
 	}
 
 	if (bound) {
+		PlaySound(NULL, 0, 0);//先停止其他所有声音,再播放当前音效
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
 	
