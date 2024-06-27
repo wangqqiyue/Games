@@ -3906,7 +3906,7 @@ namespace olc
 
 
 		// if FPS high enough, sleep to release CPU
-		std::chrono::duration<float,std::ratio<1,1>> minimal_timing = std::chrono::duration < float, std::ratio<1, 1>>(1.0f / 120.0f);//120FPS
+		std::chrono::duration<float,std::ratio<1,1>> minimal_timing = std::chrono::duration < float, std::ratio<1, 1>>(1.0f / 20.0f);//120FPS
 		//cout << "elapsedTime1=" << elapsedTime.count() << endl;
 		if (minimal_timing > elapsedTime) {
 			std::chrono::duration<float> sleep_time = minimal_timing - elapsedTime;

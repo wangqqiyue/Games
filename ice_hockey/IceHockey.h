@@ -82,6 +82,7 @@ public:
 	olc::vf2d posGoal;
 	olc::vf2d posEnemyGoal;
 	const Paddle* enemy;
+	int coolDown=10;
 };
 
 
@@ -93,15 +94,15 @@ public:
 	Puck puck;
 	Paddle paddle;
 	bool holdPaddle=false;
-	Paddle player;
+	Paddle player1;
 	AiPaddle ai1, ai2;
 	LPCWSTR whistle_sound_file = TEXT("sound\\whistle.wav");
+	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
+	LPCWSTR win_sound_file = TEXT("sound\\win.wav");
+	LPCWSTR lose_sound_file = TEXT("sound\\lose.wav");
+	bool reset = false;
 
-	IceHockey()
-	{
-		// Name your application
-		sAppName = "IceHockey";
-	}
+
 	void MouseOperate(Paddle& paddle);
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
 	void AiResponse(AiPaddle& paddle);
@@ -110,12 +111,18 @@ public:
 	bool PuckInGoal();
 	void GameReset();
 	void DrawScore(int s1,int s2);
-	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
+
 public:
+	IceHockey()
+	{
+		// Name your application
+		sAppName = "IceHockey";
+	}
+
 	bool OnUserCreate() override
 	{
 		// Called once at the start, so create things here
-		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.8f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 20.0f, this);
+		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.6f, ScreenHeight()*0.3f, ScreenWidth()*0.05f, 20.0f, this);
 		GameReset();
 		return true;
 	}
@@ -123,17 +130,25 @@ public:
 	bool OnUserUpdate(float fElapsedTime) override
 	{
 		Clear(olc::BLACK);
-		Rendering();
-		//MouseOperate();
-		AiResponse(ai1);
+
+		MouseOperate(player1);
+		//AiResponseStrong(ai1);
 		AiResponseStrong(ai2);
 		puck.Move();
 		//CollisionResponse(player, fElapsedTime);
-		CollisionResponse(ai1, fElapsedTime);
+		//CollisionResponse(ai1, fElapsedTime);
+		CollisionResponse(player1, fElapsedTime);
 		CollisionResponse(ai2, fElapsedTime);
+		Rendering();
+		if (reset) {
+			Sleep(1000);
+			reset = false;
+		}
 		if (PuckInGoal()) {
+			Sleep(1000);
 			GameReset();
 		}
+
 		return true;
 	}
 };

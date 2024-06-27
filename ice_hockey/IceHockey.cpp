@@ -28,11 +28,11 @@ void BoundBarrier(olc::vf2d& pos,olc::vf2d* v, float r, olc::vf2d barrier,  floa
 }
 
 void IceHockey::GameReset() {
-PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
-puck.InitPuck(field, olc::MAGENTA, this);
-//paddle.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
-ai1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this,&ai2);
-ai2.InitPaddle(field, RIGHT, olc::BLUE, olc::DARK_BLUE, this,&ai1);
+	puck.InitPuck(field, olc::MAGENTA, this);
+	player1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
+	//ai1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this,&ai2);
+	ai2.InitPaddle(field, RIGHT, olc::BLUE, olc::DARK_BLUE, this,&ai1);
+	reset = true;
 }
 
 bool IceHockey::PuckInGoal() {
@@ -43,11 +43,17 @@ bool IceHockey::PuckInGoal() {
 	float goalWidth = field.goalWidth;
 	if (y - r >= goalY && y + r <= goalY + goalWidth) {
 		if (x + r <= field.innerX ) {
+			
 			ai2.score++;
+			PlaySound(lose_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 			return true;
 		}
 		else if (x - r >= field.innerX + field.width) {
-			ai1.score++;
+			//ai1.score++;
+			player1.score++;
+			PlaySound(win_sound_file,NULL,SND_FILENAME|SND_ASYNC);
+			
+			return true;
 		}
 	}
 	return false;
@@ -124,7 +130,8 @@ void IceHockey::DrawScore(int s1,int s2) {
 
 void IceHockey::Rendering() {
 	//绘制比分
-	DrawScore(ai1.score,ai2.score);
+	//DrawScore(ai1.score,ai2.score);
+	DrawScore(player1.score,ai2.score);
 	//先绘制场地
 	field.DrawField();
 	//再绘制冰球
@@ -132,26 +139,35 @@ void IceHockey::Rendering() {
 	//绘制边框
 	field.DrawBarrier();
 	//绘制球拍
-	//player.DrawPaddle();
-	ai1.DrawPaddle();
+	player1.DrawPaddle();
+	//ai1.DrawPaddle();
 	ai2.DrawPaddle();
 }
 
 
 void IceHockey::AiResponseStrong(AiPaddle& paddle) {
-	olc::vf2d nMove;
-	//策略
-	if ((puck.position - paddle.pos).dot(paddle.posEnemyGoal - puck.position) > 0.5f) {
-		//如果球和敌方球门的夹角较小,则大力进攻
-		nMove = (puck.position - paddle.pos).norm()*2;
-		if ((puck.position - paddle.pos).dot(paddle.enemy->pos - puck.position) < 0.5f) {
+	olc::vf2d nMove = { 0.0f,0.0f };
+	float disX = paddle.pos.x - puck.position.x;
+	//默认方向是朝向球的方向
+	nMove = (puck.position - paddle.pos).norm();
+
+	//进攻策略,当球未越过球拍时采用
+	if ((paddle.side == LEFT && disX <0) || (paddle.side==RIGHT && disX>0)) {
+
+		if ((puck.position- paddle.pos).norm().dot((paddle.posEnemyGoal - paddle.pos).norm()) > 0.7f) {
+			//如果球拍到球的和敌方球门的夹角较小,则大力进攻
+			nMove = (puck.position - paddle.pos).norm();
+		}else if ((puck.position-paddle.pos).mag()/1.5f<puck.radius+paddle.outerR && ((puck.position - paddle.pos).norm()).dot((paddle.enemy->pos - paddle.pos).norm()) > 0.5f) {
 			//如果球和敌人的夹角较小,则侧面突击
-			nMove = (paddle.enemy->pos - puck.position).perp().norm()*2;
+			nMove = (paddle.enemy->pos - puck.position).polar().norm();
+			DrawLine(paddle.pos+ (paddle.enemy->pos - puck.position).polar().norm()*field.height, paddle.pos, olc::GREEN);
 		}
+
 	}
-	else {
-		//回防
-		nMove = (paddle.posGoal - paddle.pos).norm()/4.0f;
+	//防守策略,当球已越过球拍时采用
+	else if (puck.velocity.mag() > paddle.speedEasy) {
+		olc::vf2d pCenter = (puck.position + paddle.posGoal) / 2.0f;
+		nMove = (pCenter - paddle.pos).norm();
 	}
 
 	paddle.v = paddle.speedEasy * nMove;
