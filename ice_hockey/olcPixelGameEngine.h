@@ -1025,6 +1025,8 @@ namespace olc
 		void SetDrawTarget(Sprite* target);
 		// Gets the current Frames Per Second
 		uint32_t GetFPS() const;
+		uint32_t GetMaxFPS() const;
+		void SetMaxFPS(uint32_t maxFPS);
 		// Gets last update of elapsed time
 		float GetElapsedTime() const;
 		// Gets Actual Window size
@@ -1237,12 +1239,13 @@ namespace olc
 		bool		bEnableVSYNC = false;
 		float		fFrameTimer = 1.0f;
 		float		fLastElapsed = 0.0f;
-		int			nFrameCount = 0;		
+		int			nFrameCount = 0;	
 		bool bSuspendTextureTransfer = false;
 		Renderable  fontRenderable;
 		std::vector<LayerDesc> vLayers;
 		uint8_t		nTargetLayer = 0;
 		uint32_t	nLastFPS = 0;
+		uint32_t    maxFPS = 120;
 		bool        bPixelCohesion = false;
 		DecalMode   nDecalMode = DecalMode::NORMAL;
 		DecalStructure nDecalStructure = DecalStructure::FAN;
@@ -2101,6 +2104,12 @@ namespace olc
 
 	uint32_t PixelGameEngine::GetFPS() const
 	{ return nLastFPS; }
+
+	uint32_t PixelGameEngine::GetMaxFPS() const
+	{	return maxFPS;	}
+
+	void PixelGameEngine::SetMaxFPS(uint32_t maxFPS)
+	{	this->maxFPS = maxFPS;	}
 
 	bool PixelGameEngine::IsFocused() const
 	{ return bHasInputFocus; }
@@ -3906,7 +3915,7 @@ namespace olc
 
 
 		// if FPS high enough, sleep to release CPU
-		std::chrono::duration<float,std::ratio<1,1>> minimal_timing = std::chrono::duration < float, std::ratio<1, 1>>(1.0f / 120.0f);//120FPS
+		std::chrono::duration<float,std::ratio<1,1>> minimal_timing = std::chrono::duration < float, std::ratio<1, 1>>(1.0f/maxFPS);//120FPS
 		//cout << "elapsedTime1=" << elapsedTime.count() << endl;
 		if (minimal_timing > elapsedTime) {
 			std::chrono::duration<float> sleep_time = minimal_timing - elapsedTime;

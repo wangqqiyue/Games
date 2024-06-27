@@ -50,7 +50,7 @@ public:
 	Puck() = default;
 	void InitPuck(const Field& f, olc::Pixel col, olc::PixelGameEngine* p);
 	void DrawPuck();
-	void Move();
+	void Move(float fElapsedTime);
 
 };
 
@@ -65,6 +65,8 @@ public:
 	olc::vf2d v;
 	float mass = 1.0f;
 	float speedEasy = 10.0f;
+	float speedNormal = 20.0f;
+	float speedHard = 30.0f;
 	float goalPaddleRatio = 4.0f;
 	olc::PixelGameEngine* p;
 	Field f;
@@ -72,7 +74,7 @@ public:
 
 	void InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine*p);
 	void DrawPaddle();
-	void Move();
+	void Move(float fElapsedTime);
 
 };
 
@@ -82,7 +84,6 @@ public:
 	olc::vf2d posGoal;
 	olc::vf2d posEnemyGoal;
 	const Paddle* enemy;
-	int coolDown=10;
 };
 
 
@@ -105,8 +106,8 @@ public:
 
 	void MouseOperate(Paddle& paddle);
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
-	void AiResponse(AiPaddle& paddle);
-	void AiResponseStrong(AiPaddle& paddle);
+	void AiResponse(AiPaddle& paddle,float fElapsedTime);
+	void AiResponseStrong(AiPaddle& paddle,float fElapsedTime);
 	void Rendering();
 	bool PuckInGoal();
 	void GameReset();
@@ -140,8 +141,8 @@ public:
 
 		MouseOperate(player1);
 		//AiResponseStrong(ai1);
-		AiResponseStrong(ai2);
-		puck.Move();
+		AiResponseStrong(ai2, fElapsedTime);
+		puck.Move(fElapsedTime);
 		//CollisionResponse(player, fElapsedTime);
 		//CollisionResponse(ai1, fElapsedTime);
 		CollisionResponse(player1, fElapsedTime);
