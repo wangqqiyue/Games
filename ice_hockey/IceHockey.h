@@ -106,6 +106,21 @@ public:
 	LPCWSTR lose_sound_file = TEXT("sound\\lose.wav");
 	bool reset = false;
 	bool judged = false;
+	std::unique_ptr<olc::Sprite> bgSprite;
+	std::unique_ptr<olc::Decal> bgDecal;
+	std::unique_ptr<olc::Sprite> ringSprite;
+	std::unique_ptr<olc::Decal> ringDecal;
+	std::unique_ptr<olc::Sprite> logoSprite;
+	std::unique_ptr<olc::Decal> logoDecal;
+	std::unique_ptr<olc::Sprite> chinaSprite;
+	std::unique_ptr<olc::Decal> chinaDecal;
+	std::unique_ptr<olc::Sprite> franceSprite;
+	std::unique_ptr<olc::Decal> franceDecal;
+	std::string  ring_img_file = "img\\olympic-ring.jpg";
+	std::string  bg_img_file = "img\\beijing-2022.jpg";
+	std::string  logo_img_file = "img\\logo.jpg";
+	std::string  china_img_file = "img\\china-flag.png";
+	std::string  france_img_file = "img\\france-flag.png";
 
 	void MouseOperate(Paddle& paddle);
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
@@ -127,6 +142,16 @@ public:
 	{
 		// Called once at the start, so create things here
 		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.6f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 40.0f, this);
+		bgSprite= std::make_unique<olc::Sprite>(bg_img_file);
+		bgDecal = std::make_unique<olc::Decal>(bgSprite.get());
+		ringSprite = std::make_unique<olc::Sprite>(ring_img_file);
+		ringDecal = std::make_unique<olc::Decal>(ringSprite.get());
+		logoSprite = std::make_unique<olc::Sprite>(logo_img_file);
+		logoDecal = std::make_unique<olc::Decal>(logoSprite.get());
+		chinaSprite = std::make_unique<olc::Sprite>(china_img_file);
+		chinaDecal = std::make_unique<olc::Decal>(chinaSprite.get());
+		franceSprite = std::make_unique<olc::Sprite>(france_img_file);
+		franceDecal = std::make_unique<olc::Decal>(franceSprite.get());
 		GameReset();
 		return true;
 	}

@@ -4482,8 +4482,21 @@ namespace olc
 					glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 					break;
 				case olc::DecalMode::MULTIPLICATIVE:
-					glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+					//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+					//glBlendFunc(GL_ZERO, GL_DST_COLOR); 
+					//glBlendFunc(GL_DST_COLOR, GL_ZERO); 重叠部分颜色以背景为主,非重叠部分也显示背景
+					//glBlendFunc(GL_DST_COLOR, GL_ONE);重叠部分颜色以图像为主,非重叠部分不显示背景
+					//glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_DST_ALPHA);重叠部分会显示下层内容的1-alpha
+					//glBlendFunc(GL_ZERO, GL_DST_COLOR); 完全不显示背景图,图像颜色加深,没有重叠
+					//glBlendFunc(GL_ZERO, GL_ONE);只有图像,没有背景
+					//glBlendFunc(GL_ONE, GL_ZERO);只有背景,没有图像
+					//glBlendFunc(GL_SRC_COLOR, GL_ONE);不显示图像,重叠部分可以看到背景
+					//glBlendFunc(GL_ONE, GL_SRC_COLOR);不显示图像,重叠部分可以看到背景
+					//glBlendFunc(GL_ONE, GL_ONE);不显示图像,重叠部分可以看到背景
+					glBlendFunc(GL_DST_COLOR, GL_ZERO);
+					
 					break;
+
 				case olc::DecalMode::STENCIL:
 					glBlendFunc(GL_ZERO, GL_SRC_ALPHA);
 					break;
@@ -4527,7 +4540,7 @@ namespace olc
 			{
 				glEnable(GL_DEPTH_TEST);
 			}
-
+		
 			if (nDecalMode == DecalMode::WIREFRAME)
 				glBegin(GL_LINE_LOOP);
 			else

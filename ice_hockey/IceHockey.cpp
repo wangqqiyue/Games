@@ -161,14 +161,28 @@ void IceHockey::MouseOperate(Paddle& paddle) {
 }
 
 void IceHockey::DrawScore(int s1,int s2) {
-	std::string str = "Score ";
+	std::string str;
 	str += std::to_string(s1);
 	str += ":";
 	str += std::to_string(s2);
-	DrawString((ScreenWidth() - str.length() * 2 * 8) / 2.0f, 8, str, olc::BLACK, 2);
+	DrawString((ScreenWidth() - str.length() * 4 * 8) / 2.0f, 65, str, olc::BLACK, 4);
 }
 
 void IceHockey::Rendering() {
+	//绘制背景,太耗时了
+	// Sprites live in RAM and are accessed and manipulated by the CPU. 
+	//DrawSprite(0, 0, bgSprite.get());
+	//A decal is a sprite that lives on the GPU
+	// The GPU will draw the decal on top of whatever was drawn by the CPU first. 
+	//SetDrawTarget(bgSprite.get());
+	SetDecalMode(olc::DecalMode::MULTIPLICATIVE);
+	DrawDecal({ 10,10 }, bgDecal.get());
+	DrawDecal({ ScreenWidth()-ringSprite.get()->width-10.0f ,5.0f }, ringDecal.get());
+	DrawDecal({ (ScreenWidth() - logoSprite.get()->width) / 2.0f ,(ScreenHeight() - logoSprite.get()->height) / 2.0f }, logoDecal.get());
+	DrawDecal({ ScreenWidth()/2.0f - chinaSprite.get()->width - 4.0f ,5.0f }, chinaDecal.get());
+	DrawDecal({ ScreenWidth()/2.0f + 4.0f ,5.0f }, franceDecal.get());
+
+	SetDrawTarget(nullptr);
 	//绘制比分
 	//DrawScore(ai1.score,ai2.score);
 	DrawScore(player1.score,ai2.score);
@@ -410,7 +424,7 @@ void Puck::Move(float fElapsedTime) {
 	}
 
 	float ratio = fElapsedTime * p->GetFPS();
-	cout << "ratio=" << ratio<<endl;
+	//cout << "ratio=" << ratio<<endl;
 	position.x += velocity.x*ratio;
 	position.y += velocity.y*ratio;
 	velocity *= (1.0f-f.friction);
