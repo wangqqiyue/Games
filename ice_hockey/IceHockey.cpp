@@ -131,16 +131,11 @@ void IceHockey::MouseOperate(Paddle& paddle) {
 	if (!holdPaddle) {
 		if ((mPos-paddle.pos).mag() <= paddle.outerR && GetMouse(0).bHeld) {
 			holdPaddle = true;
-			cout << "holdPaddle=" << holdPaddle << endl;
-		}
-		if (GetMouse(0).bHeld) {
-			cout << "(mPos-paddle.pos).mag()=" << (mPos-paddle.pos).mag() << endl;
-			cout << "mPos" << mPos << endl;
-			cout << "paddle.pos" << paddle.pos << endl;
+		//	cout << "holdPaddle=" << holdPaddle << endl;
 		}
 		
 	}
-	if (holdPaddle) {
+	if (true) {
 		paddle.lastPos = paddle.pos;
 		paddle.pos.x = mPos.x;
 		paddle.pos.y = mPos.y;
@@ -318,7 +313,7 @@ void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {
 	
 	radius = f.goalWidth/goalPuckRatio;
 	color = col;
-	speedMax = f.height/10.0f;
+	speedMax = radius;
 }
 
 
@@ -412,8 +407,8 @@ void Puck::Move(float fElapsedTime) {
 		velocity /= 2.0f;
 	}
 
-	float ratio = fElapsedTime * p->GetMaxFPS();
-
+	float ratio = fElapsedTime * p->GetFPS();
+	cout << "ratio=" << ratio<<endl;
 	position.x += velocity.x*ratio;
 	position.y += velocity.y*ratio;
 	velocity *= (1.0f-f.friction);

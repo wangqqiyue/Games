@@ -46,7 +46,7 @@ public:
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav"); 
 	Field f;
 	olc::PixelGameEngine* p;
-	float speedMax = 50.0f;
+	float speedMax;
 
 	Puck() = default;
 	void InitPuck(const Field& f, olc::Pixel col, olc::PixelGameEngine* p);
@@ -125,7 +125,7 @@ public:
 	bool OnUserCreate() override
 	{
 		// Called once at the start, so create things here
-		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.6f, ScreenHeight()*0.3f, ScreenWidth()*0.05f, 20.0f, this);
+		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.6f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 40.0f, this);
 		GameReset();
 		return true;
 	}
