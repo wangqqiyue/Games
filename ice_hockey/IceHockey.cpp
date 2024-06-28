@@ -152,6 +152,9 @@ void IceHockey::MouseOperate(Paddle& paddle) {
 			paddle.pos.y = field.innerY + paddle.outerR;
 		}
 		paddle.v = paddle.pos - paddle.lastPos;
+		while (paddle.v.mag() > SPEED_MAX) {
+			paddle.v /= 2.0F;
+		}
 	}
 	
 	//cout << "player.v.mag = " << paddle.v.mag() << endl;
@@ -313,7 +316,6 @@ void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {
 	
 	radius = f.goalWidth/goalPuckRatio;
 	color = col;
-	speedMax = radius;
 }
 
 
@@ -403,7 +405,7 @@ void Puck::Move(float fElapsedTime) {
 		PlaySound(NULL, 0, 0);//先停止其他所有声音,再播放当前音效
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
-	while (velocity.mag() > speedMax) {
+	while (velocity.mag() > SPEED_MAX) {
 		velocity /= 2.0f;
 	}
 
@@ -451,7 +453,15 @@ void Paddle::Move(float fElapsedTime) {
 	if (nextY - outerR < f.innerY || nextY + outerR > f.innerY + f.height) {
 		pos.y = -v.y;
 	}
-	float ratio = fElapsedTime * p->GetMaxFPS();
+	float ratio = fElapsedTime * p->GetFPS();
+	while (v.mag() < speedEasy) {
+		v *= 2.0f;
+	}
+
+	while (v.mag() > SPEED_MAX) {
+		v / 2.0f;
+	}
+
 	pos.x += v.x* ratio;
 	pos.y += v.y* ratio;
 	if (ratio > ratioMax) {

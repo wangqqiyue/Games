@@ -8,6 +8,8 @@
 using std::cout;
 using std::endl;
 
+#define SPEED_MAX  30.0f
+
 enum Side {
 	LEFT =0,
 	RIGHT,
@@ -46,7 +48,6 @@ public:
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav"); 
 	Field f;
 	olc::PixelGameEngine* p;
-	float speedMax;
 
 	Puck() = default;
 	void InitPuck(const Field& f, olc::Pixel col, olc::PixelGameEngine* p);
