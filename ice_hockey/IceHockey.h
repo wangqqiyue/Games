@@ -64,13 +64,14 @@ public:
 	olc::vf2d lastPos;
 	olc::vf2d v;
 	float mass = 1.0f;
-	float speedEasy = 10.0f;
-	float speedNormal = 20.0f;
-	float speedHard = 30.0f;
+	float speedEasy = 2.0f;
+	float speedNormal = 4.0f;
+	float speedHard = 10.0f;
 	float goalPaddleRatio = 4.0f;
 	olc::PixelGameEngine* p;
 	Field f;
 	Side side;
+	bool win = false;
 
 	void InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine*p);
 	void DrawPaddle();
@@ -112,7 +113,7 @@ public:
 	bool PuckInGoal();
 	void GameReset();
 	void DrawScore(int s1,int s2);
-
+	void DrawWin(const Paddle& p1, const Paddle& p2);
 public:
 	IceHockey()
 	{
@@ -130,28 +131,38 @@ public:
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
-		
+		static std::chrono::time_point<std::chrono::system_clock>  lastTime;
 		Clear(olc::WHITE);
 		if (reset) {
-			Sleep(1000);
-			//播放开始比赛的哨声
-			PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
-			reset = false;
+			auto now = std::chrono::system_clock::now();
+			std::chrono::duration<float> duration = (now - lastTime);
+			DrawWin(player1,ai2);
+			if (duration.count() > 1.0f)
+			{
+				//播放开始比赛的哨声
+				PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
+				reset = false;
+			}
+			
+		}
+		else {
+			MouseOperate(player1);
+			//AiResponseStrong(ai1);
+			AiResponseStrong(ai2, fElapsedTime);
+			puck.Move(fElapsedTime);
+			//CollisionResponse(player, fElapsedTime);
+			//CollisionResponse(ai1, fElapsedTime);
+			CollisionResponse(player1, fElapsedTime);
+			CollisionResponse(ai2, fElapsedTime);
 		}
 
-		MouseOperate(player1);
-		//AiResponseStrong(ai1);
-		AiResponseStrong(ai2, fElapsedTime);
-		puck.Move(fElapsedTime);
-		//CollisionResponse(player, fElapsedTime);
-		//CollisionResponse(ai1, fElapsedTime);
-		CollisionResponse(player1, fElapsedTime);
-		CollisionResponse(ai2, fElapsedTime);
+	
 		Rendering();
 		
 		if (PuckInGoal()) {
 			GameReset();
 			reset = true;
+			lastTime= std::chrono::system_clock::now();
 		}
 
 		return true;

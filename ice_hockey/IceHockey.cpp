@@ -33,6 +33,26 @@ bool BoundBarrier(olc::vf2d& pos,olc::vf2d* v, float r, olc::vf2d barrier,  floa
 	return bound;
 }
 
+void IceHockey::DrawWin(const Paddle& p1, const Paddle& p2) {
+	std::string win = "GOAL!";
+	float x, y;
+	for (auto& paddle : { p1,p2 }) {
+		if (LEFT == paddle.side && paddle.win) {
+			//在左侧中央位置绘制GOAL！字符串
+			x = ((field.innerX) + (field.innerX + field.width / 2.0f) - 2 * win.length() * 8) / 2.0f;
+			y = field.innerY + field.height / 2.0f;
+
+		}
+		else if (RIGHT == paddle.side && paddle.win) {
+			//在右侧中央位置绘制 GOAL! 字符串
+			x = ((field.innerX + field.width) + (field.innerX + field.width / 2.0f) - 2 * win.length() * 8) / 2.0f;
+			y = field.innerY + field.height / 2.0f;
+		}
+	}
+	
+	DrawString(x, y, win, olc::BLACK, 2);
+}
+
 void IceHockey::GameReset() {
 	puck.InitPuck(field, olc::MAGENTA, this);
 	player1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
@@ -50,11 +70,8 @@ bool IceHockey::PuckInGoal() {
 		//左侧进球，则右侧胜利
 		if (x + r <= field.innerX ) {
 			ai2.score++;
-			//在右侧中央位置绘制 GOAL! 字符串
-			std::string win = "GOAL!";
-			float x = ((field.innerX + field.width)+(field.innerX+field.width/2.0f) - 2 * win.length() * 8) / 2.0f;
-			float y = field.innerY + field.height / 2.0f;
-			DrawString(x,y,win,olc::BLACK,2);
+			ai2.win = true;
+			player1.win = false;
 			PlaySound(lose_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 			return true;
 		}
@@ -62,12 +79,9 @@ bool IceHockey::PuckInGoal() {
 		else if (x - r >= field.innerX + field.width) {
 			//ai1.score++;
 			player1.score++;
-			std::string win = "GOAL!";
-			float x = ((field.innerX ) + (field.innerX + field.width / 2.0f) - 2 * win.length() * 8) / 2.0f;
-			float y = field.innerY + field.height / 2.0f;
-			DrawString(x, y, win, olc::BLACK, 2);
+			player1.win = true;
+			ai2.win = false;
 			PlaySound(win_sound_file,NULL,SND_FILENAME|SND_ASYNC);
-			
 			return true;
 		}
 	}
@@ -139,7 +153,7 @@ void IceHockey::DrawScore(int s1,int s2) {
 	str += std::to_string(s1);
 	str += ":";
 	str += std::to_string(s2);
-	DrawString((ScreenWidth() - str.length() * 2 * 8) / 2.0f, 8, str, olc::WHITE, 2);
+	DrawString((ScreenWidth() - str.length() * 2 * 8) / 2.0f, 8, str, olc::BLACK, 2);
 }
 
 void IceHockey::Rendering() {
