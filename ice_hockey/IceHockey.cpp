@@ -66,7 +66,7 @@ bool IceHockey::PuckInGoal() {
 	float r = puck.radius;
 	float goalY = field.goalLeft.y;
 	float goalWidth = field.goalWidth;
-	if (y - r >= goalY && y + r <= goalY + goalWidth) {
+	
 		//左侧进球，则右侧胜利
 		if (x + r <= field.innerX ) {
 			ai2.score++;
@@ -84,7 +84,7 @@ bool IceHockey::PuckInGoal() {
 			PlaySound(win_sound_file,NULL,SND_FILENAME|SND_ASYNC);
 			return true;
 		}
-	}
+	
 	return false;
 }
 
@@ -291,6 +291,7 @@ void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {
 	velocity = { 0,1.0f };
 	radius = f.goalWidth/goalPuckRatio;
 	color = col;
+	speedMax = f.height/10.0f;
 }
 
 
@@ -336,7 +337,7 @@ void Puck::DrawPuck() {
 
 void Puck::Move(float fElapsedTime) {
 	bool bound = false;
-	p->DrawRect(position.x - radius, position.y - radius, radius * 2, radius * 2, olc::RED);
+	//p->DrawRect(position.x - radius, position.y - radius, radius * 2, radius * 2, olc::RED);
 
 	if (position.y - radius >= f.goalLeft.y && position.y + radius <= f.goalLeft.y + f.goalWidth) {
 		//如果冰球上下边沿都在在球门范围内,则不必检测碰撞
@@ -380,6 +381,10 @@ void Puck::Move(float fElapsedTime) {
 		PlaySound(NULL, 0, 0);//先停止其他所有声音,再播放当前音效
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
+	while (velocity.mag() > speedMax) {
+		velocity /= 2.0f;
+	}
+
 	float ratio = fElapsedTime * p->GetMaxFPS();
 
 	position.x += velocity.x*ratio;
@@ -429,7 +434,7 @@ void Paddle::Move(float fElapsedTime) {
 	pos.y += v.y* ratio;
 	if (ratio > ratioMax) {
 		ratioMax = ratio;
-		cout << "max ratio = " << ratioMax << endl;
+		//cout << "max ratio = " << ratioMax << endl;
 	}
 	
 }

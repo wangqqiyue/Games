@@ -46,6 +46,7 @@ public:
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav"); 
 	Field f;
 	olc::PixelGameEngine* p;
+	float speedMax = 50.0f;
 
 	Puck() = default;
 	void InitPuck(const Field& f, olc::Pixel col, olc::PixelGameEngine* p);
