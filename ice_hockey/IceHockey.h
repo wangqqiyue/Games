@@ -104,7 +104,7 @@ public:
 	LPCWSTR win_sound_file = TEXT("sound\\win.wav");
 	LPCWSTR lose_sound_file = TEXT("sound\\lose.wav");
 	bool reset = false;
-
+	bool judged = false;
 
 	void MouseOperate(Paddle& paddle);
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
@@ -140,8 +140,10 @@ public:
 			DrawWin(player1,ai2);
 			if (duration.count() > 1.0f)
 			{
+				GameReset();
 				//播放开始比赛的哨声
 				PlaySound(whistle_sound_file, NULL, SND_FILENAME | SND_ASYNC);
+				judged = false;
 				reset = false;
 			}
 			
@@ -161,7 +163,7 @@ public:
 		Rendering();
 		
 		if (PuckInGoal()) {
-			GameReset();
+			
 			reset = true;
 			lastTime= std::chrono::system_clock::now();
 		}

@@ -67,12 +67,15 @@ bool IceHockey::PuckInGoal() {
 	float goalY = field.goalLeft.y;
 	float goalWidth = field.goalWidth;
 	
+	//如果未判断过胜负,则进行判断
+	if (!judged) {
 		//左侧进球，则右侧胜利
 		if (x + r <= field.innerX ) {
 			ai2.score++;
 			ai2.win = true;
 			player1.win = false;
 			PlaySound(lose_sound_file, NULL, SND_FILENAME | SND_ASYNC);
+			judged = true;
 			return true;
 		}
 		//右侧进球，则左侧胜利
@@ -82,9 +85,11 @@ bool IceHockey::PuckInGoal() {
 			player1.win = true;
 			ai2.win = false;
 			PlaySound(win_sound_file,NULL,SND_FILENAME|SND_ASYNC);
+			judged = true;
 			return true;
 		}
-	
+
+	}
 	return false;
 }
 
@@ -124,27 +129,36 @@ void IceHockey::MouseOperate(Paddle& paddle) {
 		holdPaddle = false;
 	}
 	if (!holdPaddle) {
-		if ((mPos, paddle.pos).mag() <= paddle.outerR && GetMouse(0).bHeld) {
+		if ((mPos-paddle.pos).mag() <= paddle.outerR && GetMouse(0).bHeld) {
 			holdPaddle = true;
+			cout << "holdPaddle=" << holdPaddle << endl;
 		}
+		if (GetMouse(0).bHeld) {
+			cout << "(mPos-paddle.pos).mag()=" << (mPos-paddle.pos).mag() << endl;
+			cout << "mPos" << mPos << endl;
+			cout << "paddle.pos" << paddle.pos << endl;
+		}
+		
 	}
-
-	paddle.lastPos = paddle.pos;
-	paddle.pos.x = mPos.x;
-	paddle.pos.y = mPos.y;
-	if (paddle.pos.x >= ScreenWidth() / 2.0f - paddle.outerR) {
-		paddle.pos.x = ScreenWidth() / 2.0f - paddle.outerR;
+	if (holdPaddle) {
+		paddle.lastPos = paddle.pos;
+		paddle.pos.x = mPos.x;
+		paddle.pos.y = mPos.y;
+		if (paddle.pos.x >= ScreenWidth() / 2.0f - paddle.outerR) {
+			paddle.pos.x = ScreenWidth() / 2.0f - paddle.outerR;
+		}
+		if (paddle.pos.x <= field.innerX + paddle.outerR) {
+			paddle.pos.x = field.innerX + paddle.outerR;
+		}
+		if (paddle.pos.y >= field.innerY + field.height - paddle.outerR) {
+			paddle.pos.y = field.innerY + field.height - paddle.outerR;
+		}
+		if (paddle.pos.y <= field.innerY + paddle.outerR) {
+			paddle.pos.y = field.innerY + paddle.outerR;
+		}
+		paddle.v = paddle.pos - paddle.lastPos;
 	}
-	if (paddle.pos.x <= field.innerX + paddle.outerR) {
-		paddle.pos.x = field.innerX + paddle.outerR;
-	}
-	if (paddle.pos.y >= field.innerY + field.height - paddle.outerR) {
-		paddle.pos.y = field.innerY + field.height - paddle.outerR;
-	}
-	if (paddle.pos.y <= field.innerY + paddle.outerR) {
-		paddle.pos.y = field.innerY + paddle.outerR;
-	}
-	paddle.v = paddle.pos - paddle.lastPos;
+	
 	//cout << "player.v.mag = " << paddle.v.mag() << endl;
 }
 
@@ -287,8 +301,21 @@ void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {
 	this->p = p;
 	this->f = f;
 	position.x = f.innerX+f.width/2.0f;
-	position.y = f.innerY+radius;
-	velocity = { 0,1.0f };
+	// 设置随机数种子
+	srand(time(0));
+
+	// 生成一个0到99之间的随机数
+	int random_number = rand() % 100;
+	if (random_number > 50) {
+		position.y = f.innerY + radius;
+		velocity = { 0,1.0f };
+	}
+	else {
+		position.y = f.innerY +f.height- radius;
+		velocity = { 0,-1.0f };
+	}
+	
+	
 	radius = f.goalWidth/goalPuckRatio;
 	color = col;
 	speedMax = f.height/10.0f;
