@@ -259,6 +259,41 @@ void IceHockey::AiResponse(AiPaddle& paddle,float fElapsedTime) {
 	
 }
 
+void Field::DrawEllipse(float a, float b, olc::Pixel c) {
+	int x, y;
+	float d1, d2;
+	x = 0;
+	y = b;
+	p->Draw(x, y, c);
+	d1 = b * b - a * a * b + a * a / 4;//b^2-a^2b+a^2/4
+	/*Region 1*/
+	while (a * a * (y - 0.5f) > b * b * (x + 1)) {//a^2(y-1/2) > b^2(x+1)
+		if (d1 < 0) {
+			d1 += b * b * (2 * x + 3);//b^2(2x+3)
+		}
+		else {
+			d1 += b * b * (2 * x + 3) + a * a * (-2 * y + 2);//b^2(2x+3)+a^2(-2y+2)
+			y--;
+		}
+		x++;
+		p->Draw(x, y, c);
+	}
+	//d2 = b^2(x+1/2)^2 + a^2(y-1)^2 -a^2b^2
+	d2 = b * b * (x + 0.5f) * (x + 0.5f) + a * a * (y - 1) * (y - 1) - a * a * b * b;
+	/*Region 2*/
+	while (y > 0) {
+		if (d2 < 0) {
+			d2 += b * b * (2 * x + 2) + a * a * (-2 * y + 3);//b^2(2x+2) + a^2(-2y+3)
+			x++;
+		}
+		else {
+			d2 += a * a * (-2 * y + 3);//a^2(-2y+3)
+		}
+		y--;
+		p->Draw(x, y, c);
+	}
+}
+
 void Field::InitField(float w, float h, float gw, float b,olc::PixelGameEngine* p) {
 	this->p = p;
 	width = w;
@@ -292,7 +327,8 @@ void Field::DrawZoneLine(float x1, float y1, float x2,float y2, olc::Pixel c) {
 	p->DrawLine(x1-1, y1, x2-1, y2, c);
 }
 void Field::DrawField() {
-
+	DrawEllipse(100, 100, olc::GREEN);
+	DrawEllipse(700, 500, olc::GREEN);
 
 	//绘制内圈
 	// Fill 函数很耗时,尽量少用

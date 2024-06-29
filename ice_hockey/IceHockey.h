@@ -35,6 +35,7 @@ public:
 	void DrawBarrier();
 	void DrawSpot(float x, float y, float r, olc::Pixel c, bool drawCentral =true);
 	void DrawZoneLine(float x1, float y1, float x2, float y2, olc::Pixel c);
+	void DrawEllipse(float a, float b, olc::Pixel c);
 };
 
 //±ùÇò
