@@ -329,6 +329,7 @@ void Field::DrawZoneLine(float x1, float y1, float x2,float y2, olc::Pixel c) {
 void Field::DrawField() {
 	DrawEllipse(100, 100, olc::GREEN);
 	DrawEllipse(700, 500, olc::GREEN);
+	p->DrawEllipse(100, 100, 300, 300, olc::BLACK);
 
 	//绘制内圈
 	// Fill 函数很耗时,尽量少用

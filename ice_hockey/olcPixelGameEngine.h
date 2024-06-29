@@ -1081,6 +1081,8 @@ namespace olc
 		// Fills a circle located at (x,y) with radius
 		void FillCircle(int32_t x, int32_t y, int32_t radius, Pixel p = olc::WHITE);
 		void FillCircle(const olc::vi2d& pos, int32_t radius, Pixel p = olc::WHITE);
+		// Draws a ellipse
+		void DrawEllipse(int32_t left, int32_t top, int32_t right, int32_t bottom, Pixel p = olc::WHITE);
 		// Draws a rectangle at (x,y) to (x+w,y+h)
 		void DrawRect(int32_t x, int32_t y, int32_t w, int32_t h, Pixel p = olc::WHITE);
 		void DrawRect(const olc::vi2d& pos, const olc::vi2d& size, Pixel p = olc::WHITE);
@@ -2364,6 +2366,49 @@ namespace olc
 		}
 		else
 			Draw(x, y, p);
+	}
+	//该函数使用当前画线样式绘制无填充的椭圆。
+	void PixelGameEngine::DrawEllipse(int32_t left, int32_t top, int32_t right, int32_t bottom, Pixel p) {
+		/*left 椭圆外切矩形的左上角 x 坐标。
+		top椭圆外切矩形的左上角 y 坐标。
+		right椭圆外切矩形的右下角 x 坐标。
+		bottom椭圆外切矩形的右下角 y 坐标。*/
+		int a = (right - left) / 2;
+		int b = (bottom-top) / 2;
+		int centerX = (left + right) / 2;
+		int centerY = (top + bottom) / 2;
+		int x, y;
+		float d1, d2;
+		x = 0;
+		y = b;
+		Draw(centerX+x, centerY+y, p);
+		d1 = b * b - a * a * b + a * a / 4;//b^2-a^2b+a^2/4
+		/*Region 1*/
+		while (a * a * (y - 0.5f) > b * b * (x + 1)) {//a^2(y-1/2) > b^2(x+1)
+			if (d1 < 0) {
+				d1 += b * b * (2 * x + 3);//b^2(2x+3)
+			}
+			else {
+				d1 += b * b * (2 * x + 3) + a * a * (-2 * y + 2);//b^2(2x+3)+a^2(-2y+2)
+				y--;
+			}
+			x++;
+			Draw(centerX + x, centerY + y, p);
+		}
+		//d2 = b^2(x+1/2)^2 + a^2(y-1)^2 -a^2b^2
+		d2 = b * b * (x + 0.5f) * (x + 0.5f) + a * a * (y - 1) * (y - 1) - a * a * b * b;
+		/*Region 2*/
+		while (y > 0) {
+			if (d2 < 0) {
+				d2 += b * b * (2 * x + 2) + a * a * (-2 * y + 3);//b^2(2x+2) + a^2(-2y+3)
+				x++;
+			}
+			else {
+				d2 += a * a * (-2 * y + 3);//a^2(-2y+3)
+			}
+			y--;
+			Draw(centerX + x, centerY + y, p);
+		}
 	}
 
 	void PixelGameEngine::DrawRect(const olc::vi2d& pos, const olc::vi2d& size, Pixel p)
