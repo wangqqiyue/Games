@@ -2367,7 +2367,7 @@ namespace olc
 		else
 			Draw(x, y, p);
 	}
-	//该函数使用当前画线样式绘制无填充的椭圆。
+	//该函数使用当前画线样式绘制无填充的椭圆
 	void PixelGameEngine::DrawEllipse(int32_t left, int32_t top, int32_t right, int32_t bottom, Pixel p) {
 		/*left 椭圆外切矩形的左上角 x 坐标。
 		top椭圆外切矩形的左上角 y 坐标。
@@ -2375,6 +2375,10 @@ namespace olc
 		bottom椭圆外切矩形的右下角 y 坐标。*/
 		int a = (right - left) / 2;
 		int b = (bottom-top) / 2;
+		if (a <= 0 || b <= 0) {
+			//非法值
+			return;
+		}
 		int centerX = (left + right) / 2;
 		int centerY = (top + bottom) / 2;
 		int x, y;

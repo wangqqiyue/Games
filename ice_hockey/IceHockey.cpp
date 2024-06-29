@@ -259,12 +259,42 @@ void IceHockey::AiResponse(AiPaddle& paddle,float fElapsedTime) {
 	
 }
 
-void Field::DrawEllipse(float a, float b, olc::Pixel c) {
+//start提供x坐标,end 提供y坐标,d代表绘制的弧线在start-end连线的什么方向
+void Field::DrawArc(olc::vf2d start , olc::vf2d end, olc::Pixel c, Direction d) {
+	olc::vf2d center;
+	olc::vi2d rotate;
 	int x, y;
+	int a, b;
 	float d1, d2;
+
+	a = abs(start.x - end.x);
+	b = abs(start.y - end.y);
+	center.x = start.x;
+	center.y = end.y;
 	x = 0;
 	y = b;
-	p->Draw(x, y, c);
+	switch (d) {
+	case NW:
+		rotate.x = -1;
+		rotate.y = -1;
+	
+		break;
+	case NE:
+		rotate.x = 1;
+		rotate.y = -1;
+		break;
+	case SW:
+		rotate.x = -1;
+		rotate.y = 1;
+		break;
+	case SE:
+		rotate.x = 1;
+		rotate.y = 1;
+		break;
+	}
+	p->Draw(center.x + rotate.x*x, center.y + rotate.y*y, c);
+
+
 	d1 = b * b - a * a * b + a * a / 4;//b^2-a^2b+a^2/4
 	/*Region 1*/
 	while (a * a * (y - 0.5f) > b * b * (x + 1)) {//a^2(y-1/2) > b^2(x+1)
@@ -276,7 +306,7 @@ void Field::DrawEllipse(float a, float b, olc::Pixel c) {
 			y--;
 		}
 		x++;
-		p->Draw(x, y, c);
+		p->Draw(center.x + rotate.x * x, center.y + rotate.y * y, c);
 	}
 	//d2 = b^2(x+1/2)^2 + a^2(y-1)^2 -a^2b^2
 	d2 = b * b * (x + 0.5f) * (x + 0.5f) + a * a * (y - 1) * (y - 1) - a * a * b * b;
@@ -290,7 +320,7 @@ void Field::DrawEllipse(float a, float b, olc::Pixel c) {
 			d2 += a * a * (-2 * y + 3);//a^2(-2y+3)
 		}
 		y--;
-		p->Draw(x, y, c);
+		p->Draw(center.x + rotate.x * x, center.y + rotate.y * y, c);
 	}
 }
 
@@ -303,9 +333,6 @@ void Field::InitField(float w, float h, float gw, float b,olc::PixelGameEngine* 
 
 	innerX = (p->ScreenWidth() - width) / 2.0f;
 	innerY = (p->ScreenHeight() - height) / 2.0f;
-
-	outterX = innerX - border;
-	outterY = innerY - border;
 
 	goalLeft.x = innerX;
 	goalLeft.y = (p->ScreenHeight() - goalWidth) / 2.0f;
@@ -327,10 +354,6 @@ void Field::DrawZoneLine(float x1, float y1, float x2,float y2, olc::Pixel c) {
 	p->DrawLine(x1-1, y1, x2-1, y2, c);
 }
 void Field::DrawField() {
-	DrawEllipse(100, 100, olc::GREEN);
-	DrawEllipse(700, 500, olc::GREEN);
-	p->DrawEllipse(100, 100, 300, 300, olc::BLACK);
-
 	//绘制内圈
 	// Fill 函数很耗时,尽量少用
 	//p->FillRect(innerX, innerY, width, height);
@@ -343,7 +366,6 @@ void Field::DrawField() {
 	float centralX = p->ScreenWidth() / 2.0f;
 	float centralY = p->ScreenHeight() / 2.0f;
 	DrawSpot(centralX, centralY, centralR, olc::BLUE);
-	
 
 	//绘制两侧4个圆
 	float sideR = height / heightRadiusRatio;
@@ -363,10 +385,63 @@ void Field::DrawField() {
 }
 
 void Field::DrawBarrier() {
-	p->FillRect(outterX, outterY, border, height + border * 2.0f, borderColor);
-	p->FillRect(outterX, outterY, width + border * 2.0f,border, borderColor);
-	p->FillRect(outterX+width+border, outterY, border, height + border * 2.0f, borderColor);
-	p->FillRect(outterX, outterY+height+border, width + border * 2.0f, border, borderColor);
+	//左
+	for (int i = 0; i < border; i++) {
+		p->DrawLine(innerX-i, innerY, innerX-i, height + innerY, olc::RED);
+	}
+	
+
+	//右
+	for (int i = 0; i < border; i++) {
+		p->DrawLine(innerX+i + width, innerY, innerX+i + width, height + innerY, olc::RED);
+	}
+
+	//上
+	for (int i = 0; i < border; i++) {
+		p->DrawLine(innerX, innerY-i, innerX + width, innerY-i, borderColor);
+	}
+
+	//下
+	for (int i = 0; i < border; i++) {
+		p->DrawLine(innerX, innerY + height+i, innerX + width, innerY + height+i, borderColor);
+	}
+
+	//左上角弧度
+	for (int i = 0; i < border; i++) {
+		for (int j = 0; j < border; j++) {
+			DrawArc({ innerX - i,innerY - j }, { innerX - i - width / 10.f,innerY - j + height / 10.0f }, borderColor, NW);
+		}
+	}
+
+	//左侧二道墙
+	for (int i = 0; i < border; i++) {
+		p->DrawLine(innerX -i- width / 10, innerY + height / 10, innerX -i- width / 10, innerY + height * 9 / 10, borderColor);
+	}
+
+	//左下角弧度
+	for (int i = 0; i < border; i++) {
+		for (int j = 0; j < border; j++) {
+			DrawArc({ innerX - i,innerY + height + j }, { innerX - i - width / 10.f,innerY + j + height * 9.0f / 10.0f }, borderColor, SW);
+		}
+	}
+
+	//右上角弧度
+	for (int i = 0; i < border; i++) {
+		for (int j = 0; j < border; j++) {
+			DrawArc({ innerX + i + width,innerY - j }, { innerX + i + width * 11 / 10.f,innerY - j + height / 10.0f }, borderColor, NE);
+		}
+	}
+
+	//右侧二道墙
+	for (int i = 0; i < border; i++) {
+		p->DrawLine(innerX+i + width * 11 / 10, innerY + height / 10, innerX+i + width * 11 / 10, innerY + height * 9 / 10, borderColor);
+	}
+	//右下角弧度
+	for (int i = 0; i < border; i++) {
+		for (int j = 0; j < border; j++) {
+			DrawArc({ innerX + i + width,innerY + j + height }, { innerX + i + width * 11 / 10.f,innerY + j + height * 9.0f / 10.0f }, borderColor, SE);
+		}
+	}
 }
 
 void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {

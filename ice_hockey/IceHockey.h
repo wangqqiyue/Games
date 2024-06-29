@@ -14,7 +14,12 @@ enum Side {
 	LEFT =0,
 	RIGHT,
 };
-
+enum Direction {
+	NW=0,//North West 西北
+	NE,//东北
+	SW,//西南
+	SE,//东南
+};
 class Field {
 public:
 	float width;
@@ -25,7 +30,7 @@ public:
 	float innerX, innerY, outterX, outterY;
 	olc::vf2d goalLeft, goalRight;
 	float friction = 0.01;//摩擦力系数
-	olc::Pixel borderColor = olc::BLUE;
+	olc::Pixel borderColor = olc::BLACK;
 	float heightRadiusRatio =  8.0f;
 	olc::PixelGameEngine* p;
 
@@ -35,7 +40,7 @@ public:
 	void DrawBarrier();
 	void DrawSpot(float x, float y, float r, olc::Pixel c, bool drawCentral =true);
 	void DrawZoneLine(float x1, float y1, float x2, float y2, olc::Pixel c);
-	void DrawEllipse(float a, float b, olc::Pixel c);
+	void DrawArc(olc::vf2d start, olc::vf2d end, olc::Pixel c,Direction d);
 };
 
 //冰球
