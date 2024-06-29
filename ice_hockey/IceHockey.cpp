@@ -62,10 +62,7 @@ void IceHockey::GameReset() {
 
 bool IceHockey::PuckInGoal() {
 	float x = puck.position.x;
-	float y = puck.position.y;
 	float r = puck.radius;
-	float goalY = field.goalLeft.y;
-	float goalWidth = field.goalWidth;
 	
 	//如果未判断过胜负,则进行判断
 	if (!judged) {
@@ -262,12 +259,11 @@ void IceHockey::AiResponse(AiPaddle& paddle,float fElapsedTime) {
 	
 }
 
-void Field::InitField(float w, float h, float gw, float gp, float b,olc::PixelGameEngine* p) {
+void Field::InitField(float w, float h, float gw, float b,olc::PixelGameEngine* p) {
 	this->p = p;
 	width = w;
 	height = h;
 	goalWidth = gw;
-	goalDepth = gp;
 	border = b;
 
 	innerX = (p->ScreenWidth() - width) / 2.0f;
@@ -279,8 +275,21 @@ void Field::InitField(float w, float h, float gw, float gp, float b,olc::PixelGa
 	goalLeft.x = innerX;
 	goalLeft.y = (p->ScreenHeight() - goalWidth) / 2.0f;
 
-	goalRight.x = (p->ScreenWidth() + width) / 2.0f - goalDepth;
+	goalRight.x = (p->ScreenWidth() + width) / 2.0f;
 	goalRight.y = goalLeft.y;
+}
+void Field::DrawSpot(float x,float y,float r,olc::Pixel c,bool drawCentral) {
+	p->DrawCircle(x, y, r, c);
+	p->DrawCircle(x, y, r - 1, c);
+	if (drawCentral) {
+		p->FillCircle(x, y, 3, c);
+	}
+}
+
+void Field::DrawZoneLine(float x1, float y1, float x2,float y2, olc::Pixel c) {
+	p->DrawLine(x1, y1, x2,y2, c);
+	p->DrawLine(x1+1, y1, x2+1, y2, c);
+	p->DrawLine(x1-1, y1, x2-1, y2, c);
 }
 void Field::DrawField() {
 
@@ -290,16 +299,30 @@ void Field::DrawField() {
 	//p->FillRect(innerX, innerY, width, height);
 
 	//绘制中线
-	p->DrawLine(p->ScreenWidth() / 2.0f, innerY, p->ScreenWidth() / 2.0f, innerY + height, borderColor);
+	DrawZoneLine(p->ScreenWidth() / 2.0f, innerY, p->ScreenWidth() / 2.0f, innerY + height, olc::RED);
 
 	//绘制中央圆
-	p->DrawCircle(p->ScreenWidth() / 2.0f, p->ScreenHeight() / 2.0f, height/ heightRadiusRatio,olc::BLACK);
+	float centralR = height / heightRadiusRatio*1.5;
+	float centralX = p->ScreenWidth() / 2.0f;
+	float centralY = p->ScreenHeight() / 2.0f;
+	DrawSpot(centralX, centralY, centralR, olc::BLUE);
+	
+
+	//绘制两侧4个圆
+	float sideR = height / heightRadiusRatio;
+	DrawSpot(innerX + 2 * sideR, innerY + 2 * sideR,sideR,olc::RED);
+	DrawSpot(innerX + width- 2 * sideR, innerY + 2 * sideR, sideR, olc::RED);
+	DrawSpot(innerX + 2 * sideR, innerY +height- 2 * sideR, sideR, olc::RED);
+	DrawSpot(innerX + width-2 * sideR, innerY +height- 2 * sideR, sideR, olc::RED);
+	
+	//绘制防守线
+	float defenseX = innerX + width / 4.0f;
+	DrawZoneLine(defenseX, innerY, defenseX, innerY + height, olc::BLUE);
+	DrawZoneLine(defenseX + width / 2.0f, innerY, defenseX + width / 2.0f, innerY + height, olc::BLUE);
 
 	//绘制球门
-	p->FillRect(goalLeft.x, goalLeft.y, goalDepth, goalWidth, olc::GREEN);
-	p->FillRect(goalRight.x, goalRight.y, goalDepth, goalWidth, olc::GREEN);
-
-
+	DrawSpot(goalLeft.x, goalLeft.y + goalWidth / 2.0f, goalWidth/2.0f, olc::GREEN,false);
+	DrawSpot(goalRight.x, goalRight.y + goalWidth / 2.0f, goalWidth / 2.0f, olc::GREEN,false);
 }
 
 void Field::DrawBarrier() {
@@ -388,7 +411,7 @@ void Puck::Move(float fElapsedTime) {
 		olc::vf2d vN;//碰撞垂向量
 		leftUp =  f.goalLeft;
 		leftDown = { leftUp.x,leftUp.y + f.goalWidth };
-		rightUp = { f.goalRight.x + f.goalDepth,f.goalRight.y };
+		rightUp = f.goalRight;
 		rightDown = { rightUp.x,rightUp.y + f.goalWidth };
 		if ((position - leftUp).mag() < radius) {
 			vN = (position - leftUp).norm();
@@ -496,11 +519,11 @@ void AiPaddle::InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixe
 	if (LEFT == side) {
 		pos.x = f.innerX + outerR;
 		posGoal = { f.goalLeft.x , f.goalRight.y + f.goalWidth / 2.0f };
-		posEnemyGoal = { f.goalRight.x + f.goalDepth, f.goalRight.y + f.goalWidth / 2.0f };
+		posEnemyGoal = { f.goalRight.x , f.goalRight.y + f.goalWidth / 2.0f };
 	}
 	else {
 		pos.x = f.innerX + f.width - outerR;
-		posGoal = { f.goalRight.x + f.goalDepth, f.goalRight.y + f.goalWidth / 2.0f };
+		posGoal = { f.goalRight.x , f.goalRight.y + f.goalWidth / 2.0f };
 		posEnemyGoal = { f.goalLeft.x , f.goalRight.y + f.goalWidth / 2.0f };
 	}
 	pos.y = f.innerY + f.height / 2.0f;

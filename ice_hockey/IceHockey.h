@@ -21,19 +21,20 @@ public:
 	float height;
 	//olc::vf2d points[2];
 	float goalWidth;
-	float goalDepth;
 	float border;
 	float innerX, innerY, outterX, outterY;
 	olc::vf2d goalLeft, goalRight;
 	float friction = 0.01;//Ä¦²ÁÁ¦ÏµÊý
-	olc::Pixel borderColor = olc::DARK_YELLOW;
-	float heightRadiusRatio =  5.0f;
+	olc::Pixel borderColor = olc::BLUE;
+	float heightRadiusRatio =  8.0f;
 	olc::PixelGameEngine* p;
 
 	Field() = default;
-	void InitField(float w, float h, float gw, float gp, float b,olc::PixelGameEngine* p);
+	void InitField(float w, float h, float gw, float b,olc::PixelGameEngine* p);
 	void DrawField();
 	void DrawBarrier();
+	void DrawSpot(float x, float y, float r, olc::Pixel c, bool drawCentral =true);
+	void DrawZoneLine(float x1, float y1, float x2, float y2, olc::Pixel c);
 };
 
 //±ùÇò
@@ -141,7 +142,7 @@ public:
 	bool OnUserCreate() override
 	{
 		// Called once at the start, so create things here
-		field.InitField(ScreenWidth()*0.8f, ScreenHeight()*0.6f, ScreenHeight()*0.2f, ScreenWidth()*0.05f, 40.0f, this);
+		field.InitField(ScreenWidth()*0.7f, ScreenHeight()*0.7f, ScreenHeight()*0.2f,  5.0f, this);
 		bgSprite= std::make_unique<olc::Sprite>(bg_img_file);
 		bgDecal = std::make_unique<olc::Decal>(bgSprite.get());
 		ringSprite = std::make_unique<olc::Sprite>(ring_img_file);
