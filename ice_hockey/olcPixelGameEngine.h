@@ -2382,6 +2382,10 @@ namespace olc
 		x = 0;
 		y = b;
 		Draw(centerX+x, centerY+y, p);
+		Draw(centerX - x, centerY + y, p);
+		Draw(centerX + x, centerY - y, p);
+		Draw(centerX - x, centerY - y, p);
+
 		d1 = b * b - a * a * b + a * a / 4;//b^2-a^2b+a^2/4
 		/*Region 1*/
 		while (a * a * (y - 0.5f) > b * b * (x + 1)) {//a^2(y-1/2) > b^2(x+1)
@@ -2394,6 +2398,9 @@ namespace olc
 			}
 			x++;
 			Draw(centerX + x, centerY + y, p);
+			Draw(centerX - x, centerY + y, p);
+			Draw(centerX + x, centerY - y, p);
+			Draw(centerX - x, centerY - y, p);
 		}
 		//d2 = b^2(x+1/2)^2 + a^2(y-1)^2 -a^2b^2
 		d2 = b * b * (x + 0.5f) * (x + 0.5f) + a * a * (y - 1) * (y - 1) - a * a * b * b;
@@ -2408,6 +2415,9 @@ namespace olc
 			}
 			y--;
 			Draw(centerX + x, centerY + y, p);
+			Draw(centerX - x, centerY + y, p);
+			Draw(centerX + x, centerY - y, p);
+			Draw(centerX - x, centerY - y, p);
 		}
 	}
 
