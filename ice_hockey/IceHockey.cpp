@@ -198,39 +198,65 @@ void IceHockey::Rendering() {
 
 void IceHockey::AiResponseStrong(AiPaddle& paddle,float fElapsedTime) {
 	olc::vf2d nMove = { 0.0f,0.0f };
+	olc::vf2d pCenter= { ScreenWidth() / 2.0f,ScreenHeight() / 2.0f };
 	float disX = paddle.pos.x - puck.position.x;
 	//默认方向是朝向球的方向
 	nMove = (puck.position - paddle.pos).norm();
-
-	//进攻策略,当球未越过球拍时采用
-	if ((paddle.side == LEFT && disX <0) || (paddle.side==RIGHT && disX>0)) {
-
-		if ((puck.position- paddle.pos).norm().dot((paddle.posEnemyGoal - paddle.pos).norm()) > 0.7f) {
-			//如果球拍到球的和敌方球门的夹角较小,则大力进攻
-			nMove = (puck.position - paddle.pos).norm();
-		}else if ((puck.position-paddle.pos).mag()/1.5f<puck.radius+paddle.outerR && ((puck.position - paddle.pos).norm()).dot((paddle.enemy->pos - paddle.pos).norm()) > 0.5f) {
-			//如果球和敌人的夹角较小,则侧面突击
-			nMove = (paddle.enemy->pos - puck.position).polar().norm();
-			DrawLine(paddle.pos+ (paddle.enemy->pos - puck.position).polar().norm()*field.height, paddle.pos, olc::GREEN);
+	srand(time(NULL));
+	//如果球在对方半场
+	if ((paddle.side == LEFT && puck.position.x -puck.radius > ScreenWidth()/2.0f) || (paddle.side==RIGHT  && puck.position.x+puck.radius < ScreenWidth() / 2.0f)) {
+		//防守策略
+		olc::vf2d pIntercept = (puck.position + paddle.posGoal ) /2.0f;
+		if ((pIntercept - paddle.pos).mag() < 2*paddle.outerR) {
+			return;
 		}
-
+		nMove = (pIntercept-paddle.pos).norm();
+		nMove *= {0.9f + 0.2f * rand() / RAND_MAX, 0.9f + 0.2f * rand() / RAND_MAX};
+		paddle.v = paddle.speedEasy * nMove;
+		
+		return;
 	}
+
+	//球在己方半场
+	
+	//进攻策略,当球未越过球拍时采用
+	if ((paddle.side == LEFT && disX <= 0) || (paddle.side == RIGHT && disX >= 0)) {
+		//如果球拍到球的和敌方球门的夹角较小,则大力进攻
+		//if ((puck.position - paddle.pos).norm().dot((paddle.posEnemyGoal - paddle.pos).norm()) > 0.7f) {
+		if ((puck.position - paddle.pos).mag() <=  1.2f*(paddle.outerR + puck.radius)) {
+			nMove = (paddle.posEnemyGoal - paddle.pos).norm();
+			nMove *= 2.0f;
+		}
+		else {
+			nMove = (puck.position - paddle.pos).norm();
+		}
+		//}
+		/*
+		else if ((puck.position - paddle.pos).mag() / 1.5f < puck.radius + paddle.outerR && ((puck.position - paddle.pos).norm()).dot((paddle.enemy->pos - paddle.pos).norm()) > 0.5f) {
+			//如果球和敌人的夹角较小,则侧面突击
+			//球到敌人连线方向，顺时针转90度
+			nMove = (paddle.enemy->pos - puck.position).perp().norm();
+		}
+		*/
+		nMove *= {0.9f + 0.2f * rand() / RAND_MAX, 0.9f + 0.2f * rand() / RAND_MAX};
+		paddle.v = paddle.speedNormal * nMove;
+		cout << "I'm attacking." << endl;
+		return;
+	}
+
 	//防守策略,当球已越过球拍时采用
-	else if (puck.velocity.mag() > paddle.speedEasy) {
-		olc::vf2d pCenter = (puck.position + paddle.posGoal) / 2.0f;
-		nMove = (pCenter - paddle.pos).norm();
-	}
-
-	paddle.v = paddle.speedEasy * nMove;
-
-	paddle.Move(fElapsedTime);
-	if (LEFT == paddle.side) {
-		BoundBarrier(paddle.pos, NULL, paddle.outerR, { field.innerX,field.innerY }, field.width / 2.0f, field.height);
+	olc::vf2d pIntercept = paddle.posGoal;//拦截点位置
+	//如果球拍击球会导致球进入自己球门,则迂回绕开
+	if (puck.velocity.mag()>paddle.speedEasy) {
+		//球拍去拦截球
+		nMove = (pIntercept - paddle.pos).norm();
 	}
 	else {
-		BoundBarrier(paddle.pos, NULL, paddle.outerR, { field.innerX + field.width / 2.0f,field.innerY }, field.width / 2.0f, field.height);
+		nMove = (puck.position - paddle.pos).norm();
 	}
-
+	nMove *= {0.6f+0.8f*rand()/RAND_MAX, 0.6f+0.8f* rand() / RAND_MAX};
+	paddle.v = paddle.speedEasy * nMove;
+	return;
 }
 void IceHockey::AiResponse(AiPaddle& paddle,float fElapsedTime) {
 	olc::vf2d nMove;
@@ -583,6 +609,9 @@ void Paddle::InitPaddle(const Field& f,Side side, olc::Pixel inCol, olc::Pixel o
 
 	innerCol = inCol;
 	outerCol = outCol;
+	speedEasy = SPEED_MAX / 10;
+	speedNormal = SPEED_MAX / 2;
+	speedHard = SPEED_MAX ;
 }
 
 void Paddle::DrawPaddle() {
@@ -617,7 +646,12 @@ void Paddle::Move(float fElapsedTime) {
 		ratioMax = ratio;
 		//cout << "max ratio = " << ratioMax << endl;
 	}
-	
+	if (LEFT == side) {
+		BoundBarrier(pos, NULL, outerR, { f.innerX,f.innerY }, f.width / 2.0f, f.height);
+	}
+	else {
+		BoundBarrier(pos, NULL, outerR, { f.innerX + f.width / 2.0f,f.innerY }, f.width / 2.0f, f.height);
+	}
 }
 
 void AiPaddle::InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine* p,const Paddle* enemy) {

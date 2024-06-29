@@ -8,7 +8,7 @@
 using std::cout;
 using std::endl;
 
-#define SPEED_MAX  30.0f
+#define SPEED_MAX  10.0f
 
 enum Side {
 	LEFT =0,
@@ -185,6 +185,8 @@ public:
 			MouseOperate(player1);
 			//AiResponseStrong(ai1);
 			AiResponseStrong(ai2, fElapsedTime);
+			ai2.Move(fElapsedTime);
+
 			puck.Move(fElapsedTime);
 			//CollisionResponse(player, fElapsedTime);
 			//CollisionResponse(ai1, fElapsedTime);
