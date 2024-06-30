@@ -8,7 +8,7 @@
 using std::cout;
 using std::endl;
 
-#define SPEED_MAX  10.0f
+#define SPEED_MAX  60.0f
 
 enum Side {
 	LEFT =0,

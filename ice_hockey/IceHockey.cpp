@@ -111,7 +111,7 @@ void IceHockey::CollisionResponse(Paddle& paddle, float fElapsedTime) {
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 
 		//调整位置
-		paddle.pos -= (sumR-dis)*vDis.norm();
+		//paddle.pos -= (sumR-dis)*vDis.norm();
 
 		if (puck.velocity.mag() > 100.0f) {
 			puck.velocity /= 2.0f;
@@ -587,7 +587,12 @@ void Puck::Move(float fElapsedTime) {
 	//cout << "ratio=" << ratio<<endl;
 	position.x += velocity.x*ratio;
 	position.y += velocity.y*ratio;
-	velocity *= (1.0f-f.friction);
+	
+	velocity *= (1.0f-f.friction);//固定的摩擦阻力
+	float resistance = 0.1*velocity.mag()/SPEED_MAX;//速度越大,空气阻力越大,阻力正比于速度
+	cout << "resistance=" << resistance << endl;
+	velocity *= (1.0f - resistance);
+
 
 }
 
