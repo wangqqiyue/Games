@@ -8,7 +8,7 @@
 using std::cout;
 using std::endl;
 
-#define SPEED_MAX  60.0f
+
 
 enum Side {
 	LEFT =0,
@@ -55,6 +55,7 @@ public:
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav"); 
 	Field f;
 	olc::PixelGameEngine* p;
+	float SPEED_MAX=60.0f;
 
 	Puck() = default;
 	void InitPuck(const Field& f, olc::Pixel col, olc::PixelGameEngine* p);
@@ -73,6 +74,7 @@ public:
 	olc::vf2d lastPos;
 	olc::vf2d v;
 	float mass = 1.0f;
+	float SPEED_MAX = 60.0f;
 	float speedEasy = 2.0f;
 	float speedNormal = 4.0f;
 	float speedHard = 10.0f;
@@ -128,6 +130,7 @@ public:
 	std::string  logo_img_file = "img\\logo.jpg";
 	std::string  china_img_file = "img\\china-flag.png";
 	std::string  france_img_file = "img\\france-flag.png";
+	int SPEED_MAX=60;
 
 	void MouseOperate(Paddle& paddle);
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
@@ -138,6 +141,8 @@ public:
 	void GameReset();
 	void DrawScore(int s1,int s2);
 	void DrawWin(const Paddle& p1, const Paddle& p2);
+	void KeyOperation();
+	void DrawSpeed();
 public:
 	IceHockey()
 	{
@@ -182,6 +187,8 @@ public:
 			
 		}
 		else {
+			KeyOperation();
+			DrawSpeed();
 			MouseOperate(player1);
 			//AiResponseStrong(ai1);
 			AiResponseStrong(ai2, fElapsedTime);

@@ -32,6 +32,34 @@ bool BoundBarrier(olc::vf2d& pos,olc::vf2d* v, float r, olc::vf2d barrier,  floa
 	}
 	return bound;
 }
+void IceHockey::KeyOperation() {
+	if (GetKey(olc::UP).bReleased) {
+		if (SPEED_MAX < 100) {
+			SPEED_MAX++;
+		}
+	}
+	else if (GetKey(olc::DOWN).bReleased) {
+		if (SPEED_MAX > 1) {
+			SPEED_MAX--;
+		}
+	}
+	else {
+		return;
+	}
+	puck.SPEED_MAX = SPEED_MAX;
+	//cout << "puck.SPEED_MAX=" << puck.SPEED_MAX << endl;
+}
+
+void IceHockey::DrawSpeed() {
+	std::string speedStr = "SPEED:";
+	speedStr += std::to_string(SPEED_MAX);
+	speedStr += "(press Up/Down to change.)";
+	float x, y;
+	x = (ScreenWidth() - speedStr.length() * 8 * 2) / 2.0f;
+	y = field.innerY + field.height + 8 * 2;
+
+	DrawString(x, y, speedStr, olc::BLACK, 2);
+}
 
 void IceHockey::DrawWin(const Paddle& p1, const Paddle& p2) {
 	std::string win = "GOAL!";
@@ -197,6 +225,9 @@ void IceHockey::Rendering() {
 
 
 void IceHockey::AiResponseStrong(AiPaddle& paddle,float fElapsedTime) {
+	paddle.speedEasy = SPEED_MAX / 10;
+	paddle.speedNormal = SPEED_MAX / 5;
+	paddle.speedHard = SPEED_MAX/2;
 	olc::vf2d nMove = { 0.0f,0.0f };
 	olc::vf2d pCenter= { ScreenWidth() / 2.0f,ScreenHeight() / 2.0f };
 	float disX = paddle.pos.x - puck.position.x;
@@ -238,13 +269,13 @@ void IceHockey::AiResponseStrong(AiPaddle& paddle,float fElapsedTime) {
 		
 		nMove *= {0.9f + 0.2f * rand() / RAND_MAX, 0.9f + 0.2f * rand() / RAND_MAX};
 		paddle.v = paddle.speedNormal * nMove;
-		cout << "I'm attacking." << endl;
+		//cout << "I'm attacking." << endl;
 		return;
 	}
 
 	//防守策略,当球已越过球拍时采用
 	olc::vf2d pIntercept = paddle.posGoal;//拦截点位置
-	cout << "I'm defensing." << endl;
+	//cout << "I'm defensing." << endl;
 	//如果球拍击球会导致球进入自己球门,则迂回绕开
 	if (puck.velocity.mag()>paddle.speedEasy) {
 		//球拍去拦截球
@@ -349,7 +380,7 @@ void Field::DrawArc(olc::vf2d start , olc::vf2d end, olc::Pixel c, Direction d) 
 	}
 }
 
-void Field::InitField(float w, float h, float gw, float b,olc::PixelGameEngine* p) {
+void Field::InitField(float w, float h, float gw, float b, olc::PixelGameEngine* p) {
 	this->p = p;
 	width = w;
 	height = h;
@@ -469,7 +500,7 @@ void Field::DrawBarrier() {
 	}
 }
 
-void Puck::InitPuck(const Field& f,olc::Pixel col,olc::PixelGameEngine *p) {
+void Puck::InitPuck(const Field& f,olc::Pixel col, olc::PixelGameEngine*p) {
 	this->p = p;
 	this->f = f;
 	position.x = f.innerX+f.width/2.0f;
@@ -581,7 +612,9 @@ void Puck::Move(float fElapsedTime) {
 	}
 	while (velocity.mag() > SPEED_MAX) {
 		velocity /= 2.0f;
+		
 	}
+	//cout << "SPEED_MAX=" << SPEED_MAX << endl;
 
 	float ratio = fElapsedTime * p->GetFPS();
 	//cout << "ratio=" << ratio<<endl;
@@ -590,7 +623,7 @@ void Puck::Move(float fElapsedTime) {
 	
 	velocity *= (1.0f-f.friction);//固定的摩擦阻力
 	float resistance = 0.1*velocity.mag()/SPEED_MAX;//速度越大,空气阻力越大,阻力正比于速度
-	cout << "resistance=" << resistance << endl;
+	//cout << "resistance=" << resistance << endl;
 	velocity *= (1.0f - resistance);
 
 
@@ -641,9 +674,8 @@ void Paddle::Move(float fElapsedTime) {
 	}
 
 	while (v.mag() > SPEED_MAX) {
-		v / 2.0f;
+		v /= 2.0f;
 	}
-
 	pos.x += v.x* ratio;
 	pos.y += v.y* ratio;
 	if (ratio > ratioMax) {
