@@ -222,22 +222,20 @@ void IceHockey::AiResponseStrong(AiPaddle& paddle,float fElapsedTime) {
 	//进攻策略,当球未越过球拍时采用
 	if ((paddle.side == LEFT && disX <= 0) || (paddle.side == RIGHT && disX >= 0)) {
 		//如果球拍到球的和敌方球门的夹角较小,则大力进攻
-		//if ((puck.position - paddle.pos).norm().dot((paddle.posEnemyGoal - paddle.pos).norm()) > 0.7f) {
-		if ((puck.position - paddle.pos).mag() <=  1.2f*(paddle.outerR + puck.radius)) {
-			nMove = (paddle.posEnemyGoal - paddle.pos).norm();
-			nMove *= 2.0f;
+		if ((puck.position - paddle.pos).norm().dot((paddle.posEnemyGoal - paddle.pos).norm()) > 0.7f) {
+			if ((puck.position - paddle.pos).mag() <=  1.2f*(paddle.outerR + puck.radius)) {
+				nMove = (paddle.posEnemyGoal - paddle.pos).norm();
+				nMove *= 2.0f;
+			}
+			else {
+				nMove = (puck.position - paddle.pos).norm();
+			}
 		}
-		else {
-			nMove = (puck.position - paddle.pos).norm();
+		//绕道球后面
+		else  {
+			nMove = (puck.position - paddle.posEnemyGoal).norm() + (puck.position - paddle.pos).norm();
 		}
-		//}
-		/*
-		else if ((puck.position - paddle.pos).mag() / 1.5f < puck.radius + paddle.outerR && ((puck.position - paddle.pos).norm()).dot((paddle.enemy->pos - paddle.pos).norm()) > 0.5f) {
-			//如果球和敌人的夹角较小,则侧面突击
-			//球到敌人连线方向，顺时针转90度
-			nMove = (paddle.enemy->pos - puck.position).perp().norm();
-		}
-		*/
+		
 		nMove *= {0.9f + 0.2f * rand() / RAND_MAX, 0.9f + 0.2f * rand() / RAND_MAX};
 		paddle.v = paddle.speedNormal * nMove;
 		cout << "I'm attacking." << endl;
@@ -246,6 +244,7 @@ void IceHockey::AiResponseStrong(AiPaddle& paddle,float fElapsedTime) {
 
 	//防守策略,当球已越过球拍时采用
 	olc::vf2d pIntercept = paddle.posGoal;//拦截点位置
+	cout << "I'm defensing." << endl;
 	//如果球拍击球会导致球进入自己球门,则迂回绕开
 	if (puck.velocity.mag()>paddle.speedEasy) {
 		//球拍去拦截球
