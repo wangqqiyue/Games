@@ -55,7 +55,7 @@ public:
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav"); 
 	Field f;
 	olc::PixelGameEngine* p;
-	float SPEED_MAX=60.0f;
+	float SPEED_MAX=30.0f;
 
 	Puck() = default;
 	void InitPuck(const Field& f, olc::Pixel col, olc::PixelGameEngine* p);
@@ -74,7 +74,7 @@ public:
 	olc::vf2d lastPos;
 	olc::vf2d v;
 	float mass = 1.0f;
-	float SPEED_MAX = 60.0f;
+	float SPEED_MAX = 30.0f;
 	float speedEasy = 2.0f;
 	float speedNormal = 4.0f;
 	float speedHard = 10.0f;
@@ -130,7 +130,7 @@ public:
 	std::string  logo_img_file = "img\\logo.jpg";
 	std::string  china_img_file = "img\\china-flag.png";
 	std::string  france_img_file = "img\\france-flag.png";
-	int SPEED_MAX=60;
+	int SPEED_MAX=30;
 
 	void MouseOperate(Paddle& paddle);
 	void CollisionResponse(Paddle& paddle,float fElapsedTime);
@@ -165,6 +165,7 @@ public:
 		franceSprite = std::make_unique<olc::Sprite>(france_img_file);
 		franceDecal = std::make_unique<olc::Decal>(franceSprite.get());
 		GameReset();
+		SetMaxFPS(60);
 		return true;
 	}
 

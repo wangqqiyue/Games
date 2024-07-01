@@ -3967,31 +3967,20 @@ namespace olc
 
 	void PixelGameEngine::olc_CoreUpdate()
 	{
+		std::chrono::duration<float> elapsedTime;
 		// Handle Timing
 		m_tp2 = std::chrono::system_clock::now();
-		std::chrono::duration<float> elapsedTime = m_tp2 - m_tp1;
+		elapsedTime = m_tp2 - m_tp1;
 		m_tp1 = m_tp2;
 
-
 		// if FPS high enough, sleep to release CPU
-		std::chrono::duration<float,std::ratio<1,1>> minimal_timing = std::chrono::duration < float, std::ratio<1, 1>>(1.0f/maxFPS);//120FPS
-		//cout << "elapsedTime1=" << elapsedTime.count() << endl;
+		std::chrono::duration<float> minimal_timing = std::chrono::duration<float>(1.0f / GetMaxFPS());
 		if (minimal_timing > elapsedTime) {
 			std::chrono::duration<float> sleep_time = minimal_timing - elapsedTime;
-			/*
-			cout << "minimal_timing=" << minimal_timing.count() << endl;
-			cout << "elapsedTime=" << elapsedTime.count() << endl;
-			cout << "sleep time=" << sleep_time.count() << endl;
-			*/
-			
 			std::this_thread::sleep_for(sleep_time);
-			m_tp2 = std::chrono::system_clock::now();
-			elapsedTime += m_tp2 - m_tp1;
-			m_tp1 = m_tp2;
-			
-			
+			m_tp1 = std::chrono::system_clock::now();
+			elapsedTime = minimal_timing;
 		}
-		//cout << "elapsedTime=" << elapsedTime.count() << endl;
 
 		// Our time per frame coefficient
 		float fElapsedTime = elapsedTime.count();
