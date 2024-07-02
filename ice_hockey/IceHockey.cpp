@@ -210,7 +210,26 @@ void IceHockey::DrawScore(int s1,int s2) {
 	str += std::to_string(s1);
 	str += ":";
 	str += std::to_string(s2);
-	DrawString((ScreenWidth() - str.length() * 4 * 8) / 2.0f, 65, str, olc::BLACK, 4);
+	float len = str.length();
+	int x = (ScreenWidth() - len * 4 * 8) / 2.0f;
+	float y = 40.0f;
+	DrawString(x, y, str, olc::BLACK, 4);
+
+	DrawDecal({ x - chinaSprite.get()->width - 4.0f ,y }, chinaDecal.get());
+	DrawDecal({ x + len * 4 * 8 + 4,y }, franceDecal.get());
+
+	DrawTime(x + len * 4 * 8 + franceSprite.get()->width + 8, y, 3);
+}
+
+void IceHockey::DrawTime(int x,int y,int scale) {
+	static std::chrono::time_point<std::chrono::system_clock> start= std::chrono::system_clock::now();
+	std::chrono::time_point<std::chrono::system_clock> now= std::chrono::system_clock::now();
+	std::chrono::duration<int> elapsedSecond = std::chrono::duration_cast<std::chrono::seconds>(now - start);
+	std::stringstream timeStr;
+	timeStr << std::setw(2) << std::setfill('0') << std::to_string(elapsedSecond.count() / 60);
+	timeStr << ":";
+	timeStr << std::setw(2) << std::setfill('0') <<std::to_string(elapsedSecond.count() % 60);
+	DrawString(x, y, timeStr.str(), olc::BLACK, scale);
 }
 
 void IceHockey::Rendering() {
@@ -224,8 +243,9 @@ void IceHockey::Rendering() {
 	DrawDecal({ 10,10 }, bgDecal.get());
 	DrawDecal({ ScreenWidth()-ringSprite.get()->width-10.0f ,5.0f }, ringDecal.get());
 	DrawDecal({ (ScreenWidth() - logoSprite.get()->width) / 2.0f ,(ScreenHeight() - logoSprite.get()->height) / 2.0f }, logoDecal.get());
-	DrawDecal({ ScreenWidth()/2.0f - chinaSprite.get()->width - 4.0f ,5.0f }, chinaDecal.get());
-	DrawDecal({ ScreenWidth()/2.0f + 4.0f ,5.0f }, franceDecal.get());
+	
+	
+	
 
 	SetDrawTarget(nullptr);
 	//ªÊ÷∆±»∑÷
@@ -248,6 +268,7 @@ void IceHockey::Rendering() {
 
 	DrawSpeed();
 	DrawFPS();
+
 }
 
 

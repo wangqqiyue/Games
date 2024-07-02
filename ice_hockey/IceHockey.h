@@ -7,6 +7,8 @@
 #include <iostream>
 using std::cout;
 using std::endl;
+#include <iomanip>
+
 
 #define SPEED_MAX_INIT 60
 
@@ -150,6 +152,8 @@ public:
 	void KeyOperation();
 	void DrawSpeed();
 	void DrawFPS();
+	void DrawTime(int x, int y, int scale);
+
 public:
 	IceHockey()
 	{
