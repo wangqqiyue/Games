@@ -24,10 +24,10 @@ class Field {
 public:
 	float width;
 	float height;
-	//olc::vf2d points[2];
+
 	float goalWidth;
 	float border;
-	float innerX, innerY, outterX, outterY;
+	float innerX, innerY;
 	olc::vf2d goalLeft, goalRight;
 	float friction = 0.01;//Ä¦²ÁÁ¦ÏµÊý
 	olc::Pixel borderColor = olc::BLACK;
@@ -48,45 +48,46 @@ class Puck {
 public:
 	olc::vf2d position;
 	olc::vf2d velocity;
-	float mass = 1.0f;
 	float radius;
 	olc::Pixel color;
-	float goalPuckRatio = 4.0f;
-	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav"); 
 	Field f;
 	olc::PixelGameEngine* p;
 	float SPEED_MAX=30.0f;
+	float mass = 1.0f;
+	float goalPuckRatio = 4.0f;
+	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
 
 	Puck() = default;
 	void InitPuck(const Field& f, olc::Pixel col, olc::PixelGameEngine* p);
 	void DrawPuck();
-	void Move(float fElapsedTime);
+	void Move();
 
 };
 
 //ÇòÅÄ
 class Paddle{
 public:
-	int score = 0;
 	olc::vf2d pos;
 	float innerR,outerR;
 	olc::Pixel innerCol,outerCol;
 	olc::vf2d lastPos;
 	olc::vf2d v;
+	olc::PixelGameEngine* p;
+	Field f;
+	Side side;
+
+	int score = 0;
 	float mass = 1.0f;
 	float SPEED_MAX = 30.0f;
 	float speedEasy = 2.0f;
 	float speedNormal = 4.0f;
 	float speedHard = 10.0f;
 	float goalPaddleRatio = 4.0f;
-	olc::PixelGameEngine* p;
-	Field f;
-	Side side;
 	bool win = false;
 
 	void InitPaddle(const Field& f, Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine*p);
 	void DrawPaddle();
-	void Move(float fElapsedTime);
+	void Move();
 
 };
 
@@ -99,7 +100,6 @@ public:
 };
 
 
-// Override base class with your custom functionality
 class IceHockey : public olc::PixelGameEngine
 {
 public:
@@ -109,12 +109,20 @@ public:
 	bool holdPaddle=false;
 	Paddle player1;
 	AiPaddle ai1, ai2;
+	int SPEED_MAX = 30;
+	bool reset = false;
+	bool judged = false;
+	bool aiPlay = true;
+
 	LPCWSTR whistle_sound_file = TEXT("sound\\whistle.wav");
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
 	LPCWSTR win_sound_file = TEXT("sound\\win.wav");
 	LPCWSTR lose_sound_file = TEXT("sound\\lose.wav");
-	bool reset = false;
-	bool judged = false;
+	std::string  ring_img_file = "img\\olympic-ring.jpg";
+	std::string  bg_img_file = "img\\beijing-2022.jpg";
+	std::string  logo_img_file = "img\\logo.jpg";
+	std::string  china_img_file = "img\\china-flag.png";
+	std::string  france_img_file = "img\\france-flag.png";
 	std::unique_ptr<olc::Sprite> bgSprite;
 	std::unique_ptr<olc::Decal> bgDecal;
 	std::unique_ptr<olc::Sprite> ringSprite;
@@ -125,17 +133,12 @@ public:
 	std::unique_ptr<olc::Decal> chinaDecal;
 	std::unique_ptr<olc::Sprite> franceSprite;
 	std::unique_ptr<olc::Decal> franceDecal;
-	std::string  ring_img_file = "img\\olympic-ring.jpg";
-	std::string  bg_img_file = "img\\beijing-2022.jpg";
-	std::string  logo_img_file = "img\\logo.jpg";
-	std::string  china_img_file = "img\\china-flag.png";
-	std::string  france_img_file = "img\\france-flag.png";
-	int SPEED_MAX=30;
+	
 
 	void MouseOperate(Paddle& paddle);
-	void CollisionResponse(Paddle& paddle,float fElapsedTime);
-	void AiResponse(AiPaddle& paddle,float fElapsedTime);
-	void AiResponseStrong(AiPaddle& paddle,float fElapsedTime);
+	void CollisionResponse(Paddle& paddle);
+	void AiResponse(AiPaddle& paddle);
+	void AiResponseStrong(AiPaddle& paddle);
 	void Rendering();
 	bool PuckInGoal();
 	void GameReset();
@@ -146,7 +149,6 @@ public:
 public:
 	IceHockey()
 	{
-		// Name your application
 		sAppName = "IceHockey";
 	}
 
@@ -165,7 +167,8 @@ public:
 		franceSprite = std::make_unique<olc::Sprite>(france_img_file);
 		franceDecal = std::make_unique<olc::Decal>(franceSprite.get());
 		GameReset();
-		SetMaxFPS(60);
+		SetMaxFPS(12);
+		aiPlay = false;
 		return true;
 	}
 
@@ -176,7 +179,12 @@ public:
 		if (reset) {
 			auto now = std::chrono::system_clock::now();
 			std::chrono::duration<float> duration = (now - lastTime);
-			DrawWin(player1,ai2);
+			if (aiPlay) {
+				DrawWin(ai1, ai2);
+			}
+			else {
+				DrawWin(player1, ai2);
+			}
 			if (duration.count() > 1.0f)
 			{
 				GameReset();
@@ -190,23 +198,27 @@ public:
 		else {
 			KeyOperation();
 			DrawSpeed();
-			MouseOperate(player1);
-			//AiResponseStrong(ai1);
-			AiResponseStrong(ai2, fElapsedTime);
-			ai2.Move(fElapsedTime);
-
-			puck.Move(fElapsedTime);
-			//CollisionResponse(player, fElapsedTime);
-			//CollisionResponse(ai1, fElapsedTime);
-			CollisionResponse(player1, fElapsedTime);
-			CollisionResponse(ai2, fElapsedTime);
+			puck.Move();
+			if (!aiPlay) {
+				MouseOperate(player1);
+				CollisionResponse(player1);
+			}
+			else {
+				AiResponseStrong(ai1);
+				//AiResponse(ai1);
+				ai1.Move();
+				CollisionResponse(ai1);
+			}
+			
+			AiResponseStrong(ai2);
+			//AiResponse(ai2);
+			ai2.Move();
+			CollisionResponse(ai2);
 		}
 
-	
 		Rendering();
 		
 		if (PuckInGoal()) {
-			
 			reset = true;
 			lastTime= std::chrono::system_clock::now();
 		}

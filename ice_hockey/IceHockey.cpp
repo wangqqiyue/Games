@@ -47,7 +47,6 @@ void IceHockey::KeyOperation() {
 		return;
 	}
 	puck.SPEED_MAX = SPEED_MAX;
-	//cout << "puck.SPEED_MAX=" << puck.SPEED_MAX << endl;
 }
 
 void IceHockey::DrawSpeed() {
@@ -83,8 +82,14 @@ void IceHockey::DrawWin(const Paddle& p1, const Paddle& p2) {
 
 void IceHockey::GameReset() {
 	puck.InitPuck(field, olc::MAGENTA, this);
-	player1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
-	//ai1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this,&ai2);
+	
+	if (aiPlay) {
+		ai1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this, &ai2);
+		player1 = ai1;
+	}
+	else {
+		player1.InitPaddle(field, LEFT, olc::RED, olc::DARK_RED, this);
+	}
 	ai2.InitPaddle(field, RIGHT, olc::BLUE, olc::DARK_BLUE, this,&ai1);
 }
 
@@ -118,7 +123,7 @@ bool IceHockey::PuckInGoal() {
 	return false;
 }
 
-void IceHockey::CollisionResponse(Paddle& paddle, float fElapsedTime) {
+void IceHockey::CollisionResponse(Paddle& paddle) {
 
 	olc::vf2d vPaddle = paddle.v;
 	olc::vf2d vRelative = puck.velocity - vPaddle;
@@ -128,9 +133,9 @@ void IceHockey::CollisionResponse(Paddle& paddle, float fElapsedTime) {
 	float dis = vDis.mag();
 	float sumR = paddle.outerR + puck.radius;
 	//距离小于两者半径和，且相对移动速度为正
-	if (dis < sumR && vRn < 0.0f) {
+	if (dis < sumR && vRn<0.0f) {
 
-		float j = -2.1f * vRn / vNormal.dot(vNormal);
+		float j = -2.0f * vRn / vNormal.dot(vNormal);
 		j /= (1.0f / paddle.mass + 1.0f / puck.mass);
 		puck.velocity += j * vNormal * 1.0f / puck.mass;
 		paddle.v -= j * vNormal * 1.0f / paddle.mass;
@@ -139,11 +144,8 @@ void IceHockey::CollisionResponse(Paddle& paddle, float fElapsedTime) {
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 
 		//调整位置
-		//paddle.pos -= (sumR-dis)*vDis.norm();
+		paddle.pos -= (sumR-dis)*vDis.norm();
 
-		if (puck.velocity.mag() > 100.0f) {
-			puck.velocity /= 2.0f;
-		}
 	}
 
 }
@@ -177,12 +179,7 @@ void IceHockey::MouseOperate(Paddle& paddle) {
 			paddle.pos.y = field.innerY + paddle.outerR;
 		}
 		paddle.v = paddle.pos - paddle.lastPos;
-		while (paddle.v.mag() > SPEED_MAX) {
-			paddle.v /= 2.0F;
-		}
 	}
-	
-	//cout << "player.v.mag = " << paddle.v.mag() << endl;
 }
 
 void IceHockey::DrawScore(int s1,int s2) {
@@ -218,13 +215,17 @@ void IceHockey::Rendering() {
 	//绘制边框
 	field.DrawBarrier();
 	//绘制球拍
-	player1.DrawPaddle();
-	//ai1.DrawPaddle();
+	if (aiPlay) {
+		ai1.DrawPaddle();
+	}
+	else {
+		player1.DrawPaddle();
+	}
 	ai2.DrawPaddle();
 }
 
 
-void IceHockey::AiResponseStrong(AiPaddle& paddle,float fElapsedTime) {
+void IceHockey::AiResponseStrong(AiPaddle& paddle) {
 	paddle.speedEasy = SPEED_MAX / 10;
 	paddle.speedNormal = SPEED_MAX / 5;
 	paddle.speedHard = SPEED_MAX/2;
@@ -288,7 +289,7 @@ void IceHockey::AiResponseStrong(AiPaddle& paddle,float fElapsedTime) {
 	paddle.v = paddle.speedEasy * nMove;
 	return;
 }
-void IceHockey::AiResponse(AiPaddle& paddle,float fElapsedTime) {
+void IceHockey::AiResponse(AiPaddle& paddle) {
 	olc::vf2d nMove;
 
 	//冰球速度大于球拍速度,且冰球速度方向朝向球门,则防守
@@ -305,7 +306,7 @@ void IceHockey::AiResponse(AiPaddle& paddle,float fElapsedTime) {
 
 	paddle.v = paddle.speedEasy * nMove;
 
-	paddle.Move(fElapsedTime);
+	paddle.Move();
 	if (LEFT == paddle.side) {
 		BoundBarrier(paddle.pos, NULL, paddle.outerR, {field.innerX,field.innerY},field.width/2.0f,field.height);
 	}
@@ -509,7 +510,7 @@ void Puck::InitPuck(const Field& f,olc::Pixel col, olc::PixelGameEngine*p) {
 
 	// 生成一个0到99之间的随机数
 	int random_number = rand() % 100;
-	if (random_number > 50) {
+	if (random_number %2) {
 		position.y = f.innerY + radius;
 		velocity = { 0,1.0f };
 	}
@@ -517,7 +518,6 @@ void Puck::InitPuck(const Field& f,olc::Pixel col, olc::PixelGameEngine*p) {
 		position.y = f.innerY +f.height- radius;
 		velocity = { 0,-1.0f };
 	}
-	
 	
 	radius = f.goalWidth/goalPuckRatio;
 	color = col;
@@ -560,13 +560,10 @@ void Puck::DrawPuck() {
 	}
 	else
 		p->Draw(x, y, color);
-	
-	
 }
 
-void Puck::Move(float fElapsedTime) {
+void Puck::Move() {
 	bool bound = false;
-	//p->DrawRect(position.x - radius, position.y - radius, radius * 2, radius * 2, olc::RED);
 
 	if (position.y - radius >= f.goalLeft.y && position.y + radius <= f.goalLeft.y + f.goalWidth) {
 		//如果冰球上下边沿都在在球门范围内,则不必检测碰撞
@@ -610,23 +607,11 @@ void Puck::Move(float fElapsedTime) {
 		PlaySound(NULL, 0, 0);//先停止其他所有声音,再播放当前音效
 		PlaySound(bound_sound_file, NULL, SND_FILENAME | SND_ASYNC);
 	}
-	while (velocity.mag() > SPEED_MAX) {
-		velocity /= 2.0f;
-		
-	}
-	//cout << "SPEED_MAX=" << SPEED_MAX << endl;
 
-	float ratio = fElapsedTime * p->GetFPS();
-	//cout << "ratio=" << ratio<<endl;
-	position.x += velocity.x*ratio;
-	position.y += velocity.y*ratio;
+	position.x += velocity.x;
+	position.y += velocity.y;
 	
 	velocity *= (1.0f-f.friction);//固定的摩擦阻力
-	float resistance = 0.1*velocity.mag()/SPEED_MAX;//速度越大,空气阻力越大,阻力正比于速度
-	//cout << "resistance=" << resistance << endl;
-	velocity *= (1.0f - resistance);
-
-
 }
 
 void Paddle::InitPaddle(const Field& f,Side side, olc::Pixel inCol, olc::Pixel outCol, olc::PixelGameEngine* p) {
@@ -656,8 +641,7 @@ void Paddle::DrawPaddle() {
 	p->FillCircle(pos.x, pos.y, innerR, innerCol);
 }
 
-void Paddle::Move(float fElapsedTime) {
-	static float  ratioMax = 0;
+void Paddle::Move() {
 	float nextX, nextY;
 	nextX = pos.x;
 	nextY = pos.y;
@@ -668,20 +652,13 @@ void Paddle::Move(float fElapsedTime) {
 	if (nextY - outerR < f.innerY || nextY + outerR > f.innerY + f.height) {
 		pos.y = -v.y;
 	}
-	float ratio = fElapsedTime * p->GetFPS();
 	while (v.mag() < speedEasy) {
 		v *= 2.0f;
 	}
 
-	while (v.mag() > SPEED_MAX) {
-		v /= 2.0f;
-	}
-	pos.x += v.x* ratio;
-	pos.y += v.y* ratio;
-	if (ratio > ratioMax) {
-		ratioMax = ratio;
-		//cout << "max ratio = " << ratioMax << endl;
-	}
+	pos.x += v.x;
+	pos.y += v.y;
+
 	if (LEFT == side) {
 		BoundBarrier(pos, NULL, outerR, { f.innerX,f.innerY }, f.width / 2.0f, f.height);
 	}
