@@ -36,17 +36,40 @@ void IceHockey::KeyOperation() {
 	if (GetKey(olc::UP).bReleased) {
 		if (SPEED_MAX < 100) {
 			SPEED_MAX++;
+			puck.SPEED_MAX = SPEED_MAX;
 		}
 	}
 	else if (GetKey(olc::DOWN).bReleased) {
 		if (SPEED_MAX > 1) {
 			SPEED_MAX--;
+			puck.SPEED_MAX = SPEED_MAX;
 		}
 	}
-	else {
-		return;
+
+	if (GetKey(olc::RIGHT).bReleased) {
+		if (maxFPS < 100) {
+			maxFPS++;
+			SetMaxFPS(maxFPS);
+		}
 	}
-	puck.SPEED_MAX = SPEED_MAX;
+	else if (GetKey(olc::LEFT).bReleased) {
+		if (maxFPS > 1) {
+			maxFPS--;
+			SetMaxFPS(maxFPS);
+		}
+	}
+
+}
+
+void IceHockey::DrawFPS() {
+	std::string fpsStr = "FPS:";
+	fpsStr += std::to_string(maxFPS);
+	fpsStr += "(press Left/Right to change.)";
+	float x, y;
+	x = (ScreenWidth() - fpsStr.length() * 8 * 2) / 2.0f;
+	y = field.innerY + field.height + 8 * 6;
+
+	DrawString(x, y, fpsStr, olc::BLACK, 2);
 }
 
 void IceHockey::DrawSpeed() {
@@ -222,6 +245,9 @@ void IceHockey::Rendering() {
 		player1.DrawPaddle();
 	}
 	ai2.DrawPaddle();
+
+	DrawSpeed();
+	DrawFPS();
 }
 
 

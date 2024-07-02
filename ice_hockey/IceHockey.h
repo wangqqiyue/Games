@@ -8,7 +8,7 @@
 using std::cout;
 using std::endl;
 
-
+#define SPEED_MAX_INIT 60
 
 enum Side {
 	LEFT =0,
@@ -52,7 +52,7 @@ public:
 	olc::Pixel color;
 	Field f;
 	olc::PixelGameEngine* p;
-	float SPEED_MAX=30.0f;
+	float SPEED_MAX= SPEED_MAX_INIT;
 	float mass = 1.0f;
 	float goalPuckRatio = 4.0f;
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
@@ -78,7 +78,7 @@ public:
 
 	int score = 0;
 	float mass = 1.0f;
-	float SPEED_MAX = 30.0f;
+	float SPEED_MAX = SPEED_MAX_INIT;
 	float speedEasy = 2.0f;
 	float speedNormal = 4.0f;
 	float speedHard = 10.0f;
@@ -109,10 +109,13 @@ public:
 	bool holdPaddle=false;
 	Paddle player1;
 	AiPaddle ai1, ai2;
-	int SPEED_MAX = 30;
+	
 	bool reset = false;
 	bool judged = false;
 	bool aiPlay = true;
+	int FPS_MAX_INIT = 20;
+	int maxFPS = FPS_MAX_INIT;
+	int SPEED_MAX = SPEED_MAX_INIT;
 
 	LPCWSTR whistle_sound_file = TEXT("sound\\whistle.wav");
 	LPCWSTR bound_sound_file = TEXT("sound\\knock.wav");
@@ -146,6 +149,7 @@ public:
 	void DrawWin(const Paddle& p1, const Paddle& p2);
 	void KeyOperation();
 	void DrawSpeed();
+	void DrawFPS();
 public:
 	IceHockey()
 	{
@@ -167,7 +171,7 @@ public:
 		franceSprite = std::make_unique<olc::Sprite>(france_img_file);
 		franceDecal = std::make_unique<olc::Decal>(franceSprite.get());
 		GameReset();
-		SetMaxFPS(12);
+		SetMaxFPS(FPS_MAX_INIT);
 		aiPlay = false;
 		return true;
 	}
@@ -197,7 +201,7 @@ public:
 		}
 		else {
 			KeyOperation();
-			DrawSpeed();
+			
 			puck.Move();
 			if (!aiPlay) {
 				MouseOperate(player1);
