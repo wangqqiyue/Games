@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL.h"
+#include "SDL_image.h"
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -21,5 +22,8 @@ private:
 	bool isRunning;
 	SDL_Window* win;
 	SDL_Renderer* ren;
+	SDL_Texture* playerTex;
+	SDL_Rect* srcR;
+	SDL_Rect* dstR;
 };
 

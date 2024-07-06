@@ -21,9 +21,26 @@ void Game::init(const char* title, int posx, int posy, int width, int height, bo
 		ren = SDL_CreateRenderer(win, -1, 0);
 		if (ren)
 		{
-			SDL_SetRenderDrawColor(ren, 0, 255, 0, 255);
+			SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
 			cout << "Renderer created!" << endl;
+			int result = IMG_Init(IMG_INIT_AVIF|IMG_INIT_PNG|IMG_INIT_JPG);
+			cout << "IMG_Init result=" << result << endl;
+			SDL_Surface* tmpSurface = IMG_Load("assets/france-flag.png");
+			//SDL_Surface* tmpSurface = SDL_LoadBMP("assets/svg64.bmp");
+			
+			if (!tmpSurface) {
+				cout << "tmpSurface = NULL" << endl;
+			}
+			playerTex = SDL_CreateTextureFromSurface(ren, tmpSurface);
+			SDL_FreeSurface(tmpSurface);
+			srcR = new SDL_Rect;
+			dstR = new SDL_Rect;
+			srcR->w = 30;
+			srcR->h = 30;
+			dstR->w = 30;
+			dstR->h = 30;
 		}
+		
 		isRunning = true;
 	}
 	else
@@ -46,10 +63,14 @@ void Game::handleEvent()
 	}
 }
 void Game::update()
-{}
+{
+	dstR->x = 100;
+	dstR->y = 100;
+}
 void Game::render()
 {
 	SDL_RenderClear(ren);
+	SDL_RenderCopy(ren, playerTex, NULL, dstR);
 	SDL_RenderPresent(ren);
 }
 void Game::clean()
