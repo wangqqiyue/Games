@@ -51,12 +51,13 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	std::cout << "init success\n";
 	m_bRunning = true; // everything inited successfully, start the main loop
 
-	if (!TheTextureManager::Instance()->load("assets/animate.png", "animate", m_pRenderer))
+	if (!TheTextureManager::Instance()->load("assets/people.png", "people", m_pRenderer))
 	{
 		return false;
 	}
 
-	m_gameObjects.push_back(new Player(new LoaderParams(100, 100, 128, 83, "animate")));
+	m_gameObjects.push_back(new Player(new LoaderParams(100, 400, 50, 54, "people")));
+
 
 	return true;
 }
@@ -84,6 +85,7 @@ void Game::clean()
 void Game::handleEvents()
 {
 	SDL_Event event;
+
 	if (SDL_PollEvent(&event))
 	{
 		switch (event.type)

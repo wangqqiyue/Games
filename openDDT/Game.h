@@ -7,6 +7,7 @@
 #include "TextureManager.h"
 #include "GameObject.h"
 #include "Player.h"
+#include "Global.h"
 using std::cout;
 using std::endl;
 
