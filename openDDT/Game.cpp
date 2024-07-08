@@ -57,7 +57,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		return false;
 	}
 
-	m_gameObjects.push_back(new Player(new LoaderParams(100, 400, 50, 54, "people")));
+	m_gameObjects.push_back(new Player(new LoaderParams(100, 400, 45, 50, "people")));
 
 
 	return true;
