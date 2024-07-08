@@ -2,6 +2,7 @@
 #include <vector>
 #include "Game.h"
 #include "TextureManager.h"
+#include "InputHandler.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -84,20 +85,7 @@ void Game::clean()
 
 void Game::handleEvents()
 {
-	SDL_Event event;
-
-	if (SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
-		case SDL_QUIT:
-			m_bRunning = false;
-			break;
-
-		default:
-			break;
-		}
-	}
+	TheInputHandler::Instance()->update();
 }
 
 void Game::update()

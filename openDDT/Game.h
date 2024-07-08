@@ -24,6 +24,7 @@ public:
 	void clean();
 
 	bool running() { return m_bRunning; }
+	void quit() { m_bRunning = false; }
 	SDL_Renderer* getRenderer() const { return m_pRenderer; }
 
 	static Game* Instance()
