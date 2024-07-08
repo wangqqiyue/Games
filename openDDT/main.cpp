@@ -5,7 +5,7 @@ using std::endl;
 int main(int argc, char* args[])
 {
 	std::cout << "game init attempt...\n";
-	if (TheGame::Instance()->init("Chapter 1", 100, 100, 640, 480, false))
+	if (TheGame::Instance()->init("Chapter 1", 100, 100, 800, 600, false))
 	{
 		std::cout << "game init success!\n";
 		cout << TheGame::Instance()->running() << endl;

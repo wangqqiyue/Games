@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "TextureManager.h"
 #include "InputHandler.h"
+#include "AnglePanel.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -57,9 +58,15 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		return false;
 	}
 
-	m_gameObjects.push_back(new Player(new LoaderParams(100, 400, 45, 50, "people")));
+	m_gameObjects.push_back(new Player(new LoaderParams(xpos + 20, ypos + height - 300, 45, 50, "people")));
 
 
+	if (!TheTextureManager::Instance()->load("assets/angle_panel.png", "angle_panel", m_pRenderer))
+	{
+		return false;
+	}
+
+	m_gameObjects.push_back(new AnglePanel(new LoaderParams(xpos+20, ypos+height-220, 200, 144, "angle_panel")));
 	return true;
 }
 bool Game::addObject(GameObject* object)
