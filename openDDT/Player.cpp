@@ -1,7 +1,10 @@
 #include <string>
 #include "SDL.h"
+#include "Game.h"
 #include "InputHandler.h"
 #include "Player.h"
+#include "TextureManager.h"
+#include "Bullet.h"
 
 Player::Player(const LoaderParams* pParams) : SDLGameObject(pParams) {}
 
@@ -27,6 +30,17 @@ void Player::update()
 		m_currentFrame = 1;
 		m_direction = RIGHT;
 		m_x += 1;
+	}
+	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
+	{
+
+		TheTextureManager::Instance()->load("assets/bullet.png", "bullet", TheGame::Instance()->getRenderer());
+
+		Bullet * b = new Bullet(new LoaderParams(m_x, m_y-50, 64, 128, "bullet"));
+
+		
+		TheGame::Instance()->addObject(b);
+		
 	}
 	
 

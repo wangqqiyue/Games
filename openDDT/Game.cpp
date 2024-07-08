@@ -62,7 +62,13 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	return true;
 }
+bool Game::addObject(GameObject* object)
+{
 
+	m_gameObjects.push_back(object);
+
+	return true;
+}
 void Game::render()
 {
 	SDL_RenderClear(m_pRenderer);

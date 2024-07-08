@@ -20,6 +20,8 @@ public:
 	bool init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
 	void render();
 	void update();
+	bool addObject(GameObject* object);
+
 	void handleEvents();
 	void clean();
 
