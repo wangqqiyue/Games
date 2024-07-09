@@ -41,7 +41,7 @@ public:
 
 private:
 
-	Game() {};
+	Game() { m_cur_state = Idle; };
 
 	SDL_Window* m_pWindow;
 	SDL_Renderer* m_pRenderer;
@@ -55,6 +55,7 @@ private:
 	std::vector<GameObject*> m_gameObjects;
 
 	static Game* s_pInstance;
+	State m_cur_state;
 };
 
 typedef Game TheGame;

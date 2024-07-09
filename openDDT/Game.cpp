@@ -101,10 +101,63 @@ void Game::handleEvents()
 	TheInputHandler::Instance()->update();
 }
 
+
 void Game::update()
 {
-	for (std::vector<GameObject*>::size_type i = 0; i != m_gameObjects.size(); i++)
+	switch (m_cur_state)
 	{
+	case Idle:
+		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
+		{
+			m_cur_state = GettingAngle;
+		}
+		break;
+	case GettingAngle:
+		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RETURN))
+		{
+			m_cur_state = Shooting;
+		}
+		break;
+	case Shooting:
+		m_cur_state = End;
+		break;
+	default:
+		break;
+	}
+
+
+	for (std::vector<SDLGameObject*>::size_type i = 0; i != m_gameObjects.size(); i++)
+	{
+		std::string id = ((SDLGameObject*)m_gameObjects[i])->getTextureID();
+		if (Idle == m_cur_state)
+		{
+			if("angle_panel" == id || "bullet" == id)
+			{
+				continue;
+			}
+		}
+		if (GettingAngle == m_cur_state)
+		{
+			if ("bullet" == id)
+			{
+				continue;
+			}
+		}
+		if (Shooting == m_cur_state)
+		{
+			if ("people" == id)
+			{
+				((Player*)m_gameObjects[i])->shoot();
+			}
+		}
+		if (End == m_cur_state)
+		{
+
+			if ("angle_panel" == id || "people" == id)
+			{
+				continue;
+			}
+		}
 		m_gameObjects[i]->update();
 	}
 }

@@ -31,19 +31,17 @@ void Player::update()
 		m_direction = RIGHT;
 		m_x += 1;
 	}
-	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
-	{
-
-		TheTextureManager::Instance()->load("assets/bullet.png", "bullet", TheGame::Instance()->getRenderer());
-
-		Bullet * b = new Bullet(new LoaderParams(m_x, m_y-50, 64, 128, "bullet"));
-
-		
-		TheGame::Instance()->addObject(b);
-		
-	}
-	
 
 }
 
 void Player::clean() {}
+
+void Player::shoot()
+{
+	TheTextureManager::Instance()->load("assets/bullet.png", "bullet", TheGame::Instance()->getRenderer());
+
+	Bullet* b = new Bullet(new LoaderParams(m_x, m_y - 50, 64, 128, "bullet"));
+
+
+	TheGame::Instance()->addObject(b);
+}

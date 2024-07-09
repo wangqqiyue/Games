@@ -19,7 +19,7 @@ void AnglePanel::draw()
 	float radians = (float)m_angle * 3.1415f / 180.0f;//ª°∂»÷∆Ω«
 	endX = startX + m_width/2 * cosf(radians);
 	endY = startY - m_width/2 * sinf(radians);
-	cout << "m_angle=" << m_angle << endl;
+	//cout << "m_angle=" << m_angle << endl;
 	
 	SDL_SetRenderDrawBlendMode(TheGame::Instance()->getRenderer(), SDL_BLENDMODE_NONE);
 	SDL_RenderDrawLine(TheGame::Instance()->getRenderer(),startX,startY, endX,endY);

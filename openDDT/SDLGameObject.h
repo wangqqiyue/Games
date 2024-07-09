@@ -15,6 +15,7 @@ public:
 	virtual void draw();
 	virtual void update() {};
 	virtual void clean() {};
+	std::string getTextureID() { return m_textureID; }
 
 protected:
 

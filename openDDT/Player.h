@@ -14,6 +14,7 @@ public:
 	void draw();
 	void update();
 	void clean();
+	void shoot();
 	void turn(Direction d);
 private:
 	Direction m_direction=RIGHT;
