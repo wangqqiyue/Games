@@ -5,6 +5,7 @@
 
 #include "GameObject.h"
 #include "LoaderParams.h"
+#include "Global.h"
 
 class SDLGameObject : public GameObject
 {
@@ -12,15 +13,19 @@ public:
 
 	SDLGameObject(const LoaderParams* pParams);
 
-	virtual void draw();
+	virtual void draw(int angle=0);
 	virtual void update() {};
 	virtual void clean() {};
 	std::string getTextureID() { return m_textureID; }
-
+	int getAngle() { return m_angle; }
+	void setAngle(int angle) { m_angle = angle; }
 protected:
 
-	int m_x;
-	int m_y;
+	vf2d m_pos;//位置
+
+	int m_angle;//和x正方向的夹角
+
+	vf2d m_v;//速度
 
 	int m_width;
 	int m_height;

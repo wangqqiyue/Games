@@ -51,7 +51,7 @@ private:
 
 	bool m_bRunning;
 	int m_currentFrame;
-
+	int m_shoot_angle = 0;
 	std::vector<GameObject*> m_gameObjects;
 
 	static Game* s_pInstance;

@@ -23,25 +23,25 @@ void Player::update()
 	{
 		m_currentFrame = 0;
 		m_direction = LEFT;
-		m_x -= 1;
+		m_pos.x -= 1;
 	}
 	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RIGHT))
 	{
 		m_currentFrame = 1;
 		m_direction = RIGHT;
-		m_x += 1;
+		m_pos.y += 1;
 	}
 
 }
 
 void Player::clean() {}
 
-void Player::shoot()
+void Player::shoot(int angle)
 {
 	TheTextureManager::Instance()->load("assets/bullet.png", "bullet", TheGame::Instance()->getRenderer());
 
-	Bullet* b = new Bullet(new LoaderParams(m_x, m_y - 50, 64, 128, "bullet"));
-
-
+	Bullet* b = new Bullet(new LoaderParams(m_pos.x, m_pos.y , 64, 128, "bullet"));
+	b->setAngle(angle);
+	cout << "shoot m_pos=" << m_pos << endl;
 	TheGame::Instance()->addObject(b);
 }

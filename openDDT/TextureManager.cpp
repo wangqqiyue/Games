@@ -40,7 +40,7 @@ void TextureManager::draw(std::string id, int x, int y, int
 
 void TextureManager::drawFrame(std::string id, int x, int y, int
 	width, int height, int currentRow, int currentFrame, SDL_Renderer
-	* pRenderer, SDL_RendererFlip flip)
+	* pRenderer, SDL_RendererFlip flip, int angle)
 {
 	SDL_Rect srcRect;
 	SDL_Rect destRect;
@@ -50,6 +50,9 @@ void TextureManager::drawFrame(std::string id, int x, int y, int
 	srcRect.h = destRect.h = height;
 	destRect.x = x;
 	destRect.y = y;
+	SDL_Point point;
+	point.x = width / 2;
+	point.y =height / 2;//旋转是在相对位置，不是绝对位置
 	SDL_RenderCopyEx(pRenderer, m_textureMap[id], &srcRect,
-		&destRect, 0, 0, flip);
+		&destRect, angle, &point, flip);
 }

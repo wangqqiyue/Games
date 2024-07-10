@@ -6,10 +6,8 @@ class AnglePanel :
 public:
 	AnglePanel(const LoaderParams* pParams);
 	~AnglePanel() {}
-	void draw();
+	void draw(int angle=0);
 	void update();
 	void clean();
-private:
-	int m_angle;
 };
 

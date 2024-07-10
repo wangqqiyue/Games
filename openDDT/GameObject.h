@@ -5,7 +5,7 @@
 class GameObject
 {
 public:
-	virtual void draw() = 0;
+	virtual void draw(int angle=0) = 0;
 	virtual void update() = 0;
 	virtual void clean() = 0;
 protected:
