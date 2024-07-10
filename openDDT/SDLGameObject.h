@@ -19,6 +19,7 @@ public:
 	std::string getTextureID() { return m_textureID; }
 	int getAngle() { return m_angle; }
 	void setAngle(int angle) { m_angle = angle; }
+	vf2d getPosition() { return m_pos; }
 protected:
 
 	vf2d m_pos;//Œª÷√

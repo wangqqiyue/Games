@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "InputHandler.h"
 #include "AnglePanel.h"
+#include "Bullet.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -104,6 +105,7 @@ void Game::handleEvents()
 
 void Game::update()
 {
+	//改变状态
 	switch (m_cur_state)
 	{
 	case Idle:
@@ -123,13 +125,13 @@ void Game::update()
 		}
 		break;
 	case Shooting:
-		m_cur_state = End;
+		m_cur_state = GettingAngle;
 		break;
 	default:
 		break;
 	}
 
-	
+	//执行更新
 	for (std::vector<SDLGameObject*>::size_type i = 0; i != m_gameObjects.size(); i++)
 	{
 		std::string id = ((SDLGameObject*)m_gameObjects[i])->getTextureID();
@@ -145,11 +147,21 @@ void Game::update()
 			if ("angle_panel" == id)
 			{
 				m_shoot_angle = ((AnglePanel*)m_gameObjects[i])->getAngle();
-				cout << "shoot_angle=" << m_shoot_angle << endl;
+				//cout << "shoot_angle=" << m_shoot_angle << endl;
 			}
-			if ("bullet" == id || "people" == id)
+			if ( "people" == id)
 			{
 				continue;
+			}
+			if ("bullet" == id)
+			{
+				Bullet* b = (Bullet*)m_gameObjects[i];
+				//cout << "b->getPosition().y=" << b->getPosition().y << endl;
+				if (b->getPosition().y >= 500)
+				{
+					//cout << "erasing.." << endl;
+					b -> needDelete = true;
+				}
 			}
 		}
 		if (Shooting == m_cur_state)
@@ -159,6 +171,7 @@ void Game::update()
 			{
 				((Player*)m_gameObjects[i])->shoot(m_shoot_angle);
 			}
+		
 			
 		}
 		if (End == m_cur_state)
@@ -171,6 +184,11 @@ void Game::update()
 		}
 		m_gameObjects[i]->update();
 	}
+
+	//删除元素
+	m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),
+		[](const GameObject* item) { return item->needDelete; }),
+		m_gameObjects.end());
 }
 
 

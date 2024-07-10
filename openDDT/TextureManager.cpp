@@ -9,6 +9,7 @@ bool TextureManager::load(std::string fileName, std::string
 	{
 		return false;
 	}
+
 	SDL_Texture* pTexture =
 		SDL_CreateTextureFromSurface(pRenderer, pTempSurface);
 	SDL_FreeSurface(pTempSurface);
