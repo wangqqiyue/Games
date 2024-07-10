@@ -1,7 +1,7 @@
 #include "Bullet.h"
 #include "SDL.h"
 #include <iostream>
-
+#include <algorithm>
 #include "Game.h"
 using std::cout;
 using std::endl;
@@ -16,7 +16,7 @@ void Bullet::setAngle(int angle)
 	m_angle = angle;
 	//cout << "set angle=" << angle << endl;
 	float radians = (float)m_angle * PI / 180.0f;//弧度制角
-	float speed = 2.0f;//初始速度值
+	float speed = 4.0f;//初始速度值
 	m_v.x = speed * cosf(radians);
 	m_v.y = -speed * sinf(radians);
 	
