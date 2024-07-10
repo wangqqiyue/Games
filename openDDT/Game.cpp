@@ -125,7 +125,7 @@ void Game::update()
 		}
 		break;
 	case Shooting:
-		m_cur_state = GettingAngle;
+		m_cur_state = Idle;
 		break;
 	default:
 		break;
@@ -137,7 +137,7 @@ void Game::update()
 		std::string id = ((SDLGameObject*)m_gameObjects[i])->getTextureID();
 		if (Idle == m_cur_state)
 		{
-			if("angle_panel" == id || "bullet" == id)
+			if("angle_panel" == id)
 			{
 				continue;
 			}
@@ -171,12 +171,10 @@ void Game::update()
 			{
 				((Player*)m_gameObjects[i])->shoot(m_shoot_angle);
 			}
-		
 			
 		}
 		if (End == m_cur_state)
 		{
-
 			if ("angle_panel" == id || "people" == id)
 			{
 				continue;

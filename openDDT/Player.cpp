@@ -29,7 +29,7 @@ void Player::update()
 	{
 		m_currentFrame = 1;
 		m_direction = RIGHT;
-		m_pos.y += 1;
+		m_pos.x += 1;
 	}
 
 }
@@ -42,6 +42,6 @@ void Player::shoot(int angle)
 
 	Bullet* b = new Bullet(new LoaderParams(m_pos.x, m_pos.y , 64, 128, "bullet"));
 	b->setAngle(angle);
-	cout << "shoot m_pos=" << m_pos << endl;
+	//cout << "shoot m_pos=" << m_pos << endl;
 	TheGame::Instance()->addObject(b);
 }
