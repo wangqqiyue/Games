@@ -25,7 +25,7 @@ void ForcePanel::draw(int angle)
 	SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(), 255, 255, 255, 255);
 }
 
-void ForcePanel::update()
+void ForcePanel::update(State state)
 {
 	static int df = 1;
 	if (m_force > 100)

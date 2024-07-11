@@ -16,7 +16,7 @@ enum State {
 	GettingAngle,
 	GettingForce,
 	Shooting,
-	End,
+	Flying,
 };
 
 //from olc::PixelGameEngine

@@ -115,6 +115,24 @@ void Game::handleEvents()
 
 void Game::update()
 {
+	if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_LEFT))
+	{
+		m_cur_state = GoingLeft;
+	}
+	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RIGHT))
+	{
+		m_cur_state = GoingRight;
+	}
+	else
+	{
+		m_cur_state = Idle;
+	}
+
+	for (GameObject* go : m_gameObjects)
+	{
+		go->update(m_cur_state);
+	}
+	/*
 	int da = 0;//角度改变量
 	static int bulletNum = 0;//子弹数量
 	cout << "bulletNum=" << bulletNum << endl;
@@ -249,6 +267,7 @@ void Game::update()
 	m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),
 		[](const GameObject* item) { return item->needDelete; }),
 		m_gameObjects.end());
+		*/
 }
 
 

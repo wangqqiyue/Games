@@ -12,7 +12,7 @@ public:
 	Player(const LoaderParams* pParams);
 
 	void draw();
-	void update();
+	void update(State state);
 	void clean();
 	void shoot(int angle,int force);
 	void turn(Direction d);

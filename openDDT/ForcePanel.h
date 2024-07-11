@@ -7,7 +7,7 @@ public:
 	ForcePanel(const LoaderParams* pParams);
 	~ForcePanel() {}
 	void draw(int angle = 0);
-	void update();
+	void update(State state);
 	void clean();
 	int getForce() { return m_force; }
 private:

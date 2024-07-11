@@ -17,15 +17,15 @@ void Player::draw()
 	SDLGameObject::draw();
 }
 
-void Player::update()
+void Player::update(State state)
 {
-	if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_LEFT))
+	if(GoingLeft == state)
 	{
 		m_currentFrame = 0;
 		m_direction = LEFT;
 		m_pos.x -= 1;
 	}
-	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RIGHT))
+	if (GoingRight == state)
 	{
 		m_currentFrame = 1;
 		m_direction = RIGHT;

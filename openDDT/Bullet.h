@@ -10,7 +10,7 @@ public:
 	Bullet(const LoaderParams* pParams);
 	~Bullet() {}
 	void draw(int angle=0);
-	void update();
+	void update(State state);
 	void clean();
 	void init(int angle,int force);
 };

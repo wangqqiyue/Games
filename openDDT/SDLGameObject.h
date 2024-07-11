@@ -14,7 +14,7 @@ public:
 	SDLGameObject(const LoaderParams* pParams);
 
 	virtual void draw(int angle=0);
-	virtual void update() {};
+	virtual void update(State state) {};
 	virtual void clean() {};
 	std::string getTextureID() { return m_textureID; }
 	int getAngle() { return m_angle; }

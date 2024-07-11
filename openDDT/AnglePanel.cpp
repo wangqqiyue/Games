@@ -27,7 +27,7 @@ void AnglePanel::draw(int angle)
 	SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(), 255, 255, 255, 255);
 }
 
-void AnglePanel::update()
+void AnglePanel::update(State state)
 {
 	if (m_angle > 360) 
 	{

@@ -39,7 +39,7 @@ void Bullet::draw(int angle)
 	TextureManager::Instance()->drawFrame(m_textureID, m_pos.x, m_pos.y, m_width, m_height, m_currentRow, m_currentFrame, TheGame::Instance()->getRenderer(), SDL_FLIP_NONE, (90-m_angle));
 }
 
-void Bullet::update()
+void Bullet::update(State state)
 {
 	m_v.y += 0.01;
 	m_pos += m_v;
