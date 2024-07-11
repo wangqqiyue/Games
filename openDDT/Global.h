@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #define PI 3.1415f
+#include <string>
 
 #define MAX_SPEED 4
 
@@ -13,11 +14,27 @@ enum State {
 	Idle=0,
 	GoingLeft,
 	GoingRight,
-	GettingAngle,
+	TurningUp,
+	TurningDown,
 	GettingForce,
 	Shooting,
 	Flying,
+	Exploding,
+	State_Total,
 };
+
+enum Event {
+	_left_press=0,
+	_right_press,
+	_space_press,
+	_space_release,
+	_up_press,
+	_down_press,
+	_none,
+	_event_total,
+};
+
+extern State g_transition_table[][_event_total];
 
 //from olc::PixelGameEngine
 template <class T>

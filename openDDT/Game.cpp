@@ -115,19 +115,40 @@ void Game::handleEvents()
 
 void Game::update()
 {
+	//Get Event
 	if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_LEFT))
 	{
-		m_cur_state = GoingLeft;
+		m_cur_event = _left_press;
 	}
 	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RIGHT))
 	{
-		m_cur_state = GoingRight;
+		m_cur_event = _right_press;
+	}
+	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
+	{
+		m_cur_event = _space_press;
+	}
+	else if (TheInputHandler::Instance()->isKeyRelease(SDL_SCANCODE_SPACE))
+	{
+		m_cur_event = _space_release;
+	}
+	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_UP))
+	{
+		m_cur_event = _up_press;
+	}
+	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_DOWN))
+	{
+		m_cur_event = _down_press;
 	}
 	else
 	{
-		m_cur_state = Idle;
+		m_cur_event = _none;
 	}
 
+	//Change state
+	m_cur_state = g_transition_table[m_cur_state][m_cur_event];
+
+	//Notify all observers, when state changed.
 	for (GameObject* go : m_gameObjects)
 	{
 		go->update(m_cur_state);
