@@ -31,6 +31,11 @@ void Player::update(State state)
 		m_direction = RIGHT;
 		m_pos.x += 1;
 	}
+	if (Shooting == state)
+	{
+		shoot(TheGame::Instance()->getShootAngle(), TheGame::Instance()->getShootForce());
+		TheGame::Instance()->setState(Flying);
+	}
 
 }
 

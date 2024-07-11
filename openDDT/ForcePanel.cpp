@@ -36,8 +36,11 @@ void ForcePanel::update(State state)
 	{
 		df = 1;
 	}
-	m_force += df;
-	cout << "force=" << m_force << endl;
+	if (GettingForce == state)
+	{
+		m_force += df;
+	}
+
 }
 
 void ForcePanel::clean() {}

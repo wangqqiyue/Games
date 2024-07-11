@@ -21,6 +21,7 @@ public:
 	void render();
 	void update();
 	bool addObject(GameObject* object);
+	void removeObject();
 
 	void handleEvents();
 	void clean();
@@ -38,6 +39,9 @@ public:
 		}
 		return s_pInstance;
 	}
+	int getShootAngle() { return m_shoot_angle; }
+	int getShootForce() { return m_shoot_force; }
+	void setState(State state) { m_cur_state = state; }
 
 private:
 
@@ -50,6 +54,7 @@ private:
 	SDL_Rect m_destinationRectangle;
 
 	bool m_bRunning;
+	bool m_bVectorChanged=false;
 	int m_currentFrame;
 	int m_shoot_angle = 0;
 	int m_shoot_force = 0;

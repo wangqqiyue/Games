@@ -80,13 +80,22 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	m_gameObjects.push_back(new ForcePanel(new LoaderParams(xpos + 220, ypos + height - 220, 400, 53, "force_panel")));
 	return true;
 }
+
 bool Game::addObject(GameObject* object)
 {
-
 	m_gameObjects.push_back(object);
-
+	m_bVectorChanged = true;
 	return true;
 }
+
+void Game::removeObject()
+{
+	//删除元素
+	m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),
+		[](const GameObject* item) { return item->needDelete; }),
+		m_gameObjects.end());
+}
+
 void Game::render()
 {
 	SDL_RenderClear(m_pRenderer);
@@ -148,10 +157,21 @@ void Game::update()
 	//Change state
 	m_cur_state = g_transition_table[m_cur_state][m_cur_event];
 
+	if (Exploding == m_cur_state)
+	{
+		removeObject();
+		m_cur_state = Idle;
+	}
+
 	//Notify all observers, when state changed.
 	for (GameObject* go : m_gameObjects)
 	{
 		go->update(m_cur_state);
+		if (m_bVectorChanged)
+		{
+			m_bVectorChanged = false;
+			break;
+		}
 	}
 	/*
 	int da = 0;//角度改变量

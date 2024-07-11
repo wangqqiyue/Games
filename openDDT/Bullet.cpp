@@ -41,19 +41,28 @@ void Bullet::draw(int angle)
 
 void Bullet::update(State state)
 {
-	m_v.y += 0.01;
-	m_pos += m_v;
-
-	m_currentFrame = (int)(SDL_GetTicks() / 100) % 4;
-	
-	float radians = acosf(m_v.x / m_v.mag());//求反余弦值,但只能返回[0-PI]区间的值
-	m_angle = radians * 180.0f / PI;
-	//需要根据速度分量的符号,判断角度
-	if (m_v.y > 0)
+	if (Flying == state)
 	{
-		m_angle = 2 * PI - m_angle;
+		m_v.y += 0.01;
+		m_pos += m_v;
+
+		m_currentFrame = (int)(SDL_GetTicks() / 100) % 4;
+
+		float radians = acosf(m_v.x / m_v.mag());//求反余弦值,但只能返回[0-PI]区间的值
+		m_angle = radians * 180.0f / PI;
+		//需要根据速度分量的符号,判断角度
+		if (m_v.y > 0)
+		{
+			m_angle = 2 * PI - m_angle;
+		}
+
+		if (m_pos.y > 500)
+		{
+			TheGame::Instance()->setState(Exploding);
+			needDelete = true;
+		}
 	}
-	//cout << "new angle=" << m_angle << endl;
+
 	
 }
 

@@ -29,6 +29,15 @@ void AnglePanel::draw(int angle)
 
 void AnglePanel::update(State state)
 {
+	if (TurningUp == state)
+	{
+		m_angle++;
+	}
+	if (TurningDown == state)
+	{
+		m_angle--;
+	}
+
 	if (m_angle > 360) 
 	{
 		m_angle = 0;
