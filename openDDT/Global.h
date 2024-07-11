@@ -2,6 +2,7 @@
 #include <cmath>
 #define PI 3.1415f
 
+#define MAX_SPEED 4
 
 enum Direction {
 	LEFT = 0,

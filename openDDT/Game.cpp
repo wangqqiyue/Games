@@ -5,6 +5,7 @@
 #include "InputHandler.h"
 #include "AnglePanel.h"
 #include "Bullet.h"
+#include "ForcePanel.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -31,7 +32,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 			if (m_pRenderer != 0) // renderer init success
 			{
 				std::cout << "renderer creation success\n";
-				SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 255);
+				SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
 			}
 			else
 			{
@@ -54,6 +55,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	std::cout << "init success\n";
 	m_bRunning = true; // everything inited successfully, start the main loop
 
+	//增加人物
 	if (!TheTextureManager::Instance()->load("assets/people.png", "people", m_pRenderer))
 	{
 		return false;
@@ -61,13 +63,21 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	m_gameObjects.push_back(new Player(new LoaderParams(xpos + 20, ypos + height - 300, 45, 50, "people")));
 
-
-	if (!TheTextureManager::Instance()->load("assets/angle_panel.png", "angle_panel", m_pRenderer))
+	//增加角度盘
+	if (!TheTextureManager::Instance()->load("assets/angle_panel3.jpg", "angle_panel", m_pRenderer))
 	{
 		return false;
 	}
 
-	m_gameObjects.push_back(new AnglePanel(new LoaderParams(xpos+20, ypos+height-220, 200, 144, "angle_panel")));
+	m_gameObjects.push_back(new AnglePanel(new LoaderParams(xpos+70, ypos + height -200, 100, 100, "angle_panel")));
+
+	//增加力度表
+	if (!TheTextureManager::Instance()->load("assets/force_panel.png", "force_panel", m_pRenderer))
+	{
+		return false;
+	}
+
+	m_gameObjects.push_back(new ForcePanel(new LoaderParams(xpos + 220, ypos + height - 220, 400, 53, "force_panel")));
 	return true;
 }
 bool Game::addObject(GameObject* object)
@@ -105,6 +115,10 @@ void Game::handleEvents()
 
 void Game::update()
 {
+	int da = 0;//角度改变量
+	static int bulletNum = 0;//子弹数量
+	cout << "bulletNum=" << bulletNum << endl;
+	cout << "current state" << m_cur_state << endl;
 	//改变状态
 	switch (m_cur_state)
 	{
@@ -113,18 +127,40 @@ void Game::update()
 		{
 			m_cur_state = GettingForce;
 		}
+		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_UP))
+		{
+			m_cur_state = GettingAngle;
+			da = 1;
+		}
+		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_DOWN))
+		{
+			m_cur_state = GettingAngle;
+			da = -1;
+		}
+		break;
+	case GettingAngle:
+		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
+		{
+			m_cur_state = GettingForce;
+		}
+		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_UP))
+		{
+			da = 1;
+		}
+		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_DOWN))
+		{
+			da = -1;
+		}
 		break;
 	case GettingForce:
-
+		cout << "Getting Force" << endl;
 		if (TheInputHandler::Instance()->isKeyRelease(SDL_SCANCODE_SPACE))
 		{
-			cout << "release" << endl;
 			m_cur_state = Shooting;
 		}
-
 		break;
 	case Shooting:
-		m_cur_state = Idle;
+		cout << "Shooting.." << endl;
 		break;
 	default:
 		break;
@@ -136,7 +172,7 @@ void Game::update()
 		std::string id = ((SDLGameObject*)m_gameObjects[i])->getTextureID();
 		if (Idle == m_cur_state)
 		{
-			if("angle_panel" == id)
+			if("people" != id)
 			{
 				continue;
 			}
@@ -145,40 +181,67 @@ void Game::update()
 		{
 			if ("angle_panel" == id)
 			{
-				m_shoot_angle = ((AnglePanel*)m_gameObjects[i])->getAngle();
-				//cout << "shoot_angle=" << m_shoot_angle << endl;
+				AnglePanel* ap = ((AnglePanel*)m_gameObjects[i]);
+				ap->addAngle(da);
+				m_shoot_angle = ap->getAngle();
 			}
-			if ( "people" == id)
+			else
 			{
 				continue;
 			}
-			if ("bullet" == id)
+			
+		}
+		if (GettingForce == m_cur_state)
+		{
+			if ("force_panel" == id)
+			{
+				ForcePanel* fp = ((ForcePanel*)m_gameObjects[i]);
+				m_shoot_force = fp->getForce();
+				
+			}
+			else
+			{
+				continue;
+			}
+		}
+		if (Shooting == m_cur_state)
+		{
+			if ("people" == id)
+			{
+				cout << "shoot." << endl;
+				((Player*)m_gameObjects[i])->shoot(m_shoot_angle, m_shoot_force);
+				bulletNum++;
+				m_cur_state = End;
+			}
+			else
+			{
+				continue;
+			}
+		}
+		if (End == m_cur_state)
+		{
+			if (0 == bulletNum)
+			{
+				m_cur_state = Idle;
+			}
+			else if ("bullet" == id)
 			{
 				Bullet* b = (Bullet*)m_gameObjects[i];
 				//cout << "b->getPosition().y=" << b->getPosition().y << endl;
 				if (b->getPosition().y >= 500)
 				{
 					//cout << "erasing.." << endl;
-					b -> needDelete = true;
+					b->needDelete = true;
+					//delete b;
+					bulletNum--;
 				}
 			}
-		}
-		if (Shooting == m_cur_state)
-		{
-
-			if ("people" == id)
-			{
-				((Player*)m_gameObjects[i])->shoot(m_shoot_angle);
-			}
-			
-		}
-		if (End == m_cur_state)
-		{
-			if ("angle_panel" == id || "people" == id)
+			else
 			{
 				continue;
 			}
 		}
+		
 		m_gameObjects[i]->update();
 	}
 

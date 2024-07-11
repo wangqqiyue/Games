@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="AnglePanel.cpp" />
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="ForcePanel.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputHandler.cpp" />
     <ClCompile Include="main.cpp" />
@@ -142,6 +143,7 @@
   <ItemGroup>
     <ClInclude Include="AnglePanel.h" />
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="ForcePanel.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Global.h" />

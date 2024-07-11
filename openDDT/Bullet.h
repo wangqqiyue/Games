@@ -12,6 +12,6 @@ public:
 	void draw(int angle=0);
 	void update();
 	void clean();
-	void setAngle(int angle);
+	void init(int angle,int force);
 };
 
