@@ -1,7 +1,6 @@
 #include "Bullet.h"
 #include "SDL.h"
 #include <iostream>
-#include <algorithm>
 #include "Game.h"
 using std::cout;
 using std::endl;

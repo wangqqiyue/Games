@@ -22,16 +22,18 @@ public:
 	void update();
 	void clean() {}
 	bool isKeyDown(SDL_Scancode key);
-
+	bool isKeyPress(SDL_Scancode key);
+	bool isKeyRelease(SDL_Scancode key);
 private:
-	InputHandler() {}
-	~InputHandler() { }
+	InputHandler() { }
+	~InputHandler() {  }
 
 	static InputHandler* s_pInstance;
 	// handle keyboard events
 	void onKeyDown();
 	void onKeyUp();
 	const Uint8* m_keystates;
+	bool m_keyDown;
 };
 typedef InputHandler TheInputHandler;
 

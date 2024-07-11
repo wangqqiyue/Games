@@ -18,10 +18,11 @@ void InputHandler::update()
 			break;
 
 		case SDL_KEYDOWN:
+			m_keyDown = true;
 			onKeyDown();
 			break;
-
 		case SDL_KEYUP:
+			m_keyDown = false;
 			onKeyUp();
 			break;
 
@@ -52,6 +53,31 @@ bool InputHandler::isKeyDown(SDL_Scancode key)
 		else
 		{
 			return false;
+		}
+	}
+
+	return false;
+}
+
+bool InputHandler::isKeyPress(SDL_Scancode key)
+{
+	if (m_keystates != 0)
+	{
+		if (m_keyDown && m_keystates[key])
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+bool InputHandler::isKeyRelease(SDL_Scancode key)
+{
+	if (m_keystates != 0)
+	{
+		if (!m_keyDown && !m_keystates[key])
+		{
+			return true;
 		}
 	}
 

@@ -111,18 +111,17 @@ void Game::update()
 	case Idle:
 		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
 		{
-			m_cur_state = GettingAngle;
+			m_cur_state = GettingForce;
 		}
 		break;
-	case GettingAngle:
-		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RETURN))
+	case GettingForce:
+
+		if (TheInputHandler::Instance()->isKeyRelease(SDL_SCANCODE_SPACE))
 		{
+			cout << "release" << endl;
 			m_cur_state = Shooting;
 		}
-		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_ESCAPE))
-		{
-			m_cur_state = Idle;
-		}
+
 		break;
 	case Shooting:
 		m_cur_state = Idle;
