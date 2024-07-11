@@ -39,6 +39,7 @@ void ForcePanel::update(State state)
 	if (GettingForce == state)
 	{
 		m_force += df;
+		TheGame::Instance()->setShootForce(m_force);
 	}
 
 }

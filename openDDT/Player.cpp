@@ -47,6 +47,7 @@ void Player::shoot(int angle,int force)
 
 	Bullet* b = new Bullet(new LoaderParams(m_pos.x, m_pos.y , 64, 128, "bullet"));
 	b->init(angle, force);
-	//cout << "shoot m_pos=" << m_pos << endl;
+	cout << "shoot angle=" << angle << endl;
+	cout << "shoot force=" << force << endl;
 	TheGame::Instance()->addObject(b);
 }

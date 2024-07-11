@@ -32,10 +32,12 @@ void AnglePanel::update(State state)
 	if (TurningUp == state)
 	{
 		m_angle++;
+		TheGame::Instance()->setShootAngle(m_angle);
 	}
 	if (TurningDown == state)
 	{
 		m_angle--;
+		TheGame::Instance()->setShootAngle(m_angle);
 	}
 
 	if (m_angle > 360) 

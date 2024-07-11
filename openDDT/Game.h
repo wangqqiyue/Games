@@ -41,6 +41,8 @@ public:
 	}
 	int getShootAngle() { return m_shoot_angle; }
 	int getShootForce() { return m_shoot_force; }
+	void setShootAngle(int angle) { m_shoot_angle=angle; }
+	void setShootForce(int force) { m_shoot_force=force; }
 	void setState(State state) { m_cur_state = state; }
 
 private:
