@@ -9,9 +9,9 @@
 
 Player::Player(const LoaderParams* pParams) : SDLGameObject(pParams) {}
 
-void Player::setMyTurn()
+void Player::setMyTurn(bool isMyTurn)
 {
-	m_myTurn = true;
+	m_myTurn = isMyTurn;
 }
 void Player::draw(int angle)
 {

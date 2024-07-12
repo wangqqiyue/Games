@@ -51,6 +51,9 @@
     <ClCompile Include="CollisionHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TurnHandler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextureManager.h">
@@ -90,6 +93,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CollisionHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TurnHandler.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

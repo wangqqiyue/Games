@@ -15,7 +15,8 @@ public:
 	void update(State state);
 	void clean();
 	void shoot(int angle,int force);
-	void setMyTurn();
+	void setMyTurn(bool isMyTurn);
+	bool getMyTurn() {return m_myTurn;}
 	void onCollision();
 private:
 	Direction m_direction=RIGHT;

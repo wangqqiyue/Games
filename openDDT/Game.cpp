@@ -8,6 +8,7 @@
 #include "ForcePanel.h"
 #include "BulletHandler.h"
 #include "CollisionHandler.h"
+#include "TurnHandler.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -63,7 +64,6 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		return false;
 	}
 	Player* character = new Player(new LoaderParams(xpos + 20, ypos + height - 300, 45, 50, "people"));
-	TheCollisionHandler::Instance()->attachObserver(character);
 	m_gameObjects.push_back(character);
 	
 	//增加NPC
@@ -72,8 +72,16 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		return false;
 	}
 	Player* npc = new Player(new LoaderParams(xpos + width -200, ypos + height - 300, 45, 50, "npc"));
-	TheCollisionHandler::Instance()->attachObserver(npc);
 	m_gameObjects.push_back(npc);
+	
+	//将人物和NPC加入碰撞管理器
+	TheCollisionHandler::Instance()->attachObserver(npc);
+	TheCollisionHandler::Instance()->attachObserver(character);
+	//将人物和NPC加入回合管理器
+	TheTurnHandler::Instance()->attachObserver(character);
+	TheTurnHandler::Instance()->attachObserver(npc);
+
+	
 
 	//增加角度盘
 	if (!TheTextureManager::Instance()->load("assets/angle_panel3.jpg", "angle_panel", m_pRenderer))
@@ -97,6 +105,9 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	//增加碰撞管理类
 	m_gameObjects.push_back(TheCollisionHandler::Instance());
+
+	//将回合管理器,加入游戏中
+	m_gameObjects.push_back(TheTurnHandler::Instance());
 	return true;
 }
 
