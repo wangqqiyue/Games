@@ -1,0 +1,40 @@
+<mxfile host="Electron" modified="2024-07-12T08:01:21.160Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.6.4 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="cTR08wsOfrxZTpAFRmkn" version="24.6.4" type="device">
+  <diagram name="第 1 页" id="1KqacbCKhUC3VhXujElA">
+    <mxGraphModel dx="1691" dy="516" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-1" value="子弹管理类" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="190" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-2" value="碰撞管理类" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="355" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-3" value="Game类" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-140" y="20" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-4" value="碰撞检测方法&lt;div style=&quot;font-size: 22px;&quot;&gt;接受两个对象，若发生碰撞&lt;/div&gt;&lt;div style=&quot;font-size: 22px;&quot;&gt;设置游戏状态为碰撞中&lt;/div&gt;&lt;div style=&quot;font-size: 22px;&quot;&gt;调用对象的onCollision方法，相应碰撞事件&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=22;align=left;" vertex="1" parent="1">
+          <mxGeometry x="310" y="355" width="450" height="125" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-6" value="把角色和地形都加入到碰撞管理类的observer列表中" style="rounded=1;whiteSpace=wrap;html=1;fontSize=22;" vertex="1" parent="1">
+          <mxGeometry x="-220" y="250" width="240" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-7" value="更新状态&lt;div&gt;更新对象列表&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=22;" vertex="1" parent="1">
+          <mxGeometry x="174" width="240" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-8" value="&lt;div&gt;新建角色对象&lt;/div&gt;&lt;div&gt;新建地形对象&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=22;" vertex="1" parent="1">
+          <mxGeometry x="-230" y="110" width="240" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-10" value="新建子弹管理类单例" style="rounded=1;whiteSpace=wrap;html=1;fontSize=22;" vertex="1" parent="1">
+          <mxGeometry x="-220" y="390" width="240" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-11" value="将上述所有对象&lt;div&gt;加入到游戏对象列表中&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=22;" vertex="1" parent="1">
+          <mxGeometry x="-210" y="540" width="240" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Az7Ihjlbr4Ys31aAAD3P-12" value="若当前游戏状态为子弹飞行中&lt;div&gt;则遍历子弹列表&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;调用碰撞管理类碰撞检测方法&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;与所有可碰撞对象进行碰撞检测&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fontSize=22;align=left;" vertex="1" parent="1">
+          <mxGeometry x="310" y="160" width="400" height="140" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
