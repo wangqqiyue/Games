@@ -68,3 +68,8 @@ void Player::shoot(int angle,int force)
 	cout << "shoot force=" << force << endl;
 	TheBulletHandler::Instance()->addBullet(b);
 }
+
+void Player::onCollision()
+{
+	m_hp -= 10;
+}

@@ -65,5 +65,9 @@ void Bullet::update(State state)
 
 	
 }
-
+void Bullet::onCollision()
+{
+	TheGame::Instance()->setState(Exploding);
+	needDelete = true;
+}
 void Bullet::clean() {}

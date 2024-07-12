@@ -13,5 +13,6 @@ public:
 	void update(State state);
 	void clean();
 	void init(int angle,int force);
+	void onCollision();
 };
 

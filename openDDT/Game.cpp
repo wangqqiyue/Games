@@ -7,6 +7,7 @@
 #include "Bullet.h"
 #include "ForcePanel.h"
 #include "BulletHandler.h"
+#include "CollisionHandler.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -83,6 +84,9 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	//增加子弹管理类
 	m_gameObjects.push_back(TheBulletHandler::Instance());
+
+	//增加碰撞管理类
+	m_gameObjects.push_back(TheCollisionHandler::Instance());
 	return true;
 }
 

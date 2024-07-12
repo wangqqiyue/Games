@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "SDLGameObject.h"
 #include <vector>
 using std::vector;
 
@@ -24,10 +25,11 @@ public:
 		}
 		return s_pInstance;
 	}
-	void attachObserver(GameObject* go);
-	void detachObserver(GameObject* go);
+	void attachObserver(SDLGameObject* go);
+	void detachObserver(SDLGameObject* go);
+	bool checkCollision(SDLGameObject* g1, SDLGameObject* g2);
 private:
 	CollisionHandler() {}
 	static CollisionHandler* s_pInstance;
-	vector<GameObject*> m_gameObjects;
+	vector<SDLGameObject*> m_gameObjects;
 };

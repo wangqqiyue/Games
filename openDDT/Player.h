@@ -16,6 +16,7 @@ public:
 	void clean();
 	void shoot(int angle,int force);
 	void turn(Direction d);
+	void onCollision();
 private:
 	Direction m_direction=RIGHT;
 	int m_hp = 100;//½¡¿µÖµ,ÑªÌõ
