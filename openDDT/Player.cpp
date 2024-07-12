@@ -12,9 +12,25 @@ void Player::turn(Direction d)
 {
 	m_direction = d;
 }
-void Player::draw()
+void Player::draw(int angle)
 {
 	SDLGameObject::draw();
+	//绘制血条和体力条
+	SDL_Rect rect;
+	rect.w = m_width*m_hp/100;
+	rect.h = m_width / 6;
+	rect.x = m_pos.x;
+	rect.y = m_pos.y - rect.h;
+	
+	SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(),   // 渲染器
+		255,     // 红
+		0,     // 绿
+		0,     // 蓝
+		255);     // 透明值
+	SDL_SetRenderDrawBlendMode(TheGame::Instance()->getRenderer(), SDL_BLENDMODE_NONE);
+	SDL_RenderFillRect(TheGame::Instance()->getRenderer(),&rect);
+	SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(),255,255,255,255);
+	
 }
 
 void Player::update(State state)
