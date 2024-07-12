@@ -1,6 +1,9 @@
 #include "TurnHandler.h"
 #include "SDL.h"
+#include <iostream>
 #include <random>
+using std::cout;
+using std::endl;
 
 TurnHandler* TurnHandler::s_pInstance = 0;
 
@@ -83,12 +86,14 @@ bool TurnHandler::countDown()
 {
 	int time_passed = SDL_GetTicks() - m_start_time;
 	bool bTimeUp = false;
-	m_count_time -= time_passed;
+	m_count_time = m_turn_limit - time_passed;
 	if (m_count_time <= 0)
 	{
 		bTimeUp = true;
 	}
-	//画倒计时数字
+	//todo 画倒计时数字
+	cout << "Time Left: " << m_count_time / 1000 << endl;
+
 	return bTimeUp;
 }
 
