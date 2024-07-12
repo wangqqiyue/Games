@@ -134,6 +134,7 @@
     <ClCompile Include="AnglePanel.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="BulletHandler.cpp" />
+    <ClCompile Include="CollisionHandler.cpp" />
     <ClCompile Include="ForcePanel.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Global.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="AnglePanel.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="BulletHandler.h" />
+    <ClInclude Include="CollisionHandler.h" />
     <ClInclude Include="ForcePanel.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />

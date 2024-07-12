@@ -48,6 +48,9 @@
     <ClCompile Include="BulletHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionHandler.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextureManager.h">
@@ -84,6 +87,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="BulletHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionHandler.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
