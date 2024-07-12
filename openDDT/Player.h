@@ -15,12 +15,13 @@ public:
 	void update(State state);
 	void clean();
 	void shoot(int angle,int force);
-	void turn(Direction d);
+	void setMyTurn();
 	void onCollision();
 private:
 	Direction m_direction=RIGHT;
 	int m_hp = 100;//健康值,血条
 	int m_mp = 100;//魔法值,体力条
+	bool m_myTurn = false;
 };
 
 #endif // __Player__

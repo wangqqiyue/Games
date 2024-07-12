@@ -9,9 +9,9 @@
 
 Player::Player(const LoaderParams* pParams) : SDLGameObject(pParams) {}
 
-void Player::turn(Direction d)
+void Player::setMyTurn()
 {
-	m_direction = d;
+	m_myTurn = true;
 }
 void Player::draw(int angle)
 {
@@ -36,22 +36,25 @@ void Player::draw(int angle)
 
 void Player::update(State state)
 {
-	if(GoingLeft == state)
+	if (m_myTurn)
 	{
-		m_currentFrame = 0;
-		m_direction = LEFT;
-		m_pos.x -= 1;
-	}
-	if (GoingRight == state)
-	{
-		m_currentFrame = 1;
-		m_direction = RIGHT;
-		m_pos.x += 1;
-	}
-	if (Shooting == state)
-	{
-		shoot(TheGame::Instance()->getShootAngle(), TheGame::Instance()->getShootForce());
-		TheGame::Instance()->setState(Flying);
+		if (GoingLeft == state)
+		{
+			m_currentFrame = 0;
+			m_direction = LEFT;
+			m_pos.x -= 1;
+		}
+		if (GoingRight == state)
+		{
+			m_currentFrame = 1;
+			m_direction = RIGHT;
+			m_pos.x += 1;
+		}
+		if (Shooting == state)
+		{
+			shoot(TheGame::Instance()->getShootAngle(), TheGame::Instance()->getShootForce());
+			TheGame::Instance()->setState(Flying);
+		}
 	}
 
 }
