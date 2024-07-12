@@ -12,6 +12,7 @@ Bullet::Bullet(const LoaderParams* pParams) : SDLGameObject(pParams)
 
 void Bullet::init(int angle, int force)
 {
+	m_start_time = SDL_GetTicks();
 	m_angle = angle;
 	//cout << "set angle=" << angle << endl;
 	float radians = (float)m_angle * PI / 180.0f;//»¡¶ÈÖÆ½Ç
@@ -64,6 +65,15 @@ void Bullet::update(State state)
 	}
 
 	
+}
+bool Bullet::isSeparate()
+{
+	int now = SDL_GetTicks();
+	if (now - m_start_time > 1000)
+	{
+		return true;
+	}
+	return false;
 }
 void Bullet::onCollision()
 {

@@ -18,10 +18,14 @@ void  BulletHandler::update(State state)
 		for (Bullet* b : m_bullets)
 		{
 			b->update(state);
-			if (TheCollisionHandler::Instance()->checkCollisionAll(b))
+			if (b->isSeparate())
 			{
-				TheGame::Instance()->setState(Exploding);
+				if (TheCollisionHandler::Instance()->checkCollisionAll(b))
+				{
+					TheGame::Instance()->setState(Exploding);
+				}
 			}
+			
 		}
 	}
 

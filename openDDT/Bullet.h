@@ -14,5 +14,8 @@ public:
 	void clean();
 	void init(int angle,int force);
 	void onCollision();
+	bool isSeparate();
+private:
+	int m_start_time = 0;
 };
 
