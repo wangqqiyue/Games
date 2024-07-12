@@ -1,4 +1,6 @@
 #include "BulletHandler.h"
+#include "CollisionHandler.h"
+#include "Game.h"
 
 BulletHandler* BulletHandler::s_pInstance = 0;
 void BulletHandler::draw(int angle)
@@ -11,9 +13,16 @@ void BulletHandler::draw(int angle)
 
 void  BulletHandler::update(State state)
 {
-	for (Bullet* b : m_bullets)
+	if (Flying == state)
 	{
-		b->update(state);
+		for (Bullet* b : m_bullets)
+		{
+			b->update(state);
+			if (TheCollisionHandler::Instance()->checkCollisionAll(b))
+			{
+				TheGame::Instance()->setState(Exploding);
+			}
+		}
 	}
 
 }

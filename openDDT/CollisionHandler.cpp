@@ -23,6 +23,18 @@ void CollisionHandler::update(State state)
 
 }
 
+bool CollisionHandler::checkCollisionAll(SDLGameObject* g1)
+{
+    for (SDLGameObject* g2 : m_gameObjects)
+    {
+        if (checkCollision(g1, g2))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CollisionHandler::checkCollision(SDLGameObject* g1, SDLGameObject* g2)
 {
     bool result = false;

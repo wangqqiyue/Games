@@ -28,6 +28,7 @@ public:
 	void attachObserver(SDLGameObject* go);
 	void detachObserver(SDLGameObject* go);
 	bool checkCollision(SDLGameObject* g1, SDLGameObject* g2);
+	bool checkCollisionAll(SDLGameObject* g1);
 private:
 	CollisionHandler() {}
 	static CollisionHandler* s_pInstance;
