@@ -6,6 +6,7 @@
 #include "AnglePanel.h"
 #include "Bullet.h"
 #include "ForcePanel.h"
+#include "BulletHandler.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -78,6 +79,10 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	}
 
 	m_gameObjects.push_back(new ForcePanel(new LoaderParams(xpos + 220, ypos + height - 220, 400, 53, "force_panel")));
+
+
+	//增加子弹管理类
+	m_gameObjects.push_back(TheBulletHandler::Instance());
 	return true;
 }
 

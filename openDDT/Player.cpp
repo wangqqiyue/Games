@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "TextureManager.h"
 #include "Bullet.h"
+#include "BulletHandler.h"
 
 Player::Player(const LoaderParams* pParams) : SDLGameObject(pParams) {}
 
@@ -65,5 +66,5 @@ void Player::shoot(int angle,int force)
 	b->init(angle, force);
 	cout << "shoot angle=" << angle << endl;
 	cout << "shoot force=" << force << endl;
-	TheGame::Instance()->addObject(b);
+	TheBulletHandler::Instance()->addBullet(b);
 }

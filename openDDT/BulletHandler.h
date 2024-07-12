@@ -4,12 +4,16 @@
 #include <vector>
 using std::vector;
 
+class BulletHandler;
+
+typedef BulletHandler TheBulletHandler;
+
 class BulletHandler :
     public GameObject
 {
 public:
 	virtual void draw(int angle = 0);
-	virtual void update(State state) {};
+	virtual void update(State state);
 	virtual void clean() {};
 	//µ¥ÀýÄ£Ê½
 	static BulletHandler* Instance()
@@ -21,8 +25,11 @@ public:
 		}
 		return s_pInstance;
 	}
+	void addBullet(Bullet* b);
 private:
+	BulletHandler() {}
 	static BulletHandler* s_pInstance;
-	vector<Bullet> bullets;
+	vector<Bullet*> bullets;
 };
+
 
