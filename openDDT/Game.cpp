@@ -56,7 +56,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	std::cout << "init success\n";
 	m_bRunning = true; // everything inited successfully, start the main loop
-
+	
 	//增加人物
 	if (!TheTextureManager::Instance()->load("assets/people.png", "people", m_pRenderer))
 	{
@@ -65,6 +65,15 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	Player* character = new Player(new LoaderParams(xpos + 20, ypos + height - 300, 45, 50, "people"));
 	TheCollisionHandler::Instance()->attachObserver(character);
 	m_gameObjects.push_back(character);
+	
+	//增加NPC
+	if (!TheTextureManager::Instance()->load("assets/people.png", "npc", m_pRenderer))
+	{
+		return false;
+	}
+	Player* npc = new Player(new LoaderParams(xpos + width -200, ypos + height - 300, 45, 50, "npc"));
+	TheCollisionHandler::Instance()->attachObserver(npc);
+	m_gameObjects.push_back(npc);
 
 	//增加角度盘
 	if (!TheTextureManager::Instance()->load("assets/angle_panel3.jpg", "angle_panel", m_pRenderer))
