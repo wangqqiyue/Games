@@ -164,7 +164,7 @@ void Game::update()
 
 	if (Exploding == m_cur_state)
 	{
-		removeObject();
+		TheBulletHandler::Instance()->removeBullet();
 		m_cur_state = Idle;
 	}
 

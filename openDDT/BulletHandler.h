@@ -26,10 +26,11 @@ public:
 		return s_pInstance;
 	}
 	void addBullet(Bullet* b);
+	void removeBullet();
 private:
 	BulletHandler() {}
 	static BulletHandler* s_pInstance;
-	vector<Bullet*> bullets;
+	vector<Bullet*> m_bullets;
 };
 
 
