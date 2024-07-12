@@ -11,6 +11,7 @@ public:
 	virtual void clean() = 0;
 	bool needDelete = false;
 protected:
+	GameObject() {}
 	GameObject(const LoaderParams* pParams) {}
 	virtual ~GameObject() {}
 	
