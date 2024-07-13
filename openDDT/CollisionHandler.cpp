@@ -1,4 +1,5 @@
 #include "CollisionHandler.h"
+#include "SoundManager.h"
 
 CollisionHandler* CollisionHandler::s_pInstance = 0;
 void CollisionHandler::attachObserver(SDLGameObject* go)
@@ -29,6 +30,7 @@ bool CollisionHandler::checkCollisionAll(SDLGameObject* g1)
     {
         if (checkCollision(g1, g2))
         {
+            TheSoundManager::Instance()->playSound(_explode_sound);
             return true;
         }
     }
