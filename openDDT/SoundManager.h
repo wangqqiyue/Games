@@ -17,7 +17,7 @@ class SoundManager :
     public GameObject
 {
 public:
-    SoundManager* Instance()
+    static SoundManager* Instance()
     {
         if (m_pInstance == 0)
         {

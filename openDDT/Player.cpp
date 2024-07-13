@@ -8,6 +8,8 @@
 #include "BulletHandler.h"
 #include "FontManager.h"
 #include "AnglePanel.h"
+#include "SoundManager.h"
+
 
 Player::Player(const LoaderParams* pParams) : SDLGameObject(pParams) {}
 
@@ -91,6 +93,7 @@ void Player::update(State state)
 		{
 			shoot(m_angle+m_shoot_angle, TheGame::Instance()->getShootForce());
 			TheGame::Instance()->setState(Flying);
+			TheSoundManager::Instance()->playSound(_shoot_sound);
 		}
 	}
 
