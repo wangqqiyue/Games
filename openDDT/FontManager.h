@@ -3,6 +3,8 @@
 #include "SDL_ttf.h"
 #include <iostream>
 using std::string;
+class FontManager;
+typedef FontManager TheFontManager;
 
 class FontManager :
     public GameObject
@@ -25,14 +27,12 @@ public:
 
 	bool init();
 
-
-
 private:
 	FontManager() {}
 	static FontManager* s_pInstance;
-	TTF_Font* m_font;
+	TTF_Font* m_font = nullptr;
 	string m_font_path="fonts/times.ttf";
 	int m_font_size = 18;
-
+	bool m_initialized = false;
 };
 

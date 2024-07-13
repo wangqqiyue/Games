@@ -6,6 +6,7 @@
 #include "TextureManager.h"
 #include "Bullet.h"
 #include "BulletHandler.h"
+#include "FontManager.h"
 
 Player::Player(const LoaderParams* pParams) : SDLGameObject(pParams) {}
 
@@ -32,6 +33,10 @@ void Player::draw(int angle)
 	SDL_RenderFillRect(TheGame::Instance()->getRenderer(),&rect);
 	SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(),255,255,255,255);
 	
+	std::string hp_str = std::to_string(m_hp);
+	//»æÖÆÑªÌõÎÄ×Ö
+	TheFontManager::Instance()->drawText(TheGame::Instance()->getRenderer(), hp_str, {255,0,0,255},
+		m_pos.x, m_pos.y - rect.h * 4);
 }
 
 void Player::update(State state)

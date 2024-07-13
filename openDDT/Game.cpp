@@ -9,7 +9,7 @@
 #include "BulletHandler.h"
 #include "CollisionHandler.h"
 #include "TurnHandler.h"
-#include "SDL_ttf.h"
+#include "FontManager.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -110,6 +110,9 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	//将回合管理器,加入游戏中
 	m_gameObjects.push_back(TheTurnHandler::Instance());
+
+	//将字体管理器加入游戏
+	m_gameObjects.push_back(TheFontManager::Instance());
 	return true;
 }
 
