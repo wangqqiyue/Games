@@ -104,14 +104,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\17964\Documents\SDL2-2.30.5\include;C:\Users\17964\Documents\SDL2_image-2.8.2\include;C:\Users\17964\Documents\SDL2_ttf-2.22.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\17964\Documents\SDL2-2.30.5\include;C:\Users\17964\Documents\SDL2_image-2.8.2\include;C:\Users\17964\Documents\SDL2_ttf-2.22.0\include;C:\Users\17964\Documents\SDL2_mixer-2.8.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\17964\Documents\SDL2_image-2.8.2\lib\x64;C:\Users\17964\Documents\SDL2-2.30.5\lib\x64;C:\Users\17964\Documents\SDL2_ttf-2.22.0\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\17964\Documents\SDL2_image-2.8.2\lib\x64;C:\Users\17964\Documents\SDL2-2.30.5\lib\x64;C:\Users\17964\Documents\SDL2_ttf-2.22.0\lib\x64;C:\Users\17964\Documents\SDL2_mixer-2.8.0\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -143,6 +143,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SDLGameObject.cpp" />
     <ClCompile Include="FontManager.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TurnHandler.cpp" />
   </ItemGroup>
@@ -160,6 +161,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="SDLGameObject.h" />
     <ClInclude Include="FontManager.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TurnHandler.h" />
   </ItemGroup>
