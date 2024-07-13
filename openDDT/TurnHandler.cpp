@@ -2,6 +2,8 @@
 #include "SDL.h"
 #include <iostream>
 #include <random>
+#include "FontManager.h"
+#include "Game.h"
 using std::cout;
 using std::endl;
 
@@ -9,7 +11,11 @@ TurnHandler* TurnHandler::s_pInstance = 0;
 
 void TurnHandler::draw(int angle)
 {
-
+	//画倒计时数字
+	std::string time_str = std::to_string(m_count_time / 1000);
+	//cout << "Time Left: " << m_count_time / 1000 << endl;
+	TheFontManager::Instance()->drawText(TheGame::Instance()->getRenderer(),
+		time_str, { 255,0,0,255 }, 450, 100);
 }
 
 void TurnHandler::update(State state)
@@ -91,8 +97,7 @@ bool TurnHandler::countDown()
 	{
 		bTimeUp = true;
 	}
-	//todo 画倒计时数字
-	cout << "Time Left: " << m_count_time / 1000 << endl;
+	
 
 	return bTimeUp;
 }
