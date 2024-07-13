@@ -7,6 +7,7 @@
 #include "Bullet.h"
 #include "BulletHandler.h"
 #include "FontManager.h"
+#include "AnglePanel.h"
 
 Player::Player(const LoaderParams* pParams) : SDLGameObject(pParams) {}
 
@@ -74,7 +75,7 @@ void Player::update(State state)
 		}
 		if (Shooting == state)
 		{
-			shoot(TheGame::Instance()->getShootAngle(), TheGame::Instance()->getShootForce());
+			shoot(TheAnglePanel::Instance()->getAngle(), TheGame::Instance()->getShootForce());
 			TheGame::Instance()->setState(Flying);
 		}
 	}

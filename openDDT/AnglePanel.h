@@ -15,12 +15,21 @@ public:
 	void update(State state);
 	void clean();
 	void addAngle(int da) { m_angle += da; }
+	void setAngle(int angle) { m_angle = angle; }
+	int getAngle() { return m_angle; }
 	//µ¥ÀýÄ£Ê½
-	static AnglePanel* Instance(const LoaderParams* pParams)
+	static AnglePanel* Instance(const LoaderParams* pParams=nullptr)
 	{
 		if (s_pInstance == 0)
 		{
-			s_pInstance = new AnglePanel(pParams);
+			if (pParams)
+			{
+				s_pInstance = new AnglePanel(pParams);
+			}
+			else
+			{
+				printf("nullptr as parameter\n");
+			}
 		}
 		return s_pInstance;
 	}
