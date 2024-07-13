@@ -90,8 +90,8 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	{
 		return false;
 	}
-
-	m_gameObjects.push_back(TheAnglePanel::Instance(new LoaderParams(xpos + 70, ypos + height - 200, 100, 100, "angle_panel")));
+	TheAnglePanel::Instance(new LoaderParams(xpos + 70, ypos + height - 200, 100, 100, "angle_panel"));
+	//m_gameObjects.push_back(TheAnglePanel::Instance(new LoaderParams(xpos + 70, ypos + height - 200, 100, 100, "angle_panel")));
 
 	//增加力度表
 	if (!TheTextureManager::Instance()->load("assets/force_panel.png", "force_panel", m_pRenderer))

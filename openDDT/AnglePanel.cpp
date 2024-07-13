@@ -14,11 +14,10 @@ void AnglePanel::draw(int angle)
 {
 	SDLGameObject::draw();
 	/* Select the color for drawing. It is set to red here. */
-	
 	int startX, startY, endX, endY;
 	startX = m_pos.x + m_width / 2;
 	startY = m_pos.y + m_height/2;
-	float radians = (float)m_angle * 3.1415f / 180.0f;//弧度制角
+	float radians = (float)angle * 3.1415f / 180.0f;//弧度制角
 	endX = startX + m_width/2 * cosf(radians);
 	endY = startY - m_width/2 * sinf(radians);
 //	cout << "m_angle=" << m_angle << endl;
@@ -31,25 +30,7 @@ void AnglePanel::draw(int angle)
 
 void AnglePanel::update(State state)
 {
-	if (TurningUp == state)
-	{
-		m_angle++;
-		TheGame::Instance()->setShootAngle(m_angle);
-	}
-	if (TurningDown == state)
-	{
-		m_angle--;
-		TheGame::Instance()->setShootAngle(m_angle);
-	}
-
-	if (m_angle > 360) 
-	{
-		m_angle = 0;
-	}
-	if (m_angle < 0)
-	{
-		m_angle = 360;
-	}
+	
 }
 
 void AnglePanel::clean() {}

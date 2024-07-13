@@ -23,6 +23,7 @@ private:
 	int m_hp = 100;//健康值,血条
 	int m_mp = 100;//魔法值,体力条
 	bool m_myTurn = false;
+	int m_shoot_angle = 0;
 };
 
 #endif // __Player__

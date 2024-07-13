@@ -3,7 +3,7 @@
 #define PI 3.1415f
 #include <string>
 
-#define MAX_SPEED 4
+#define MAX_SPEED 8
 
 enum Direction {
 	LEFT = 0,

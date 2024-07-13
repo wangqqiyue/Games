@@ -25,19 +25,19 @@ public:
 
 protected:
 
-	vf2d m_pos;//位置
+	vf2d m_pos={0,0};//位置
 
-	int m_angle;//和x正方向的夹角
+	int m_angle=0;//和x正方向的夹角
 
-	vf2d m_v;//速度
+	vf2d m_v={0,0};//速度
 
-	int m_width;
-	int m_height;
+	int m_width=0;
+	int m_height=0;
 
-	int m_currentRow;
-	int m_currentFrame;
+	int m_currentRow=0;
+	int m_currentFrame=0;
 
-	std::string m_textureID;
+	std::string m_textureID="";
 };
 
 #endif // __SDLGameObject__

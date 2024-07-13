@@ -54,6 +54,12 @@ void Player::draw(int angle)
 	TheFontManager::Instance()->drawText(TheGame::Instance()->getRenderer(), hp_str, {255,0,0,255},
 		m_pos.x, m_pos.y - rect.h * 4);
 
+	if (m_myTurn)
+	{
+		//»æÖÆ½Ç¶ÈÅÌ
+		TheAnglePanel::Instance()->draw(m_angle + m_shoot_angle);
+	}
+
 	
 }
 
@@ -73,9 +79,17 @@ void Player::update(State state)
 			m_direction = RIGHT;
 			m_pos.x += 1;
 		}
+		if (TurningUp == state)
+		{
+			m_shoot_angle++;
+		}
+		if (TurningDown == state)
+		{
+			m_shoot_angle--;
+		}
 		if (Shooting == state)
 		{
-			shoot(TheAnglePanel::Instance()->getAngle(), TheGame::Instance()->getShootForce());
+			shoot(m_angle+m_shoot_angle, TheGame::Instance()->getShootForce());
 			TheGame::Instance()->setState(Flying);
 		}
 	}
