@@ -2,6 +2,8 @@
 #include "Game.h"
 #include "SDL.h"
 
+AnglePanel* AnglePanel::s_pInstance = 0;
+
 AnglePanel::AnglePanel(const LoaderParams* pParams) : SDLGameObject(pParams) 
 {
 	m_currentFrame = 0;
