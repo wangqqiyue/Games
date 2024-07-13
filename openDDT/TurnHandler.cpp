@@ -24,6 +24,10 @@ void TurnHandler::update(State state)
 	{
 		init();
 	}
+	//炮弹已射出则不再计时
+	if (Idle != state) {
+		return;
+	}
 	if (countDown() || !m_cur_player->getMyTurn())
 	{
 		m_cur_player->setMyTurn(false);

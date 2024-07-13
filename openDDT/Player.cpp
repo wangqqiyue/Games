@@ -30,13 +30,30 @@ void Player::draw(int angle)
 		0,     // 蓝
 		255);     // 透明值
 	SDL_SetRenderDrawBlendMode(TheGame::Instance()->getRenderer(), SDL_BLENDMODE_NONE);
+	//绘制血条
 	SDL_RenderFillRect(TheGame::Instance()->getRenderer(),&rect);
+	//绘制红三角
+	if (m_myTurn)
+	{
+		SDL_Point triangle[4];
+		triangle[0].x = m_pos.x + m_width / 2;
+		triangle[0].y = m_pos.y - 40;
+		triangle[1].x = triangle[0].x - 15;
+		triangle[1].y = triangle[0].y - 30;
+		triangle[2].x = triangle[0].x + 15;
+		triangle[2].y = triangle[0].y - 30;
+		triangle[3] = triangle[0];
+
+		SDL_RenderDrawLines(TheGame::Instance()->getRenderer(), triangle, 4);
+	}
 	SDL_SetRenderDrawColor(TheGame::Instance()->getRenderer(),255,255,255,255);
 	
 	std::string hp_str = std::to_string(m_hp);
 	//绘制血条文字
 	TheFontManager::Instance()->drawText(TheGame::Instance()->getRenderer(), hp_str, {255,0,0,255},
 		m_pos.x, m_pos.y - rect.h * 4);
+
+	
 }
 
 void Player::update(State state)
@@ -75,6 +92,7 @@ void Player::shoot(int angle,int force)
 	cout << "shoot angle=" << angle << endl;
 	cout << "shoot force=" << force << endl;
 	TheBulletHandler::Instance()->addBullet(b);
+	m_myTurn = false;
 }
 
 void Player::onCollision()

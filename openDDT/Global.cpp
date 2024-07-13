@@ -8,7 +8,7 @@ State g_transition_table[][_event_total] = {
 	{GoingLeft, GoingRight, GettingForce, Idle, TurningUp, TurningDown, Idle},/*TuringUp*/
 	{GoingLeft, GoingRight, GettingForce, Idle, TurningUp, TurningDown, Idle},/*TuringDown*/
 	{GettingForce, GettingForce, GettingForce, Shooting, GettingForce, GettingForce, GettingForce},/*GettingForce*/
-	{Shooting, Shooting, Shooting, Shooting, Shooting, Shooting, Shooting},/*Shooting*/
+	{Shooting, Shooting, Shooting, Shooting, Shooting, Shooting, Flying},/*Shooting*/
 	{Flying, Flying, Flying, Flying, Flying, Flying, Flying},/*Flying*/
 	{Exploding, Exploding, Exploding, Exploding, Exploding, Exploding, Exploding},/*Exploding*/
 };
