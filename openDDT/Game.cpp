@@ -9,6 +9,7 @@
 #include "BulletHandler.h"
 #include "CollisionHandler.h"
 #include "TurnHandler.h"
+#include "SDL_ttf.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -22,6 +23,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		{
 			flags = SDL_WINDOW_FULLSCREEN;
 		}
+
 
 		std::cout << "SDL init success\n";
 		// init the window
