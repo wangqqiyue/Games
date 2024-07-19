@@ -18,10 +18,9 @@ int main(int argc, char* argv[]) {
 	while (true) {
 		if (client_sock = SDLNet_TCP_Accept(server_sock)) {
 			IPaddress *client_ip = SDLNet_TCP_GetPeerAddress(client_sock);
-			unsigned char* ip = (unsigned char *)client_ip->host;
-			cout << "开始接受来自客户端" << 
-				ip[0] << "." << ip[1] << "." << ip[2] << "." << ip[3] << 
-				"的消息" << endl;
+			unsigned char* client_ip_str = (unsigned char *)&client_ip->host;
+			printf("开始接受来自客户端%d.%d.%d.%d的消息",
+				client_ip_str[0], client_ip_str[1], client_ip_str[2], client_ip_str[3]);
 
 			char buf[512];
 			int len = 0;
