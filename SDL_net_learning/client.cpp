@@ -16,9 +16,9 @@ int main(int argc, char* argv[]) {
 	}
 	atexit(SDLNet_Quit);//注册一个程序终止时执行的退出函数
 
+	const char* dstip = "127.0.0.1";
+	SDLNet_ResolveHost(&ip, dstip, 12345);
 	
-	SDLNet_ResolveHost(&ip, NULL, 12345);
-	cout << "Local Host: " << SDLNet_ResolveIP(&ip) << endl;
 	socket = SDLNet_TCP_Open(&ip);
 	char buf[512] = { 0 };
 	while (true) {
