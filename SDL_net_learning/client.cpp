@@ -22,8 +22,9 @@ int main(int argc, char* argv[]) {
 	socket = SDLNet_TCP_Open(&ip);
 	char buf[512] = { 0 };
 	while (true) {
-		cout << "请输入要发送的内容:";
-		cin >> buf;
+		cout << "请输入:";
+		memset(buf, 0, 512);
+		gets_s(buf, 512);
 		int len = strlen(buf);
 		SDLNet_TCP_Send(socket, buf, len);
 	}
