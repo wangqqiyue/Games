@@ -16,13 +16,13 @@ void doHandler(TCPsocket client_sock) {
 	int len = 0;
 	bool quit = false;
 	
-	printf("已与客户端%d.%d.%d.%d:%d 建立连接",
+	printf("已与客户端%d.%d.%d.%d:%d 建立连接\n",
 		client_ip_str[0], client_ip_str[1], client_ip_str[2], client_ip_str[3],port);
 	while (!quit) {
 
 		len = SDLNet_TCP_Recv(client_sock, buf, 512);
 		buf[len] = 0;
-		printf("来自%d.%d.%d.%d:port",
+		printf("来自%d.%d.%d.%d:%d: ",
 			client_ip_str[0], client_ip_str[1], client_ip_str[2], client_ip_str[3],port);
 		cout << buf << endl;
 		if (0 == strcmp(buf, "exit")) {
