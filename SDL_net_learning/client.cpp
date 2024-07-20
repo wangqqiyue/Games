@@ -16,17 +16,27 @@ int main(int argc, char* argv[]) {
 	}
 	atexit(SDLNet_Quit);//注册一个程序终止时执行的退出函数
 
-	const char* dstip = "127.0.0.1";
-	SDLNet_ResolveHost(&ip, dstip, 12345);
+	const char* dstip = "116.198.37.2";//116.198.37.2  192.168.3.128
+	SDLNet_ResolveHost(&ip, dstip, 8888);
 	
 	socket = SDLNet_TCP_Open(&ip);
 	char buf[512] = { 0 };
+	if (socket) {
+		cout << "已连接到服务器." << endl;
+		cout << "请输入你的消息，以exit退出服务器" << endl;
+	}
+	else {
+		cout << "无法连接到服务器" << endl;
+	}
 	while (true) {
 		cout << "请输入:";
 		memset(buf, 0, 512);
 		gets_s(buf, 512);
 		int len = strlen(buf);
 		SDLNet_TCP_Send(socket, buf, len);
+		if (0 == strcmp(buf, "exit")) {
+			break;
+		}
 	}
 	SDLNet_TCP_Close(socket);
 	SDLNet_Quit();
