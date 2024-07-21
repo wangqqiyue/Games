@@ -35,7 +35,7 @@ int main(int arg, char* argv[]) {
 	}
 	atexit(SDLNet_Quit);//注册一个程序终止时执行的退出函数
 
-	SDLNet_ResolveHost(&server_ip, nullptr, 12346);
+	SDLNet_ResolveHost(&server_ip, nullptr, 12345);
 	server_sock = SDLNet_TCP_Open(&server_ip);
 	//创建线程,用于接受其他P2P节点的连接请求
 	thread server_thread(serverHandler, server_sock);
