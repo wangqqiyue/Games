@@ -18,12 +18,14 @@ public:
 	void setMyTurn(bool isMyTurn);
 	bool getMyTurn() {return m_myTurn;}
 	void onCollision();
+	void setName(string name) { m_name = name; }
 private:
 	Direction m_direction=RIGHT;
 	int m_hp = 100;//健康值,血条
 	int m_mp = 100;//魔法值,体力条
 	bool m_myTurn = false;
 	int m_shoot_angle = 0;
+	string m_name = "";
 };
 
 #endif // __Player__

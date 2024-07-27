@@ -62,6 +62,9 @@ void Player::draw(int angle)
 		TheAnglePanel::Instance()->draw(m_angle + m_shoot_angle);
 	}
 
+	/*»æÖÆ½ÇÉ«Ãû*/
+	TheFontManager::Instance()->drawText(TheGame::Instance()->getRenderer(), m_textureID, { 255,0,0,255 },
+		m_pos.x, m_pos.y - rect.h * 6);
 	
 }
 

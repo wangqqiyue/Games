@@ -33,6 +33,7 @@ bool Game::addPlayer(string name) {
 		return false;
 	}
 	Player* character = new Player(new LoaderParams(m_pos.x + 20, m_pos.y + m_size.y - 300, 45, 50, name));
+	character->setName(name);
 	m_gameObjects.push_back(character);
 	//将人物加入碰撞管理器
 	TheCollisionHandler::Instance()->attachObserver(character);
