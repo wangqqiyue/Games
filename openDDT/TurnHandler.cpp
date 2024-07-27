@@ -28,6 +28,9 @@ void TurnHandler::update(State state)
 	if (Idle != state) {
 		return;
 	}
+	if (0 == m_player_total) {
+		return;
+	}
 	if (countDown() || !m_cur_player->getMyTurn())
 	{
 		m_cur_player->setMyTurn(false);
@@ -90,6 +93,7 @@ void TurnHandler::init()
 void TurnHandler::attachObserver(Player *p)
 {
 	m_waitQueue.push_back(p);
+	m_player_total += 1;
 }
 
 bool TurnHandler::countDown()

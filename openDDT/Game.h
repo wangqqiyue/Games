@@ -8,8 +8,10 @@
 #include "GameObject.h"
 #include "Player.h"
 #include "Global.h"
+
 using std::cout;
 using std::endl;
+using std::string;
 
 class Game
 {
@@ -44,7 +46,7 @@ public:
 	void setShootAngle(int angle) { m_shoot_angle=angle; }
 	void setShootForce(int force) { m_shoot_force=force; }
 	void setState(State state) { m_cur_state = state; }
-
+	bool addPlayer(string name);
 private:
 
 	Game() { m_cur_state = Idle; };
@@ -61,7 +63,8 @@ private:
 	int m_shoot_angle = 0;
 	int m_shoot_force = 0;
 	std::vector<GameObject*> m_gameObjects;
-
+	vi2d m_pos;
+	vi2d m_size;
 	static Game* s_pInstance;
 	State m_cur_state = Idle;
 	Event m_cur_event = _event_total;

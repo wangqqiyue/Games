@@ -43,4 +43,5 @@ private:
 	int m_count_time = 0;
 	int m_turn_limit = 15000;
 	int m_start_time = 0;
+	int m_player_total = 0;
 };

@@ -13,6 +13,20 @@
 
 Game* Game::s_pInstance = 0;
 
+bool Game::addPlayer(string name) {
+	//增加人物
+	if (!TheTextureManager::Instance()->load("assets/people.png", name, m_pRenderer))
+	{
+		return false;
+	}
+	Player* character = new Player(new LoaderParams(m_pos.x + 20, m_pos.y + m_size.y - 300, 45, 50, name));
+	m_gameObjects.push_back(character);
+	//将人物加入碰撞管理器
+	TheCollisionHandler::Instance()->attachObserver(character);
+	//将人物加入回合管理器
+	TheTurnHandler::Instance()->attachObserver(character);
+	return true;
+}
 bool Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
 	// attempt to initialize SDL
@@ -28,7 +42,10 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 		std::cout << "SDL init success\n";
 		// init the window
 		m_pWindow = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
-
+		m_pos.x = xpos;
+		m_pos.y = ypos;
+		m_size.x = width;
+		m_size.y = height;
 		if (m_pWindow != 0) // window init success
 		{
 			std::cout << "window creation success\n";
@@ -60,30 +77,7 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	std::cout << "init success\n";
 	m_bRunning = true; // everything inited successfully, start the main loop
 	
-	//增加人物
-	if (!TheTextureManager::Instance()->load("assets/people.png", "people", m_pRenderer))
-	{
-		return false;
-	}
-	Player* character = new Player(new LoaderParams(xpos + 20, ypos + height - 300, 45, 50, "people"));
-	m_gameObjects.push_back(character);
-	
-	//增加NPC
-	if (!TheTextureManager::Instance()->load("assets/people.png", "npc", m_pRenderer))
-	{
-		return false;
-	}
-	Player* npc = new Player(new LoaderParams(xpos + width -200, ypos + height - 300, 45, 50, "npc"));
-	m_gameObjects.push_back(npc);
-	
-	//将人物和NPC加入碰撞管理器
-	TheCollisionHandler::Instance()->attachObserver(npc);
-	TheCollisionHandler::Instance()->attachObserver(character);
-	//将人物和NPC加入回合管理器
-	TheTurnHandler::Instance()->attachObserver(character);
-	TheTurnHandler::Instance()->attachObserver(npc);
 
-	
 
 	//增加角度盘
 	if (!TheTextureManager::Instance()->load("assets/angle_panel3.jpg", "angle_panel", m_pRenderer))
