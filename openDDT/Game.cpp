@@ -13,6 +13,19 @@
 
 Game* Game::s_pInstance = 0;
 
+void Game::showUserName() {
+	TheFontManager::Instance()->drawText(TheGame::Instance()->getRenderer(), "Please Input your user name", {0,0,0,255},
+		300, 200);
+	if (m_username.length()) {
+		TheFontManager::Instance()->drawText(TheGame::Instance()->getRenderer(), m_username, { 0,0,0,255 },
+			300, 220);
+	}
+}
+
+void Game::editUserName(string str) {
+	m_username += str;
+}
+
 bool Game::addPlayer(string name) {
 	//增加人物
 	if (!TheTextureManager::Instance()->load("assets/people.png", name, m_pRenderer))
@@ -107,6 +120,8 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
 	//将字体管理器加入游戏
 	m_gameObjects.push_back(TheFontManager::Instance());
+
+	m_cur_state = Typing;
 	return true;
 }
 
@@ -133,7 +148,9 @@ void Game::render()
 	{
 		m_gameObjects[i]->draw();
 	}
-
+	if (Typing == m_cur_state) {
+		showUserName();
+	}
 	SDL_RenderPresent(m_pRenderer);
 }
 
@@ -178,6 +195,10 @@ void Game::update()
 	{
 		m_cur_event = _down_press;
 	}
+	else if(TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RETURN))
+	{
+		m_cur_event = _enter_press;
+	}
 	else
 	{
 		m_cur_event = _none;
@@ -192,6 +213,11 @@ void Game::update()
 		m_cur_state = Idle;
 	}
 
+	//增加新角色
+	if (Adding == m_cur_state) {
+		addPlayer(m_username);
+	}
+
 	//Notify all observers, when state changed.
 	for (GameObject* go : m_gameObjects)
 	{
@@ -202,6 +228,7 @@ void Game::update()
 			break;
 		}
 	}
+	
 	/*
 	int da = 0;//角度改变量
 	static int bulletNum = 0;//子弹数量

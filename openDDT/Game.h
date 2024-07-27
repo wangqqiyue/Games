@@ -47,6 +47,8 @@ public:
 	void setShootForce(int force) { m_shoot_force=force; }
 	void setState(State state) { m_cur_state = state; }
 	bool addPlayer(string name);
+	void showUserName();
+	void editUserName(string str);
 private:
 
 	Game() { m_cur_state = Idle; };
@@ -68,6 +70,7 @@ private:
 	static Game* s_pInstance;
 	State m_cur_state = Idle;
 	Event m_cur_event = _event_total;
+	string m_username = "";
 };
 
 typedef Game TheGame;

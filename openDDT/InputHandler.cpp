@@ -13,6 +13,9 @@ void InputHandler::update()
 	{
 		switch (event.type)
 		{
+		case SDL_TEXTINPUT:
+			TheGame::Instance()->editUserName(event.text.text);
+			break;
 		case SDL_QUIT:
 			TheGame::Instance()->quit();
 			break;

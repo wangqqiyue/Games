@@ -20,6 +20,8 @@ enum State {
 	Shooting,
 	Flying,
 	Exploding,
+	Typing,
+	Adding,
 	State_Total,
 };
 
@@ -30,6 +32,7 @@ enum Event {
 	_space_release,
 	_up_press,
 	_down_press,
+	_enter_press,
 	_none,
 	_event_total,
 };
