@@ -14,6 +14,7 @@ NetworkManager::~NetworkManager() {
 	SDLNet_Quit();
 }
 
+
 bool NetworkManager::connect() {
 	IPaddress ip;
 	SDLNet_ResolveHost(&ip, m_server_ip, m_server_port);
@@ -22,4 +23,9 @@ bool NetworkManager::connect() {
 		return false;
 	}
 	return true;
+}
+
+bool NetworkManager::send(const char *msg) {
+	int len = SDLNet_TCP_Send(m_socket, msg, strlen(msg));
+	return len != 0;
 }

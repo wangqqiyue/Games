@@ -15,7 +15,7 @@ public:
 		}
 		return s_pInstance;
 	}
-	
+	bool send(const char* msg);
 private:
 	static NetworkManager* s_pInstance;
 	NetworkManager();

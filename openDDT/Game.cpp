@@ -10,6 +10,7 @@
 #include "CollisionHandler.h"
 #include "TurnHandler.h"
 #include "FontManager.h"
+#include "NetworkManager.h"
 
 Game* Game::s_pInstance = 0;
 
@@ -122,6 +123,8 @@ bool Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 	//将字体管理器加入游戏
 	m_gameObjects.push_back(TheFontManager::Instance());
 
+	TheNetworkManager::Instance();
+
 	m_cur_state = Typing;
 	return true;
 }
@@ -217,6 +220,7 @@ void Game::update()
 	//增加新角色
 	if (Adding == m_cur_state) {
 		addPlayer(m_username);
+		TheNetworkManager::Instance()->send(m_username.c_str());
 	}
 
 	//Notify all observers, when state changed.
