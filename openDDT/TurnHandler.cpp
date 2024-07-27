@@ -25,7 +25,7 @@ void TurnHandler::update(State state)
 		init();
 	}
 	//炮弹已射出则不再计时
-	if (Idle != state) {
+	if (Shooting == state || Flying == state) {
 		return;
 	}
 	if (0 == m_player_total) {
@@ -55,6 +55,8 @@ Player* TurnHandler::getFirstPlayer()
 
 		// 生成一个随机索引
 		size_t randomIndex = dis(gen);
+		//目前调试，默认取第一个
+		randomIndex = 0;
 		player = m_waitQueue[randomIndex];
 		auto it = m_waitQueue.begin();
 		std::advance(it, randomIndex);

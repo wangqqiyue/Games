@@ -11,6 +11,9 @@
 #include "TurnHandler.h"
 #include "FontManager.h"
 #include "NetworkManager.h"
+#include <sstream>
+using std::istringstream;
+using std::getline;
 
 Game* Game::s_pInstance = 0;
 
@@ -40,8 +43,24 @@ bool Game::addPlayer(string name) {
 	TheCollisionHandler::Instance()->attachObserver(character);
 	//将人物加入回合管理器
 	TheTurnHandler::Instance()->attachObserver(character);
+	
+	
 	return true;
 }
+
+
+void Game::recvMsg(const char* msg, int len) {
+	string type, content;
+	istringstream iss(msg);
+	getline(iss, type);
+	getline(iss, content);
+
+	if (type == "add") {
+		addPlayer(content);
+	}
+}
+
+
 bool Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
 	// attempt to initialize SDL
@@ -166,6 +185,7 @@ void Game::clean()
 	SDL_Quit();
 }
 
+
 void Game::handleEvents()
 {
 	TheInputHandler::Instance()->update();
@@ -219,8 +239,12 @@ void Game::update()
 
 	//增加新角色
 	if (Adding == m_cur_state) {
+		//向服务器发送新增角色的指令
+		string msg;
+		msg += "add\n";
+		msg += m_username;
+		TheNetworkManager::Instance()->send(msg.c_str());
 		addPlayer(m_username);
-		TheNetworkManager::Instance()->send(m_username.c_str());
 	}
 
 	//Notify all observers, when state changed.
@@ -234,142 +258,7 @@ void Game::update()
 		}
 	}
 	
-	/*
-	int da = 0;//角度改变量
-	static int bulletNum = 0;//子弹数量
-	cout << "bulletNum=" << bulletNum << endl;
-	cout << "current state" << m_cur_state << endl;
-	//改变状态
-	switch (m_cur_state)
-	{
-	case Idle:
-		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
-		{
-			m_cur_state = GettingForce;
-		}
-		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_UP))
-		{
-			m_cur_state = GettingAngle;
-			da = 1;
-		}
-		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_DOWN))
-		{
-			m_cur_state = GettingAngle;
-			da = -1;
-		}
-		break;
-	case GettingAngle:
-		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
-		{
-			m_cur_state = GettingForce;
-		}
-		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_UP))
-		{
-			da = 1;
-		}
-		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_DOWN))
-		{
-			da = -1;
-		}
-		break;
-	case GettingForce:
-		cout << "Getting Force" << endl;
-		if (TheInputHandler::Instance()->isKeyRelease(SDL_SCANCODE_SPACE))
-		{
-			m_cur_state = Shooting;
-		}
-		break;
-	case Shooting:
-		cout << "Shooting.." << endl;
-		break;
-	default:
-		break;
-	}
-
-	//执行更新
-	for (std::vector<SDLGameObject*>::size_type i = 0; i != m_gameObjects.size(); i++)
-	{
-		std::string id = ((SDLGameObject*)m_gameObjects[i])->getTextureID();
-		if (Idle == m_cur_state)
-		{
-			if("people" != id)
-			{
-				continue;
-			}
-		}
-		if (GettingAngle == m_cur_state)
-		{
-			if ("angle_panel" == id)
-			{
-				AnglePanel* ap = ((AnglePanel*)m_gameObjects[i]);
-				ap->addAngle(da);
-				m_shoot_angle = ap->getAngle();
-			}
-			else
-			{
-				continue;
-			}
-			
-		}
-		if (GettingForce == m_cur_state)
-		{
-			if ("force_panel" == id)
-			{
-				ForcePanel* fp = ((ForcePanel*)m_gameObjects[i]);
-				m_shoot_force = fp->getForce();
-				
-			}
-			else
-			{
-				continue;
-			}
-		}
-		if (Shooting == m_cur_state)
-		{
-			if ("people" == id)
-			{
-				cout << "shoot." << endl;
-				((Player*)m_gameObjects[i])->shoot(m_shoot_angle, m_shoot_force);
-				bulletNum++;
-				m_cur_state = End;
-			}
-			else
-			{
-				continue;
-			}
-		}
-		if (End == m_cur_state)
-		{
-			if (0 == bulletNum)
-			{
-				m_cur_state = Idle;
-			}
-			else if ("bullet" == id)
-			{
-				Bullet* b = (Bullet*)m_gameObjects[i];
-				//cout << "b->getPosition().y=" << b->getPosition().y << endl;
-				if (b->getPosition().y >= 500)
-				{
-					//cout << "erasing.." << endl;
-					b->needDelete = true;
-					//delete b;
-					bulletNum--;
-				}
-			}
-			else
-			{
-				continue;
-			}
-		}
-		
-		m_gameObjects[i]->update();
-	}
-
-	//删除元素
-	m_gameObjects.erase(std::remove_if(m_gameObjects.begin(), m_gameObjects.end(),
-		[](const GameObject* item) { return item->needDelete; }),
-		m_gameObjects.end());
-		*/
+	
 }
 
 

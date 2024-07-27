@@ -49,6 +49,7 @@ public:
 	bool addPlayer(string name);
 	void showUserName();
 	void editUserName(string str);
+	void recvMsg(const char* msg, int len);
 private:
 
 	Game() { m_cur_state = Idle; };

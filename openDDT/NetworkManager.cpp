@@ -1,6 +1,7 @@
 #include "NetworkManager.h"
 
 NetworkManager* NetworkManager::s_pInstance = nullptr;
+TCPsocket NetworkManager::m_socket=nullptr;
 
 NetworkManager::NetworkManager() {
 	if (0 != SDLNet_Init()) {
@@ -22,6 +23,32 @@ bool NetworkManager::connect() {
 	if (!m_socket) {
 		return false;
 	}
+	createRecvThread();
+	return true;
+}
+
+
+void NetworkManager::doRecv() {
+	char *buffer = new char[BUFSIZ];
+	while (true)
+	{
+		memset(buffer, 0, BUFSIZ);
+		int len = SDLNet_TCP_Recv(m_socket, buffer, BUFSIZ);
+		if (len > 0)
+		{
+			TheGame::Instance()->recvMsg(buffer,len);
+		}
+		else
+		{
+			break;
+		}
+	}
+	delete buffer;
+	SDLNet_TCP_Close(m_socket);
+}
+bool NetworkManager::createRecvThread() {
+	thread th(NetworkManager::doRecv);//线程处理
+	th.detach();
 	return true;
 }
 

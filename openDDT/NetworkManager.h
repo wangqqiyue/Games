@@ -2,6 +2,10 @@
 #include "SDL.h"
 #include "SDL_net.h"
 #include "Global.h"
+#include "Game.h"
+#include <thread>
+using std::thread;
+
 class NetworkManager
 {
 public:
@@ -16,13 +20,15 @@ public:
 		return s_pInstance;
 	}
 	bool send(const char* msg);
+	bool createRecvThread();
 private:
 	static NetworkManager* s_pInstance;
 	NetworkManager();
 	~NetworkManager();
 	bool connect();
+	static void doRecv();
 
-	TCPsocket m_socket = nullptr;
+	static TCPsocket m_socket;
 	const char* m_server_ip = "116.198.37.2";
 	int m_server_port = 8888;
 };
