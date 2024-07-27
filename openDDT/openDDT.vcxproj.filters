@@ -60,6 +60,9 @@
     <ClCompile Include="SoundManager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="NetworkManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TextureManager.h">
@@ -108,6 +111,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SoundManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkManager.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
