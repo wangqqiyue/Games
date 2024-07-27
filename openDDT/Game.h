@@ -71,7 +71,7 @@ private:
 	static Game* s_pInstance;
 	State m_cur_state = Idle;
 	Event m_cur_event = _event_total;
-	string m_username = "";
+	string m_username = "1";
 };
 
 typedef Game TheGame;

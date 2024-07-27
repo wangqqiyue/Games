@@ -1,11 +1,15 @@
 #include "NetworkManager.h"
 
+
 NetworkManager* NetworkManager::s_pInstance = nullptr;
 TCPsocket NetworkManager::m_socket=nullptr;
+
+
 
 NetworkManager::NetworkManager() {
 	if (0 != SDLNet_Init()) {
 		//≥ı ºªØ ß∞‹
+		cout << "SDLNet_Init failed." << endl;
 		return;
 	}
 	connect();
@@ -21,6 +25,7 @@ bool NetworkManager::connect() {
 	SDLNet_ResolveHost(&ip, m_server_ip, m_server_port);
 	m_socket = SDLNet_TCP_Open(&ip);
 	if (!m_socket) {
+		cout << "connect failed." << endl;
 		return false;
 	}
 	createRecvThread();
@@ -43,7 +48,7 @@ void NetworkManager::doRecv() {
 			break;
 		}
 	}
-	delete buffer;
+	delete[] buffer;
 	SDLNet_TCP_Close(m_socket);
 }
 bool NetworkManager::createRecvThread() {

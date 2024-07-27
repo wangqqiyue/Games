@@ -4,6 +4,7 @@
 #include "Global.h"
 #include "Game.h"
 #include <thread>
+#include <Windows.h>
 using std::thread;
 
 class NetworkManager
@@ -21,6 +22,7 @@ public:
 	}
 	bool send(const char* msg);
 	bool createRecvThread();
+	static TCPsocket m_socket;
 private:
 	static NetworkManager* s_pInstance;
 	NetworkManager();
@@ -28,9 +30,11 @@ private:
 	bool connect();
 	static void doRecv();
 
-	static TCPsocket m_socket;
+	
 	const char* m_server_ip = "116.198.37.2";
 	int m_server_port = 8888;
 };
 
 typedef  NetworkManager TheNetworkManager;
+
+

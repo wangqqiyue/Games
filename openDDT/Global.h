@@ -2,7 +2,10 @@
 #include <cmath>
 #define PI 3.1415f
 #include <string>
+#include <iostream>
 using std::string;
+using std::cout;
+using std::endl;
 
 #define MAX_SPEED 8
 

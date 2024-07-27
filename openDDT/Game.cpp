@@ -50,13 +50,35 @@ bool Game::addPlayer(string name) {
 
 
 void Game::recvMsg(const char* msg, int len) {
-	string type, content;
+	string user,type, content;
 	istringstream iss(msg);
+	State state;
+	getline(iss, user);
 	getline(iss, type);
 	getline(iss, content);
 
 	if (type == "add") {
 		addPlayer(content);
+		return;
+	}
+	else if (type == "event") {
+		if ("_left_press" == content) {
+			state = GoingLeft;
+		}
+		if ("_right_press" == content) {
+			state = GoingRight;
+		}
+	}
+	else {
+		return;
+	}
+	//查找所有的对象,给特定的用户施加作用
+	for (GameObject* go : m_gameObjects)
+	{
+		SDLGameObject*  sgo = (SDLGameObject*)go;
+		if (sgo->getTextureID() == user) {
+			sgo->update(state);
+		}
 	}
 }
 
@@ -182,6 +204,12 @@ void Game::clean()
 	std::cout << "cleaning game\n";
 	SDL_DestroyWindow(m_pWindow);
 	SDL_DestroyRenderer(m_pRenderer);
+	if (TheNetworkManager::m_socket) {
+		cout << "SDLNet_Quit." << endl;
+		SDLNet_TCP_Send(TheNetworkManager::m_socket, "exit", 4);
+		SDLNet_TCP_Close(TheNetworkManager::m_socket);
+		SDLNet_Quit();
+	}
 	SDL_Quit();
 }
 
@@ -198,16 +226,28 @@ void Game::update()
 	if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_LEFT))
 	{
 		m_cur_event = _left_press;
+		//向服务器发送左移的指令
+		string msg;
+		msg += m_username;
+		msg += "\nevent\n";
+		msg += "_left_press";
+		TheNetworkManager::Instance()->send(msg.c_str());
 	}
 	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RIGHT))
 	{
 		m_cur_event = _right_press;
+		//向服务器发送左移的指令
+		string msg;
+		msg += m_username;
+		msg += "\nevent\n";
+		msg += "_right_press";
+		TheNetworkManager::Instance()->send(msg.c_str());
 	}
 	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
 	{
 		m_cur_event = _space_press;
 	}
-	else if (TheInputHandler::Instance()->isKeyRelease(SDL_SCANCODE_SPACE))
+	else if (m_cur_state == GettingForce && TheInputHandler::Instance()->isKeyRelease(SDL_SCANCODE_SPACE))
 	{
 		m_cur_event = _space_release;
 	}
@@ -241,7 +281,8 @@ void Game::update()
 	if (Adding == m_cur_state) {
 		//向服务器发送新增角色的指令
 		string msg;
-		msg += "add\n";
+		msg += m_username;
+		msg += "\nadd\n";
 		msg += m_username;
 		TheNetworkManager::Instance()->send(msg.c_str());
 		addPlayer(m_username);

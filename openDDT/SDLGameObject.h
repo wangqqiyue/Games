@@ -17,12 +17,12 @@ public:
 	virtual void update(State state) {};
 	virtual void clean() {};
 	virtual void onCollision() {};
-	std::string getTextureID() { return m_textureID; }
+
 	int getAngle() { return m_angle; }
 	void setAngle(int angle) { m_angle = angle; }
 	vf2d getPosition() { return m_pos; }
 	vi2d getSize() { return { m_width,m_height }; }
-
+	string getTextureID() { return m_textureID; }
 protected:
 
 	vf2d m_pos={0,0};//Œª÷√
