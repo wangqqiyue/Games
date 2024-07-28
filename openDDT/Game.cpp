@@ -63,23 +63,14 @@ void Game::recvMsg(const char* msg, int len) {
 	}
 	else if (type == "event") {
 		if ("_left_press" == content) {
-			state = GoingLeft;
+			m_cur_event = _left_press;
 		}
 		if ("_right_press" == content) {
-			state = GoingRight;
+			m_cur_event = _right_press;
 		}
 	}
-	else {
-		return;
-	}
-	//查找所有的对象,给特定的用户施加作用
-	for (GameObject* go : m_gameObjects)
-	{
-		SDLGameObject*  sgo = (SDLGameObject*)go;
-		if (sgo->getTextureID() == user) {
-			sgo->update(state);
-		}
-	}
+
+	
 }
 
 
@@ -263,7 +254,7 @@ void Game::update()
 	{
 		m_cur_event = _enter_press;
 	}
-	else
+	else if(_event_total==m_cur_event)
 	{
 		m_cur_event = _none;
 	}

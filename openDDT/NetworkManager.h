@@ -31,7 +31,7 @@ private:
 	static void doRecv();
 
 	
-	const char* m_server_ip = "116.198.37.2";
+	const char* m_server_ip = "116.198.36.246";
 	int m_server_port = 8888;
 };
 
