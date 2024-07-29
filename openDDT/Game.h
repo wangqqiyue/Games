@@ -50,6 +50,8 @@ public:
 	void showUserName();
 	void editUserName(string str);
 	void recvMsg(const char* msg, int len);
+	vi2d m_pos;
+	vi2d m_size;
 private:
 
 	Game() { m_cur_state = Idle; };
@@ -66,12 +68,12 @@ private:
 	int m_shoot_angle = 0;
 	int m_shoot_force = 0;
 	std::vector<GameObject*> m_gameObjects;
-	vi2d m_pos;
-	vi2d m_size;
+	std::vector<Player*> m_players;
+	
 	static Game* s_pInstance;
 	State m_cur_state = Idle;
 	Event m_cur_event = _event_total;
-	string m_username = "1";
+	string m_username = "";
 };
 
 typedef Game TheGame;

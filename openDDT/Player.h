@@ -19,6 +19,7 @@ public:
 	bool getMyTurn() {return m_myTurn;}
 	void onCollision();
 	void setName(string name) { m_name = name; }
+	string getName() const  { return m_name; }
 private:
 	Direction m_direction=RIGHT;
 	int m_hp = 100;//½¡¿µÖµ,ÑªÌõ

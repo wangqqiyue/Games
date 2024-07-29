@@ -98,6 +98,13 @@ void Player::update(State state)
 			TheGame::Instance()->setState(Flying);
 			TheSoundManager::Instance()->playSound(_shoot_sound);
 		}
+
+		if (m_pos.x <= 0) {
+			m_pos.x = 0;
+		}
+		else if (m_pos.x + m_width >= TheGame::Instance()->m_size.x) {
+			m_pos.x = TheGame::Instance()->m_size.x - m_width;
+		}
 	}
 
 }

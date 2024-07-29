@@ -38,7 +38,7 @@ bool Game::addPlayer(string name) {
 	}
 	Player* character = new Player(new LoaderParams(m_pos.x + 20, m_pos.y + m_size.y - 300, 45, 50, name));
 	character->setName(name);
-	m_gameObjects.push_back(character);
+	m_players.push_back(character);
 	//将人物加入碰撞管理器
 	TheCollisionHandler::Instance()->attachObserver(character);
 	//将人物加入回合管理器
@@ -52,7 +52,7 @@ bool Game::addPlayer(string name) {
 void Game::recvMsg(const char* msg, int len) {
 	string user,type, content;
 	istringstream iss(msg);
-	State state;
+	State state = Idle;
 	getline(iss, user);
 	getline(iss, type);
 	getline(iss, content);
@@ -63,13 +63,14 @@ void Game::recvMsg(const char* msg, int len) {
 	}
 	else if (type == "event") {
 		if ("_left_press" == content) {
-			m_cur_event = _left_press;
+			state = GoingLeft;
 		}
 		if ("_right_press" == content) {
-			m_cur_event = _right_press;
+			state = GoingRight;
 		}
+		m_cur_state = state;
 	}
-
+	
 	
 }
 
@@ -184,6 +185,9 @@ void Game::render()
 	{
 		m_gameObjects[i]->draw();
 	}
+	for (auto *p : m_players) {
+		p->draw(p->getAngle());
+	}
 	if (Typing == m_cur_state) {
 		showUserName();
 	}
@@ -213,54 +217,68 @@ void Game::handleEvents()
 
 void Game::update()
 {
-	//Get Event
-	if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_LEFT))
-	{
-		m_cur_event = _left_press;
-		//向服务器发送左移的指令
-		string msg;
-		msg += m_username;
-		msg += "\nevent\n";
-		msg += "_left_press";
-		TheNetworkManager::Instance()->send(msg.c_str());
+	static bool isAdded = false;//是否已增加角色
+	string cur_playername = TheTurnHandler::Instance()->getCurrentPlayerName();
+	//cout << "curent_player=" << cur_playername << endl;
+	if (!isAdded || m_username == cur_playername) {
+		
+		//Get Event
+		if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_LEFT))
+		{
+			m_cur_event = _left_press;
+			//向服务器发送左移的指令
+			string msg;
+			msg += m_username;
+			msg += "\nevent\n";
+			msg += "_left_press";
+			TheNetworkManager::Instance()->send(msg.c_str());
+		}
+		else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RIGHT))
+		{
+			m_cur_event = _right_press;
+			//向服务器发送左移的指令
+			string msg;
+			msg += m_username;
+			msg += "\nevent\n";
+			msg += "_right_press";
+			TheNetworkManager::Instance()->send(msg.c_str());
+		}
+		else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
+		{
+			m_cur_event = _space_press;
+		}
+		else if (m_cur_event == _space_press && TheInputHandler::Instance()->isKeyRelease(SDL_SCANCODE_SPACE))
+		{
+			m_cur_event = _space_release;
+		}
+		else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_UP))
+		{
+			m_cur_event = _up_press;
+		}
+		else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_DOWN))
+		{
+			m_cur_event = _down_press;
+		}
+		else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RETURN))
+		{
+			m_cur_event = _enter_press;
+		}
+		else
+		{
+			m_cur_event = _none;
+		}
+		//Change state
+		m_cur_state = g_transition_table[m_cur_state][m_cur_event];
 	}
-	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RIGHT))
-	{
-		m_cur_event = _right_press;
-		//向服务器发送左移的指令
-		string msg;
-		msg += m_username;
-		msg += "\nevent\n";
-		msg += "_right_press";
-		TheNetworkManager::Instance()->send(msg.c_str());
-	}
-	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_SPACE))
-	{
-		m_cur_event = _space_press;
-	}
-	else if (m_cur_state == GettingForce && TheInputHandler::Instance()->isKeyRelease(SDL_SCANCODE_SPACE))
-	{
-		m_cur_event = _space_release;
-	}
-	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_UP))
-	{
-		m_cur_event = _up_press;
-	}
-	else if (TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_DOWN))
-	{
-		m_cur_event = _down_press;
-	}
-	else if(TheInputHandler::Instance()->isKeyDown(SDL_SCANCODE_RETURN))
-	{
-		m_cur_event = _enter_press;
-	}
-	else if(_event_total==m_cur_event)
-	{
-		m_cur_event = _none;
+	
+
+	if (Idle != m_cur_state) {
+		for (auto* p : m_players) {
+			p->update(m_cur_state);
+		}
 	}
 
-	//Change state
-	m_cur_state = g_transition_table[m_cur_state][m_cur_event];
+	
 
 	if (Exploding == m_cur_state)
 	{
@@ -277,8 +295,10 @@ void Game::update()
 		msg += m_username;
 		TheNetworkManager::Instance()->send(msg.c_str());
 		addPlayer(m_username);
+		isAdded = true;
+		m_cur_state = Idle;
 	}
-
+	
 	//Notify all observers, when state changed.
 	for (GameObject* go : m_gameObjects)
 	{

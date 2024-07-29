@@ -20,6 +20,7 @@ void TurnHandler::draw(int angle)
 
 void TurnHandler::update(State state)
 {
+	static bool first = true;
 	if (!m_bInitialized)
 	{
 		init();
@@ -28,18 +29,31 @@ void TurnHandler::update(State state)
 	if (Shooting == state || Flying == state) {
 		return;
 	}
-	if (0 == m_player_total) {
+	if (2 != m_player_total) {
 		return;
 	}
+	if (first) {
+		m_cur_player = getFirstPlayer();
+		m_cur_playerName = m_cur_player->getName();
+		
+		first = false;
+	}
+	
 	if (countDown() || !m_cur_player->getMyTurn())
 	{
 		m_cur_player->setMyTurn(false);
 		m_waitQueue.push_back(m_cur_player);
 		m_cur_player = m_waitQueue.front();
+		m_cur_playerName = m_cur_player->getName();
 		m_waitQueue.pop_front();
 		m_cur_player->setMyTurn(true);
+		cout << "cur player=" << m_cur_playerName << endl;
 		resetTime();
 	}
+}
+
+bool comparePlayerByName(const Player* p1, const Player* p2) {
+	return p1->getName() < p2->getName();
 }
 
 /*根据随机性原则,随机获取一个玩家作为首发*/
@@ -55,12 +69,15 @@ Player* TurnHandler::getFirstPlayer()
 
 		// 生成一个随机索引
 		size_t randomIndex = dis(gen);
-		//目前调试，默认取第一个
+		//目前调试，默认取当前队列用户名最小的作为首发
+		std::sort(m_waitQueue.begin(), m_waitQueue.end(), comparePlayerByName);
 		randomIndex = 0;
 		player = m_waitQueue[randomIndex];
+		/*
 		auto it = m_waitQueue.begin();
 		std::advance(it, randomIndex);
 		m_waitQueue.erase(it);//从队列删除元素,且不影响其他元素顺序
+		*/
 	}
 	else
 	{

@@ -27,12 +27,12 @@ public:
 	}
 	void attachObserver(Player* p);
 	void init();
-
-	
+	Player* getFirstPlayer();
+	string getCurrentPlayerName() { return m_cur_playerName; }
 
 private:
 	TurnHandler() {}
-	Player* getFirstPlayer();
+	
 	bool countDown();//返回时间是否用完
 	void resetTime();
 
@@ -44,4 +44,5 @@ private:
 	int m_turn_limit = 15000;
 	int m_start_time = 0;
 	int m_player_total = 0;
+	string m_cur_playerName = "";
 };
